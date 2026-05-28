@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Estúdio — ANTONOV CENTER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+/* ----- Page hero ----- */
+.page-hero {
+  padding: calc(var(--nav-h) + 100px) var(--pad-x) 80px;
+  background: var(--bg);
+}
+.page-hero__inner { max-width: var(--container); margin: 0 auto; }
+.page-hero__crumb {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-hero__crumb::before { content: ""; width: 28px; height: 1px; background: var(--blue); }
+.page-hero h1 {
+  font-family: var(--f-display);
+  font-size: clamp(56px, 8.5vw, 136px);
+  line-height: 0.95; letter-spacing: -0.01em;
+  text-transform: uppercase; margin: 0 0 32px;
+  }
+.page-hero h1 .yel { color: var(--yellow); }
+.page-hero__row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: end;
+  border-top: 1px solid var(--line-strong); padding-top: 32px;
+}
+.page-hero__lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.4; max-width: 50ch; }
+.page-hero__meta {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--ink-mute);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;
+}
+.page-hero__meta .v { color: var(--ink); display: block; margin-top: 2px; }
+@media (max-width: 880px) { .page-hero__row { grid-template-columns: 1fr; gap: 24px; } }
+
+/* ----- Hero image strip ----- */
+.studio-strip {
+  height: 70vh; min-height: 520px;
+  margin: 0 var(--pad-x);
+  border-radius: 12px; overflow: hidden;
+  position: relative; background: var(--carbon);
+}
+.studio-strip .ph { position: absolute; inset: 0; }
+.studio-strip__overlay {
+  position: absolute; inset: 0; z-index: 2;
+  padding: 32px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 30%, transparent 60%, rgba(0,0,0,0.7) 100%);
+  color: #fff;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.studio-strip__hud {
+  display: flex; justify-content: space-between;
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+}
+.studio-strip__hud .yel { color: var(--blue); }
+.studio-strip__title {
+  font-family: var(--f-display);
+  font-size: clamp(44px, 5vw, 80px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  margin: 0;
+  max-width: 16ch;
+}
+
+/* ----- Zone navigation (sticky) ----- */
+.zones-nav {
+  position: sticky;
+  top: var(--nav-h);
+  z-index: 10;
+  background: var(--paper);
+  border-block: 1px solid var(--line);
+  padding: 0 var(--pad-x);
+}
+.zones-nav__inner {
+  max-width: var(--container); margin: 0 auto;
+  display: flex; gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.zones-nav__inner::-webkit-scrollbar { display: none; }
+.zones-nav a {
+  padding: 18px 22px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  white-space: nowrap;
+  border-right: 1px solid var(--line);
+  transition: color 200ms, background 200ms;
+}
+.zones-nav a:first-child { border-left: 1px solid var(--line); }
+.zones-nav a:hover, .zones-nav a.active { color: var(--ink); background: var(--bg); }
+.zones-nav a::before {
+  content: "▸ "; color: var(--blue);
+}
+
+/* ----- Zone block ----- */
+.zone {
+  padding: 120px var(--pad-x);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.zone:nth-child(odd) { background: var(--paper); }
+.zone__inner { max-width: var(--container); margin: 0 auto; }
+.zone__head {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 60px;
+  align-items: end;
+  margin-bottom: 48px;
+}
+.zone__no {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 12px;
+}
+.zone__no::before { content: ""; width: 28px; height: 1px; background: var(--blue); }
+.zone h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0;
+  text-wrap: balance;
+}
+.zone__pitch {
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+.zone__pitch strong { color: var(--ink); font-weight: 600; }
+
+.zone__body {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+}
+.zone__big {
+  aspect-ratio: 16/10;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  background: var(--carbon);
+}
+.zone__big .ph { position: absolute; inset: 0; }
+.zone__big-tag {
+  position: absolute; bottom: 20px; left: 20px; z-index: 3;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.2em; color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+  padding: 6px 12px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  text-transform: uppercase;
+}
+
+.zone__specs {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 24px;
+}
+.spec {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 10px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.spec--yellow { background: var(--blue); color: var(--ink); }
+.spec__lbl {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 16px;
+}
+.spec__title {
+  font-family: var(--f-display);
+  font-size: clamp(22px, 1.8vw, 26px);
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+.spec ul {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.spec ul li {
+  display: flex; align-items: baseline; gap: 8px;
+  opacity: 0.85;
+}
+.spec ul li::before {
+  content: ""; width: 5px; height: 5px;
+  background: var(--blue); border-radius: 50%;
+  flex-shrink: 0;
+  transform: translateY(-2px);
+}
+.spec--yellow ul li::before { background: var(--ink); }
+.spec--yellow .spec__lbl { color: rgba(0,0,0,0.6); }
+
+@media (max-width: 880px) {
+  .zone__head { grid-template-columns: 1fr; gap: 20px; }
+  .zone__body { grid-template-columns: 1fr; }
+}
+
+/* ----- Specs panel (technical features) ----- */
+.tech {
+  padding: 140px var(--pad-x);
+  background: var(--ink);
+  color: #fff;
+}
+.tech__inner { max-width: var(--container); margin: 0 auto; }
+.tech__head {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+  align-items: end; margin-bottom: 80px;
+}
+.tech h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; text-transform: uppercase;
+  letter-spacing: -0.005em;
+  margin: 0;
+  color: #fff;
+}
+.tech__sub { color: rgba(255,255,255,0.65); line-height: 1.55; max-width: 50ch; }
+.tech__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid rgba(255,255,255,0.14);
+}
+.tcell {
+  padding: 36px 28px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  transition: background 250ms;
+}
+.tcell:hover { background: var(--carbon-2); }
+.tcell:nth-child(4n) { border-right: 0; }
+.tcell__no {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; color: var(--blue);
+  margin-bottom: 28px;
+}
+.tcell__icon {
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+}
+.tcell__icon svg { width: 16px; height: 16px; fill: none; stroke: var(--blue); stroke-width: 1.6; }
+.tcell__title {
+  font-family: var(--f-display);
+  font-size: 20px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+.tcell__txt { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.65); margin: 0; }
+
+@media (max-width: 880px) {
+  .tech__head { grid-template-columns: 1fr; gap: 24px; }
+  .tech__grid { grid-template-columns: 1fr 1fr; }
+  .tcell:nth-child(4n) { border-right: 1px solid rgba(255,255,255,0.1); }
+  .tcell:nth-child(2n) { border-right: 0; }
+}
+
+/* ----- Layout / map ----- */
+.layout-section {
+  padding: 140px var(--pad-x);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.layout-section__wireframe {
+  position: absolute;
+  top: -10%;
+  right: -8%;
+  width: 60vw;
+  max-width: 1100px;
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transform: rotate(15deg);
+}
+.layout-section__inner { max-width: var(--container); margin: 0 auto; }
+.layout-section__head {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: end; margin-bottom: 60px;
+}
+.layout-section h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.floorplan {
+  background: var(--carbon);
+  border-radius: 12px;
+  aspect-ratio: 16/8;
+  position: relative;
+  overflow: hidden;
+  padding: 40px;
+  color: rgba(255,255,255,0.9);
+}
+.floorplan__grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.floorplan__hud {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between;
+  font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.floorplan__hud .yel { color: var(--blue); }
+.floorplan__zones {
+  position: relative; z-index: 2;
+  height: calc(100% - 40px);
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  margin-top: 24px;
+}
+.fpzone {
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 6px;
+  padding: 16px;
+  position: relative;
+  background: rgba(255,255,255,0.02);
+  display: flex; flex-direction: column; justify-content: space-between;
+  transition: background 200ms, border-color 200ms;
+}
+.fpzone:hover { background: rgba(42,143,214,0.08); border-color: var(--blue); }
+.fpzone--big { grid-row: span 2; }
+.fpzone__id {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.22em; color: var(--blue);
+}
+.fpzone__name {
+  font-family: var(--f-display); font-size: 22px;
+  line-height: 0.95; text-transform: uppercase; margin: 0;
+}
+.fpzone__area {
+  font-family: var(--f-mono); font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.18em;
+}
+
+@media (max-width: 880px) {
+  .layout-section__head { grid-template-columns: 1fr; gap: 24px; }
+  .floorplan { aspect-ratio: 4/5; padding: 20px; }
+  .floorplan__zones { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(3, 1fr); }
+  .fpzone--big { grid-row: auto; }
+}
+
+/* ----- Gallery ----- */
+.gallery {
+  padding: 140px var(--pad-x) 120px;
+  background: var(--paper);
+}
+.gallery__inner { max-width: var(--container); margin: 0 auto; }
+.gallery h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; text-transform: uppercase;
+  letter-spacing: -0.005em;
+  margin: 0 0 48px;
+}
+.gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 220px;
+  gap: 12px;
+}
+.g-cell { position: relative; overflow: hidden; border-radius: 8px; background: var(--carbon); }
+.g-cell .ph { position: absolute; inset: 0; }
+.g-cell--w2 { grid-column: span 2; }
+.g-cell--h2 { grid-row: span 2; }
+
+@media (max-width: 880px) {
+  .gallery__grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 160px; }
+  .g-cell--w2 { grid-column: auto; }
+  .g-cell--h2 { grid-row: auto; }
+}
+@media (max-width: 560px) {
+  .gallery__grid { grid-template-columns: 1fr; }
+  .tech__grid { grid-template-columns: 1fr; }
+  .tcell { border-right: 0 !important; }
+}
+.gallery .g-cell .ph__label { top: auto; bottom: 16px; }
+</style>
+</head>
+<body>
+
+<div class="page-mask">
+  <div class="page-mask__flight" aria-hidden="true">
+    <img src="assets/imagotipo.png" alt="" width="591" height="591" decoding="async" />
+  </div>
+</div>
+
+<header class="nav" data-screen-label="01 Nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img class="nav__logo-img nav__logo-img--dark" src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" />
+      <img class="nav__logo-img nav__logo-img--light" src="assets/logo-preta.png" alt="ANTONOV CENTER — Bahia" width="253" height="38" decoding="async" />
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="index.html">Home</a>
+      <a href="planos.html">Planos</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__backdrop" aria-hidden="true"></div>
+  <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
+    <div class="nav__drawer-links" role="navigation"></div>
+    <a href="planos.html" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
+  </aside>
+</header>
+
+<!-- ============= PAGE HERO ============= -->
+<section class="page-hero" data-screen-label="02 Estudio Hero">
+  <div class="page-hero__inner">
+    <div class="page-hero__crumb">/ TOUR — HANGAR ANTONOV</div>
+    <h1>Cada zona<br/>tem <span class="yel">propósito.</span></h1>
+    <div class="page-hero__row">
+      <p class="page-hero__lede reveal">
+        3.000m² de hangar industrial requalificado — quatro zonas dedicadas, projetadas pra fluxo, foco e progresso real.
+      </p>
+      <div class="page-hero__meta reveal">
+        <div>ÁREA TOTAL<span class="v">3.000m²</span></div>
+        <div>PÉ-DIREITO<span class="v">7.2m</span></div>
+        <div>ZONAS<span class="v">04 + RECOVERY</span></div>
+        <div>EQUIPAMENTOS<span class="v">82 ESTAÇÕES</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= STRIP ============= -->
+<div class="studio-strip reveal">
+  <div class="ph h-fill">
+    <span class="ph__label">FULL-BLEED · HANGAR</span>
+    <span class="ph__caption">visão panorâmica do interior · grande angular · noite</span>
+    <span class="ph__id">IMG_E01 / 21:9</span>
+  </div>
+  <div class="studio-strip__overlay">
+    <div class="studio-strip__hud">
+      <span><span class="yel">●</span> RWY 01 · HANGAR PRINCIPAL</span>
+      <span>11°18'32"S 41°51'13"W · ALT 772m</span>
+    </div>
+    <h2 class="studio-strip__title">Step inside<br/>the hangar.</h2>
+  </div>
+</div>
+
+<!-- ============= ZONES NAV ============= -->
+<nav class="zones-nav" aria-label="Zonas">
+  <div class="zones-nav__inner">
+    <a href="#zone-01" class="active">01 / Strength Floor</a>
+    <a href="#zone-02">02 / Engine Room</a>
+    <a href="#zone-03">03 / Flow Studio</a>
+    <a href="#zone-04">04 / Bio-Circuit</a>
+    <a href="#zone-05">05 / Recovery Suite</a>
+    <a href="#zone-06">06 / Lobby & Lounge</a>
+  </div>
+</nav>
+
+<!-- ============= ZONE 01 ============= -->
+<section class="zone" id="zone-01" data-screen-label="03 Zona Strength">
+  <div class="zone__inner">
+    <div class="zone__head">
+      <div>
+        <div class="zone__no reveal">/ ZONA 01</div>
+        <h2 class="reveal">Strength<br/>Floor.</h2>
+      </div>
+      <p class="zone__pitch reveal">
+        <strong>820m²</strong> dedicados a força. Plataformas Eleiko, jaulas Hammer Strength, racks Rogue. Foco em levantamento progressivo — sessão pesada, espaço limpo.
+      </p>
+    </div>
+    <div class="zone__body reveal">
+      <div class="zone__big">
+        <div class="ph h-fill">
+          <span class="ph__label">ZONE 01 · MAIN</span>
+          <span class="ph__caption">plataformas + racks · vista grande angular · noite</span>
+          <span class="ph__id">IMG_Z01A</span>
+        </div>
+        <span class="zone__big-tag">▸ PLATAFORMA PRINCIPAL · 820m²</span>
+      </div>
+      <div class="zone__specs">
+        <div class="spec">
+          <div class="spec__lbl">EQUIPAMENTO</div>
+          <h4 class="spec__title">Material<br/>industrial.</h4>
+          <ul>
+            <li>8× plataformas Eleiko Olímpicas</li>
+            <li>6× racks Rogue Monster</li>
+            <li>Hammer Strength full-line</li>
+            <li>Anilhas calibradas IWF</li>
+          </ul>
+        </div>
+        <div class="spec spec--yellow">
+          <div class="spec__lbl">ESTRUTURA</div>
+          <h4 class="spec__title">Engenharia<br/>do silêncio.</h4>
+          <ul>
+            <li>Piso amortecedor 40mm</li>
+            <li>Isolamento acústico ≥ −45dB</li>
+            <li>Pé-direito 7.2m</li>
+            <li>Iluminação calibrada 4000K</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= ZONE 02 ============= -->
+<section class="zone" id="zone-02" data-screen-label="04 Zona Engine">
+  <div class="zone__inner">
+    <div class="zone__head">
+      <div>
+        <div class="zone__no reveal">/ ZONA 02</div>
+        <h2 class="reveal">Engine<br/>Room.</h2>
+      </div>
+      <p class="zone__pitch reveal">
+        Condicionamento metabólico. Bikes Assault, remos Concept2, esteiras curvas Trueform. Programação <strong>Hyrox-ready</strong> com supervisão de coach.
+      </p>
+    </div>
+    <div class="zone__body reveal">
+      <div class="zone__big">
+        <div class="ph h-fill">
+          <span class="ph__label">ZONE 02 · CARDIO</span>
+          <span class="ph__caption">esteiras · bikes · remos · vista cidade</span>
+          <span class="ph__id">IMG_Z02A</span>
+        </div>
+        <span class="zone__big-tag">▸ ENGINE ROOM · 420m²</span>
+      </div>
+      <div class="zone__specs">
+        <div class="spec">
+          <div class="spec__lbl">CARDIO</div>
+          <h4 class="spec__title">Premium &<br/>silencioso.</h4>
+          <ul>
+            <li>12× Trueform Runner curvas</li>
+            <li>8× Concept2 RowErg</li>
+            <li>6× Assault AirBike</li>
+            <li>4× SkiErg + Echo Bike</li>
+          </ul>
+        </div>
+        <div class="spec spec--yellow">
+          <div class="spec__lbl">HYROX</div>
+          <h4 class="spec__title">Pronto<br/>pra prova.</h4>
+          <ul>
+            <li>Pista de sled regulamentar</li>
+            <li>Wall balls + medicine balls</li>
+            <li>Burpee broad jump zone</li>
+            <li>Carries lane 24m</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= ZONE 03 ============= -->
+<section class="zone" id="zone-03" data-screen-label="05 Zona Flow">
+  <div class="zone__inner">
+    <div class="zone__head">
+      <div>
+        <div class="zone__no reveal">/ ZONA 03</div>
+        <h2 class="reveal">Flow<br/>Studio.</h2>
+      </div>
+      <p class="zone__pitch reveal">
+        Sala dedicada a <strong>mobilidade, yoga e respiração</strong>. Piso suspenso de madeira, climatização independente e iluminação warm calibrada para sessões longas.
+      </p>
+    </div>
+    <div class="zone__body reveal">
+      <div class="zone__big">
+        <div class="ph h-fill">
+          <span class="ph__label">ZONE 03 · FLOW</span>
+          <span class="ph__caption">estúdio yoga · piso madeira · luz quente</span>
+          <span class="ph__id">IMG_Z03A</span>
+        </div>
+        <span class="zone__big-tag">▸ FLOW STUDIO · 180m²</span>
+      </div>
+      <div class="zone__specs">
+        <div class="spec">
+          <div class="spec__lbl">AMBIENTE</div>
+          <h4 class="spec__title">Made<br/>for stillness.</h4>
+          <ul>
+            <li>Piso suspenso bambu 24mm</li>
+            <li>Climatização independente</li>
+            <li>Iluminação 2700K dimmer</li>
+            <li>Som direcional 5.1</li>
+          </ul>
+        </div>
+        <div class="spec spec--yellow">
+          <div class="spec__lbl">CLASSES</div>
+          <h4 class="spec__title">Aulas<br/>guiadas.</h4>
+          <ul>
+            <li>Vinyasa · Yin · Restaurativa</li>
+            <li>Respiração & Pranayama</li>
+            <li>Mobilidade funcional</li>
+            <li>Grupos de até 14 pessoas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= ZONE 04 ============= -->
+<section class="zone" id="zone-04" data-screen-label="06 Zona Bio">
+  <div class="zone__inner">
+    <div class="zone__head">
+      <div>
+        <div class="zone__no reveal">/ ZONA 04</div>
+        <h2 class="reveal">Bio-<br/>Circuit.</h2>
+      </div>
+      <p class="zone__pitch reveal">
+        Circuito guiado proprietário. <strong>14 estações conectadas</strong>, treino full-body em 35 minutos com supervisão e leitura de carga em tempo real.
+      </p>
+    </div>
+    <div class="zone__body reveal">
+      <div class="zone__big">
+        <div class="ph h-fill">
+          <span class="ph__label">ZONE 04 · BIO</span>
+          <span class="ph__caption">circuito guiado · displays · supervisão</span>
+          <span class="ph__id">IMG_Z04A</span>
+        </div>
+        <span class="zone__big-tag">▸ BIO-CIRCUIT · 220m²</span>
+      </div>
+      <div class="zone__specs">
+        <div class="spec">
+          <div class="spec__lbl">CIRCUITO</div>
+          <h4 class="spec__title">14 estações<br/>guiadas.</h4>
+          <ul>
+            <li>Display individual por estação</li>
+            <li>Carga ajustada automaticamente</li>
+            <li>Histórico salvo no app</li>
+            <li>Coach presente em todas as rodadas</li>
+          </ul>
+        </div>
+        <div class="spec spec--yellow">
+          <div class="spec__lbl">PROGRAMAÇÃO</div>
+          <h4 class="spec__title">35 min<br/>full-body.</h4>
+          <ul>
+            <li>3 turnos / hora</li>
+            <li>Pré-agendamento obrigatório</li>
+            <li>Iniciante / Intermediário / Atleta</li>
+            <li>Inclui sessão de aquecimento</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= ZONE 05 ============= -->
+<section class="zone" id="zone-05" data-screen-label="07 Zona Recovery">
+  <div class="zone__inner">
+    <div class="zone__head">
+      <div>
+        <div class="zone__no reveal">/ ZONA 05</div>
+        <h2 class="reveal">Recovery<br/>Suite.</h2>
+      </div>
+      <p class="zone__pitch reveal">
+        <strong>Recuperação como rotina.</strong> Sauna a vapor, sauna seca, banho gelado, piscina aquecida e área de descanso silencioso. Reset completo entre sessões.
+      </p>
+    </div>
+    <div class="zone__body reveal">
+      <div class="zone__big">
+        <div class="ph h-fill">
+          <span class="ph__label">ZONE 05 · REC</span>
+          <span class="ph__caption">sauna · piscina · descanso · ambiente warm</span>
+          <span class="ph__id">IMG_Z05A</span>
+        </div>
+        <span class="zone__big-tag">▸ RECOVERY SUITE · 280m²</span>
+      </div>
+      <div class="zone__specs">
+        <div class="spec">
+          <div class="spec__lbl">HEAT & COLD</div>
+          <h4 class="spec__title">Protocolo<br/>contraste.</h4>
+          <ul>
+            <li>Sauna seca 85°C</li>
+            <li>Banho gelado 4°C</li>
+            <li>Sauna a vapor 45°C</li>
+            <li>Sala de meditação</li>
+          </ul>
+        </div>
+        <div class="spec spec--yellow">
+          <div class="spec__lbl">PISCINA</div>
+          <h4 class="spec__title">Lap pool<br/>22m.</h4>
+          <ul>
+            <li>4 raias · profundidade 1.5m</li>
+            <li>Tratamento UV (sem cloro)</li>
+            <li>Aquecida 28°C</li>
+            <li>Chuveiros no vestiário</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= ZONE 06 ============= -->
+<section class="zone" id="zone-06" data-screen-label="08 Zona Lobby">
+  <div class="zone__inner">
+    <div class="zone__head">
+      <div>
+        <div class="zone__no reveal">/ ZONA 06</div>
+        <h2 class="reveal">Lobby<br/>& Lounge.</h2>
+      </div>
+      <p class="zone__pitch reveal">
+        Entrada com <strong>cafeteria especializada</strong>, lounge, vestiários com armário por reconhecimento facial, chuveiros e check-in. Chegue, respire, entre no modo de treino.
+      </p>
+    </div>
+    <div class="zone__body reveal">
+      <div class="zone__big">
+        <div class="ph h-fill">
+          <span class="ph__label">ZONE 06 · LOBBY</span>
+          <span class="ph__caption">recepção · café · lounge · skylight</span>
+          <span class="ph__id">IMG_Z06A</span>
+        </div>
+        <span class="zone__big-tag">▸ LOBBY & LOUNGE · 320m²</span>
+      </div>
+      <div class="zone__specs">
+        <div class="spec">
+          <div class="spec__lbl">SERVIÇOS</div>
+          <h4 class="spec__title">Tudo no<br/>caminho.</h4>
+          <ul>
+            <li>Cafeteria especializada</li>
+            <li>Loja de suplementos curados</li>
+            <li>Lounge co-working silencioso</li>
+            <li>Wi-fi gigabit</li>
+          </ul>
+        </div>
+        <div class="spec spec--yellow">
+          <div class="spec__lbl">VESTIÁRIO</div>
+          <h4 class="spec__title">Vestiário<br/>equipado.</h4>
+          <ul>
+            <li>Armário com reconhecimento facial</li>
+            <li>Chuveiros masculino e feminino</li>
+            <li>Secador + ferramentas</li>
+            <li>Área private call</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= TECH SPECS ============= -->
+<section class="tech" data-screen-label="09 Specs">
+  <div class="tech__inner">
+    <div class="tech__head">
+      <h2 class="reveal">Specs<br/>técnicas.</h2>
+      <p class="tech__sub reveal">A engenharia invisível que sustenta a experiência — climatização, acústica, segurança e dados. Tudo medido, tudo monitorado.</p>
+    </div>
+    <div class="tech__grid reveal-up-stagger">
+      <div class="tcell">
+        <div class="tcell__no">/ 01</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><path d="M3 8c1.5-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 14c1.5-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg></div>
+        <h4 class="tcell__title">Climatização</h4>
+        <p class="tcell__txt">VRF de alta eficiência. Renovação total a cada 12 minutos.</p>
+      </div>
+      <div class="tcell">
+        <div class="tcell__no">/ 02</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.2-1.5"/></svg></div>
+        <h4 class="tcell__title">Acústica</h4>
+        <p class="tcell__txt">Painéis absorvedores. NC-30 — biblioteca silenciosa.</p>
+      </div>
+      <div class="tcell">
+        <div class="tcell__no">/ 03</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h4 class="tcell__title">Horário estendido</h4>
+        <p class="tcell__txt">Seg–Sex 5h–23h · Sáb 6h–22h · Dom 8h–20h. Coach em pico.</p>
+      </div>
+      <div class="tcell">
+        <div class="tcell__no">/ 04</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg></div>
+        <h4 class="tcell__title">Coach support</h4>
+        <p class="tcell__txt">Pelo menos 1 coach em piso a qualquer momento.</p>
+      </div>
+      <div class="tcell">
+        <div class="tcell__no">/ 05</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h4 class="tcell__title">No-filming</h4>
+        <p class="tcell__txt">Ambiente sem câmera. Privacidade como padrão.</p>
+      </div>
+      <div class="tcell">
+        <div class="tcell__no">/ 06</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <h4 class="tcell__title">App membros</h4>
+        <p class="tcell__txt">Reservas, histórico, sinais vitais. Tudo num lugar.</p>
+      </div>
+      <div class="tcell">
+        <div class="tcell__no">/ 07</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg></div>
+        <h4 class="tcell__title">Wi-fi gigabit</h4>
+        <p class="tcell__txt">Mesh 6E. Streaming sem queda em qualquer zona.</p>
+      </div>
+      <div class="tcell">
+        <div class="tcell__no">/ 08</div>
+        <div class="tcell__icon"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-16 0 8 8 0 0 1 16 0z"/><path d="M12 8v4l3 2"/></svg></div>
+        <h4 class="tcell__title">Estacionamento</h4>
+        <p class="tcell__txt">120 vagas cobertas, valet opcional, carregadores EV.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FLOORPLAN ============= -->
+<section class="layout-section" data-screen-label="10 Floorplan">
+  <img class="layout-section__wireframe" src="assets/wireframe-top.png" alt="" />
+  <div class="layout-section__inner">
+    <div class="layout-section__head">
+      <h2 class="reveal">Layout<br/>da operação.</h2>
+      <p class="lede reveal">Diagrama do hangar — fluxo pensado entre zonas pra reduzir tempo de transição e atrito. Você entra, treina, recupera, sai.</p>
+    </div>
+    <div class="floorplan reveal">
+      <div class="floorplan__grid"></div>
+      <div class="floorplan__hud">
+        <span><span class="yel">▸</span> HANGAR ANTONOV · LAYOUT 2.0</span>
+        <span>3.000 m² · ESC. 1:200</span>
+      </div>
+      <div class="floorplan__zones">
+        <div class="fpzone fpzone--big">
+          <div class="fpzone__id">/ Z01</div>
+          <h4 class="fpzone__name">Strength<br/>Floor</h4>
+          <div class="fpzone__area">820 m²</div>
+        </div>
+        <div class="fpzone">
+          <div class="fpzone__id">/ Z02</div>
+          <h4 class="fpzone__name">Engine<br/>Room</h4>
+          <div class="fpzone__area">420 m²</div>
+        </div>
+        <div class="fpzone">
+          <div class="fpzone__id">/ Z05</div>
+          <h4 class="fpzone__name">Recovery<br/>Suite</h4>
+          <div class="fpzone__area">280 m²</div>
+        </div>
+        <div class="fpzone">
+          <div class="fpzone__id">/ Z03</div>
+          <h4 class="fpzone__name">Flow<br/>Studio</h4>
+          <div class="fpzone__area">180 m²</div>
+        </div>
+        <div class="fpzone">
+          <div class="fpzone__id">/ Z04</div>
+          <h4 class="fpzone__name">Bio-<br/>Circuit</h4>
+          <div class="fpzone__area">220 m²</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= GALLERY ============= -->
+<section class="gallery" data-screen-label="11 Galeria">
+  <div class="gallery__inner">
+    <h2 class="reveal">Galeria.</h2>
+    <div class="gallery__grid reveal-up-stagger">
+      <div class="g-cell g-cell--w2 g-cell--h2">
+        <div class="ph h-fill"><span class="ph__label">G · 01</span><span class="ph__caption">strength floor · vista panorâmica</span></div>
+      </div>
+      <div class="g-cell">
+        <div class="ph h-fill"><span class="ph__label">G · 02</span><span class="ph__caption">detalhe rack</span></div>
+      </div>
+      <div class="g-cell">
+        <div class="ph h-fill"><span class="ph__label">G · 03</span><span class="ph__caption">cardio · vista cidade</span></div>
+      </div>
+      <div class="g-cell">
+        <div class="ph h-fill"><span class="ph__label">G · 04</span><span class="ph__caption">sauna · interior</span></div>
+      </div>
+      <div class="g-cell g-cell--h2">
+        <div class="ph h-fill"><span class="ph__label">G · 05</span><span class="ph__caption">piscina · vista vertical</span></div>
+      </div>
+      <div class="g-cell">
+        <div class="ph h-fill"><span class="ph__label">G · 06</span><span class="ph__caption">coach + atleta</span></div>
+      </div>
+      <div class="g-cell">
+        <div class="ph h-fill"><span class="ph__label">G · 07</span><span class="ph__caption">lobby · entrada</span></div>
+      </div>
+      <div class="g-cell g-cell--w2">
+        <div class="ph h-fill"><span class="ph__label">G · 08</span><span class="ph__caption">flow studio · horizontal</span></div>
+      </div>
+      <div class="g-cell">
+        <div class="ph h-fill"><span class="ph__label">G · 09</span><span class="ph__caption">detalhe equipamento</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer class="footer" data-screen-label="09 Footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div>
+        <h2 class="footer__cta-title reveal">Pronto<br />quando você<br />estiver.</h2>
+        <p class="footer__cta-text reveal">Comece com um tour ou uma aula experimental. A gente ajuda você a achar o plano, a rotina e o espaço pra desbloquear todo seu potencial.</p>
+        <a href="contato.html" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
+      </div>
+      <div class="footer__cols" style="grid-template-columns: 1fr 1fr; padding: 0;">
+        <div class="footer__col">
+          <h4>Navegação</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="planos.html">Planos</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="trabalhe-conosco.html">Trabalhe conosco</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Contato</h4>
+          <ul>
+            <li><a href="tel:+5574999631507">+55 74 99963-1507</a></li>
+            <li><a href="mailto:antonovacademia@gmail.com">antonovacademia@gmail.com</a></li>
+            <li><address class="footer__address">Av. 1º de Janeiro · ANTONOV<br />Irecê · Bahia · BR</address></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__cols">
+      <div class="footer__col">
+        <h4>Operação</h4>
+        <ul>
+          <li>Todos os dias<br />05:00h às 24:00h</li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Coordenadas</h4>
+        <ul>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">11°18'32"S</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">41°51'13"W</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">ALT. 772m</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="termos.html">Termos</a></li>
+          <li><a href="privacidade.html">Privacidade</a></li>
+          <li><a href="cookies.html">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Social</h4>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/antonovcenter" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/5574999631507" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="mailto:antonovacademia@gmail.com" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 6.66a2 2 0 0 1-2.06 0L2 7"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div>© 2026 ANTONOV CENTER · TODOS OS DIREITOS RESERVADOS · </div>
+      <div class="footer__bottom-links">
+        <span>OPERAÇÃO V1.0</span>
+        <span>DESENVOLVIDO POR <a href="https://www.instagram.com/asuavybe" target="_blank" rel="noopener noreferrer">Vybe LTDA</a></span>
+      </div>
+    </div>
+  </div>
+  <div class="footer__wordmark">ANTONOV</div>
+</footer>
+
+<script src="leads-config.js"></script>
+<script src="vip-leads.js"></script>
+<script src="app.js"></script>
+<script>
+// active zone-nav highlighter
+(function () {
+  const links = document.querySelectorAll('.zones-nav a');
+  const targets = [...links].map(l => document.querySelector(l.getAttribute('href')));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const i = targets.indexOf(e.target);
+        if (i >= 0) {
+          links.forEach(l => l.classList.remove('active'));
+          links[i].classList.add('active');
+        }
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  targets.forEach(t => t && io.observe(t));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,824 @@
+﻿<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sobre — O Manifesto · ANTONOV CENTER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+/* ----- Page hero (compact, light) ----- */
+.page-hero {
+  padding: calc(var(--nav-h) + 100px) var(--pad-x) 80px;
+  background: var(--bg);
+  position: relative;
+}
+.page-hero__inner { max-width: var(--container); margin: 0 auto; }
+.page-hero__crumb {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-hero__crumb::before { content: ""; width: 28px; height: 1px; background: var(--blue); }
+.page-hero h1 {
+  font-family: var(--f-display);
+  font-size: clamp(56px, 8.5vw, 136px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12em;
+}
+.page-hero h1 > span {
+  display: block;
+}
+.page-hero h1 .yel { color: var(--yellow); }
+.page-hero__row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: end;
+  border-top: 1px solid var(--line-strong);
+  padding-top: 32px;
+}
+.page-hero__lede {
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.4;
+  color: var(--ink);
+  max-width: 50ch;
+  text-wrap: pretty;
+}
+.page-hero__meta {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  display: grid; gap: 6px;
+  text-align: right;
+  align-self: end;
+}
+.page-hero__meta .v { color: var(--ink); }
+
+@media (max-width: 880px) {
+  .page-hero__row { grid-template-columns: 1fr; gap: 28px; }
+  .page-hero__meta { text-align: left; }
+}
+
+/* ----- Hero image strip ----- */
+.about-strip {
+  height: 60vh; min-height: 480px;
+  margin: 0 var(--pad-x);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  background: var(--carbon);
+}
+.about-strip .ph { position: absolute; inset: 0; }
+.about-strip__overlay {
+  position: absolute; inset: 0; z-index: 2;
+  padding: 32px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%);
+  color: #fff;
+}
+.about-strip__caption {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.about-strip__caption::before { content: "● "; color: var(--blue); }
+
+/* ----- Editorial section ----- */
+.editorial {
+  padding: 140px var(--pad-x);
+  background: var(--bg);
+}
+.editorial__inner { max-width: var(--container); margin: 0 auto; }
+.editorial__grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 100px;
+  margin-bottom: 100px;
+}
+.editorial__grid:last-child { margin-bottom: 0; }
+.editorial__num {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--blue);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.editorial__num::before { content: ""; width: 24px; height: 1px; background: var(--blue); }
+.editorial h2 {
+  font-family: var(--f-display);
+  font-size: clamp(40px, 5vw, 72px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  text-wrap: balance;
+  display: flex;
+  flex-direction: column;
+  gap: 0.14em;
+}
+.editorial h2 > span {
+  display: block;
+}
+.editorial__body { font-size: 16px; line-height: 1.6; color: var(--ink-soft); display: grid; gap: 16px; max-width: 64ch; }
+.editorial__body p:first-child { font-size: 18px; color: var(--ink); }
+.editorial__body strong { color: var(--ink); font-weight: 600; }
+
+@media (max-width: 880px) {
+  .editorial__grid { grid-template-columns: 1fr; gap: 32px; margin-bottom: 64px; }
+}
+
+/* ----- Founder quote ----- */
+.founder {
+  padding: 140px var(--pad-x);
+  background: var(--ink);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.founder__inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 2; text-align: center; }
+.founder__mark {
+  font-family: var(--f-display);
+  font-size: 160px;
+  line-height: 0.6;
+  color: var(--yellow);
+  margin: 0 0 16px;
+  height: 60px;
+}
+.founder__quote {
+  font-family: var(--f-display);
+  font-size: clamp(32px, 4.2vw, 64px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12em;
+  align-items: center;
+  text-transform: uppercase;
+  margin: 0 auto 40px;
+  text-wrap: balance;
+  max-width: 22ch;
+}
+.founder__quote > span { display: block; }
+.founder__quote .yel { color: var(--yellow); }
+.founder__author {
+  display: flex; justify-content: center; align-items: center; gap: 16px;
+}
+.founder__avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--carbon-3);
+  position: relative; overflow: hidden;
+}
+.founder__avatar .ph { position: absolute; inset: 0; }
+.founder__meta {
+  text-align: left;
+}
+.founder__meta .n { font-size: 16px; }
+.founder__meta .r { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+.founder__bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(50% 50% at 50% 0%, rgba(42,143,214,0.08) 0, transparent 60%);
+}
+
+/* ----- Pillars grid (icons) ----- */
+.pillars {
+  padding: 140px var(--pad-x);
+  background: var(--bg);
+}
+.pillars__inner { max-width: var(--container); margin: 0 auto; }
+.pillars__head {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: end;
+  margin-bottom: 80px;
+}
+.pillars h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.14em;
+}
+.pillars h2 > span {
+  display: block;
+}
+.pillars__grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line-strong);
+}
+.pillar {
+  padding: 56px 36px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  transition: background 250ms;
+}
+.pillar:last-child { border-right: 0; }
+.pillar:hover { background: var(--paper); }
+.pillar__no {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--blue);
+  margin-bottom: 32px;
+}
+.pillar__icon {
+  width: 48px; height: 48px;
+  display: grid; place-items: center;
+  margin-bottom: 28px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+}
+.pillar__icon svg { width: 18px; height: 18px; stroke: var(--ink); fill: none; stroke-width: 1.6; }
+.pillar h3 {
+  font-family: var(--f-display);
+  font-size: clamp(26px, 2.4vw, 36px);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  margin: 0 0 16px;
+}
+.pillar p {
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 38ch;
+}
+
+@media (max-width: 880px) {
+  .pillars__head { grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
+  .pillars__grid { grid-template-columns: 1fr; }
+  .pillar { border-right: 0; }
+}
+
+/* ----- Team strip ----- */
+.team {
+  padding: 140px var(--pad-x);
+  background: var(--ink);
+  color: #fff;
+}
+.team__inner { max-width: var(--container); margin: 0 auto; }
+.team__head {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: end; margin-bottom: 60px;
+}
+.team h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #fff;
+}
+.team__sub { color: rgba(255,255,255,0.65); max-width: 50ch; line-height: 1.55; }
+.team__grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.member {
+  position: relative;
+  aspect-ratio: 3/4;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.member .ph { position: absolute; inset: 0; }
+.member__info {
+  position: absolute; inset: 0;
+  padding: 20px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.9) 100%);
+  z-index: 2;
+}
+.member__name {
+  font-family: var(--f-display);
+  font-size: 26px;
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+.member__role {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.member__no {
+  position: absolute; top: 16px; left: 16px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.6);
+  z-index: 3;
+}
+
+@media (max-width: 880px) {
+  .team__head { grid-template-columns: 1fr; gap: 24px; }
+  .team__grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .team__grid { grid-template-columns: 1fr; }
+}
+
+/* ----- Anatomy section (wireframes) ----- */
+.anatomia {
+  padding: 140px var(--pad-x);
+  background: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+.anatomia__inner { max-width: var(--container); margin: 0 auto; position: relative; z-index: 2; }
+.anatomia__head {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 80px;
+  align-items: end;
+  margin-bottom: 64px;
+}
+.anatomia__num {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--blue);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 18px;
+}
+.anatomia__num::before { content: ""; width: 28px; height: 1px; background: var(--blue); }
+.anatomia h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.14em;
+}
+.anatomia h2 > span {
+  display: block;
+}
+.anatomia h2 .yel { color: var(--yellow); }
+.anatomia__sub {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 56ch;
+  margin: 0;
+}
+.anatomia__sub strong { color: var(--ink); font-weight: 600; }
+
+.anatomia__footnote {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  border-top: 1px solid var(--line);
+  padding-top: 32px;
+}
+.anatomia__data {
+  font-family: var(--f-mono);
+}
+.anatomia__data .lbl {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  display: block;
+  margin-bottom: 8px;
+}
+.anatomia__data .v {
+  font-family: var(--f-display);
+  font-size: 24px;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.anatomia__data .v .pl { color: var(--blue); }
+
+@media (max-width: 880px) {
+  .anatomia__head { grid-template-columns: 1fr; gap: 24px; }
+  .anatomia__footnote { grid-template-columns: 1fr 1fr; gap: 20px; }
+}
+.timeline {
+  padding: 140px var(--pad-x);
+  background: var(--bg);
+}
+.timeline__inner { max-width: var(--container); margin: 0 auto; }
+.timeline h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  margin: 0 0 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.14em;
+}
+.timeline h2 > span {
+  display: block;
+}
+.timeline__list {
+  display: grid; gap: 0;
+  border-top: 1px solid var(--line-strong);
+}
+.tlitem {
+  display: grid;
+  grid-template-columns: 160px 140px 1fr 200px;
+  gap: 40px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.tlitem__year {
+  font-family: var(--f-display);
+  font-size: 28px;
+  line-height: 1;
+}
+.tlitem__tag {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  background: rgba(42,143,214,0.12);
+  border: 1px solid rgba(42,143,214,0.4);
+  padding: 6px 10px;
+  border-radius: 999px;
+  justify-self: start;
+}
+.tlitem__txt { font-size: 16px; line-height: 1.55; color: var(--ink-soft); max-width: 56ch; }
+.tlitem__txt strong { color: var(--ink); }
+.tlitem__meta {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--ink-mute);
+  text-align: right;
+}
+
+@media (max-width: 880px) {
+  .tlitem { grid-template-columns: 1fr; gap: 8px; padding: 24px 0; }
+  .tlitem__meta { text-align: left; }
+}
+.member .ph__label, .member .ph__id { display: none; }
+</style>
+</head>
+<body>
+
+<div class="page-mask">
+  <div class="page-mask__flight" aria-hidden="true">
+    <img src="assets/imagotipo.png" alt="" width="591" height="591" decoding="async" />
+  </div>
+</div>
+
+<header class="nav" data-screen-label="01 Nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img class="nav__logo-img nav__logo-img--dark" src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" />
+      <img class="nav__logo-img nav__logo-img--light" src="assets/logo-preta.png" alt="ANTONOV CENTER — Bahia" width="253" height="38" decoding="async" />
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="index.html">Home</a>
+      <a href="planos.html">Planos</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__backdrop" aria-hidden="true"></div>
+  <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
+    <div class="nav__drawer-links" role="navigation"></div>
+    <a href="planos.html" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
+  </aside>
+</header>
+
+<!-- ============= PAGE HERO ============= -->
+<section class="page-hero" data-screen-label="02 Sobre Hero">
+  <div class="page-hero__inner">
+    <div class="page-hero__crumb">/ 01 — O MANIFESTO</div>
+    <h1><span>Força bruta.</span><span class="yel">Tecnologia pura.</span></h1>
+    <div class="page-hero__row">
+      <p class="page-hero__lede reveal">
+        Esqueça tudo o que você já ouviu sobre o que é uma academia. No coração de Irecê, erguemos o maior Hangar Fitness da região — um hangar pronto para impulsionar o seu maior potencial.
+      </p>
+      <div class="page-hero__meta reveal">
+        <div>EST. <span class="v">2026</span></div>
+        <div>IRECÊ <span class="v">/ BA</span></div>
+        <div>HANGAR <span class="v">3.000m²</span></div>
+        <div>COMPLEXO <span class="v">#1 IRECÊ</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= STRIP ============= -->
+<div class="about-strip reveal">
+  <div class="ph h-fill">
+    <span class="ph__label">TEAM · MAIN</span>
+    <span class="ph__caption">grupo coaches + atletas · vista interna · noite</span>
+    <span class="ph__id">IMG_AB01 / 16:9</span>
+  </div>
+  <div class="about-strip__overlay">
+    <div class="about-strip__caption">/ MANIFESTO — NOVA ERA · 2026</div>
+    <div class="about-strip__caption">11°18'32"S · 41°51'13"W</div>
+  </div>
+</div>
+
+<!-- ============= EDITORIAL — MANIFESTO ============= -->
+<section class="editorial" data-screen-label="03 Manifesto">
+  <div class="editorial__inner">
+    <div class="editorial__grid">
+      <div>
+        <div class="editorial__num reveal">/ 02 — O MANIFESTO</div>
+        <h2 class="reveal"><span>Esqueça o que</span><span>você conhecia</span><span>como academia.</span></h2>
+      </div>
+      <div class="editorial__body reveal">
+        <p><strong>A força não é um acidente.</strong> Ela é o resultado de uma escolha consciente, de precisão milimétrica e de uma estrutura implacável.</p>
+        <p>No coração de Irecê, as engrenagens mudaram. Erguemos mais do que um espaço de treino; construímos um <strong>monumento à evolução humana</strong> — um complexo de escala massiva, onde a força bruta do ferro encontra a inteligência da altíssima tecnologia.</p>
+        <p>Aqui, o conceito de galpão ganha uma nova dimensão: a de um <strong>hangar pronto para impulsionar o seu maior potencial.</strong> Equipamentos de última geração que calculam cada movimento, em um ambiente projetado para desafiar os seus próprios limites todos os dias.</p>
+      </div>
+    </div>
+    <div class="editorial__grid">
+      <div>
+        <div class="editorial__num reveal">/ 03 — O NOVO PADRÃO</div>
+        <h2 class="reveal"><span>Sem desculpas.</span><span>Sem atalhos.</span></h2>
+      </div>
+      <div class="editorial__body reveal">
+        <p>Não viemos para ser apenas mais uma opção. Viemos para <strong>ditar o novo padrão da região.</strong> Sem desculpas. Sem atalhos. Apenas engenharia pura aplicada à sua performance.</p>
+        <p>Se você busca o comum, o mercado está cheio dele. Mas se você está pronto para a sua melhor e mais robusta versão — bem-vindo à nova era. Bem-vindo ao <strong>maior Hangar Fitness da região.</strong></p>
+        <p><strong>Antonov Center: Força Bruta. Tecnologia Pura.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOUNDER QUOTE ============= -->
+<section class="founder" data-screen-label="04 Fundador">
+  <div class="founder__bg"></div>
+  <div class="founder__inner">
+    <div class="founder__mark">"</div>
+    <p class="founder__quote reveal">
+      <span>Bem-vindo à</span><span>nova era.</span>
+      <span class="yel">Força bruta.</span><span>Tecnologia pura.</span>
+    </p>
+    <div class="founder__author reveal">
+      <div class="founder__avatar">
+        <div class="ph h-fill"><span class="ph__label" style="font-size:7px;">JR</span></div>
+      </div>
+      <div class="founder__meta">
+        <div class="n">Jaeldson Rosa</div>
+        <div class="r">Fundador & Head Coach</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= ANATOMIA ============= -->
+<section class="anatomia" data-screen-label="05 Anatomia">
+  <div class="anatomia__inner">
+    <div class="anatomia__head">
+      <div>
+        <div class="anatomia__num">/ 04 — DNA</div>
+        <h2><span>Anatomia</span><span>da <span class="yel">operação.</span></span></h2>
+      </div>
+      <p class="anatomia__sub">
+        O nome vem dos cargueiros <strong>Antonov</strong> — engenharia bruta, propósito claro, capacidade absurda. Metáfora para um hangar de <strong>3.000m²</strong> onde ferro, tecnologia e estrutura implacável sustentam cada sessão.
+      </p>
+    </div>
+
+    <div class="anatomia__footnote reveal">
+      <div class="anatomia__data">
+        <span class="lbl">Área do hangar</span>
+        <span class="v">3.000<span class="pl">m²</span></span>
+      </div>
+      <div class="anatomia__data">
+        <span class="lbl">Estações</span>
+        <span class="v">80<span class="pl">+</span></span>
+      </div>
+      <div class="anatomia__data">
+        <span class="lbl">Lojas integradas</span>
+        <span class="v">8<span class="pl">+</span></span>
+      </div>
+      <div class="anatomia__data">
+        <span class="lbl">Treinadores</span>
+        <span class="v">18<span class="pl">+</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= PILLARS ============= -->
+<section class="pillars" data-screen-label="05 Pilares">
+  <div class="pillars__inner">
+    <div class="pillars__head">
+      <h2 class="reveal"><span>Três pilares.</span><span>Sem desculpa.</span></h2>
+      <p class="lede reveal">O manifesto em operação — da escolha consciente à engenharia pura aplicada à sua performance.</p>
+    </div>
+    <div class="pillars__grid reveal-up-stagger">
+      <article class="pillar">
+        <div class="pillar__no">/ 01 — FORÇA</div>
+        <div class="pillar__icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+        </div>
+        <h3>Escolha consciente.</h3>
+        <p>A força não é acidente — é precisão milimétrica, estrutura implacável e decisão diária de evoluir.</p>
+      </article>
+      <article class="pillar">
+        <div class="pillar__no">/ 02 — TECNOLOGIA</div>
+        <div class="pillar__icon">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <h3>Tecnologia pura.</h3>
+        <p>Equipamentos de última geração que calculam cada movimento — força bruta do ferro com inteligência de ponta.</p>
+      </article>
+      <article class="pillar">
+        <div class="pillar__no">/ 03 — PADRÃO</div>
+        <div class="pillar__icon">
+          <svg viewBox="0 0 24 24"><path d="M3.5 12h3l3-7 4 14 3-7h4"/></svg>
+        </div>
+        <h3>Sem atalhos.</h3>
+        <p>Não viemos para ser mais uma opção. Viemos para ditar o novo padrão da região — engenharia pura, sem desculpas.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============= TIMELINE ============= -->
+<section class="timeline" data-screen-label="06 Timeline">
+  <div class="timeline__inner">
+    <div class="editorial__num reveal" style="margin-bottom: 24px;">/ 06 — A OPERAÇÃO</div>
+    <h2 class="reveal"><span>Da prancheta</span><span>à pista.</span></h2>
+    <div class="timeline__list reveal-up-stagger">
+      <div class="tlitem">
+        <div class="tlitem__year">2023</div>
+        <div class="tlitem__tag">Concepção</div>
+        <p class="tlitem__txt">A prancheta. Jaeldson Rosa reúne <strong>3 coaches, 2 arquitetos e 1 engenheiro</strong> de biomecânica pra desenhar o que faltava na Bahia — um centro premium projetado por quem treina, não por quem vende treino.</p>
+        <div class="tlitem__meta">FASE / 01 ALPHA</div>
+      </div>
+      <div class="tlitem">
+        <div class="tlitem__year">2024</div>
+        <div class="tlitem__tag">Construção</div>
+        <p class="tlitem__txt">Reforma de 14 meses. <strong>3.000m² de hangar industrial</strong> requalificados em zonas dedicadas — força, condicionamento, mobilidade e recuperação. Acústica, iluminação e ventilação calibradas por consultores externos.</p>
+        <div class="tlitem__meta">FASE / 02 BETA</div>
+      </div>
+      <div class="tlitem">
+        <div class="tlitem__year">2025</div>
+        <div class="tlitem__tag">Decolagem</div>
+        <p class="tlitem__txt">Operação inicia em julho com <strong>120 membros fundadores</strong>. Programação completa com Hyrox, powerlifting, mobilidade e Bio-Circuit (circuito guiado proprietário). 18 coaches certificados em escala.</p>
+        <div class="tlitem__meta">FASE / 03 LIVE</div>
+      </div>
+      <div class="tlitem">
+        <div class="tlitem__year">2026</div>
+        <div class="tlitem__tag">Nova era</div>
+        <p class="tlitem__txt">O maior Hangar Fitness da região. Manifesto em operação plena — <strong>Força Bruta. Tecnologia Pura.</strong> Novo padrão consolidado na região.</p>
+        <div class="tlitem__meta">FASE / 04 ATUAL</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= TEAM ============= -->
+<section class="team" data-screen-label="07 Time">
+  <div class="team__inner">
+    <div class="team__head">
+      <h2 class="reveal">A tripulação.</h2>
+      <p class="team__sub reveal">Profissionais certificados que operam no mesmo padrão do complexo — precisão, tecnologia e performance sem atalhos.</p>
+    </div>
+    <div class="team__grid reveal-up-stagger">
+      <article class="member">
+        <div class="ph h-fill"><span class="ph__label">COACH · 01</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="member__no">/ HEAD COACH</div>
+        <div class="member__info">
+          <h3 class="member__name">Jaeldson<br/>Rosa</h3>
+          <div class="member__role">Fundador / Força</div>
+        </div>
+      </article>
+      <article class="member">
+        <div class="ph h-fill"><span class="ph__label">COACH · 02</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="member__no">/ HYROX</div>
+        <div class="member__info">
+          <h3 class="member__name">Luiza<br/>Marini</h3>
+          <div class="member__role">Performance / Hyrox</div>
+        </div>
+      </article>
+      <article class="member">
+        <div class="ph h-fill"><span class="ph__label">COACH · 03</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="member__no">/ RECOVERY</div>
+        <div class="member__info">
+          <h3 class="member__name">Rafael<br/>Choi</h3>
+          <div class="member__role">Mobilidade / Reset</div>
+        </div>
+      </article>
+      <article class="member">
+        <div class="ph h-fill"><span class="ph__label">COACH · 04</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="member__no">/ SCIENCE</div>
+        <div class="member__info">
+          <h3 class="member__name">Júlia<br/>Vasques</h3>
+          <div class="member__role">Fisiologia / Dados</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer class="footer" data-screen-label="09 Footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div>
+        <h2 class="footer__cta-title reveal">Pronto<br />quando você<br />estiver.</h2>
+        <p class="footer__cta-text reveal">Comece com um tour ou uma aula experimental. A gente ajuda você a achar o plano, a rotina e o espaço pra desbloquear todo seu potencial.</p>
+        <a href="contato.html" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
+      </div>
+      <div class="footer__cols" style="grid-template-columns: 1fr 1fr; padding: 0;">
+        <div class="footer__col">
+          <h4>Navegação</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="planos.html">Planos</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="trabalhe-conosco.html">Trabalhe conosco</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Contato</h4>
+          <ul>
+            <li><a href="tel:+5574999631507">+55 74 99963-1507</a></li>
+            <li><a href="mailto:antonovacademia@gmail.com">antonovacademia@gmail.com</a></li>
+            <li><address class="footer__address">Av. 1º de Janeiro · ANTONOV<br />Irecê · Bahia · BR</address></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__cols">
+      <div class="footer__col">
+        <h4>Operação</h4>
+        <ul>
+          <li>Todos os dias<br />05:00h às 24:00h</li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Coordenadas</h4>
+        <ul>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">11°18'32"S</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">41°51'13"W</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">ALT. 772m</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="termos.html">Termos</a></li>
+          <li><a href="privacidade.html">Privacidade</a></li>
+          <li><a href="cookies.html">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Social</h4>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/antonovcenter" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/5574999631507" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="mailto:antonovacademia@gmail.com" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 6.66a2 2 0 0 1-2.06 0L2 7"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div>© 2026 ANTONOV CENTER · TODOS OS DIREITOS RESERVADOS · </div>
+      <div class="footer__bottom-links">
+        <span>OPERAÇÃO V1.0</span>
+        <span>DESENVOLVIDO POR <a href="https://www.instagram.com/asuavybe" target="_blank" rel="noopener noreferrer">Vybe LTDA</a></span>
+      </div>
+    </div>
+  </div>
+  <div class="footer__wordmark">ANTONOV</div>
+</footer>
+
+<script src="leads-config.js"></script>
+<script src="vip-leads.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

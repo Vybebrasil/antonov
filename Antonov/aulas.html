@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aulas — ANTONOV CENTER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+.page-hero {
+  padding: calc(var(--nav-h) + 100px) var(--pad-x) 80px;
+  background: var(--bg);
+}
+.page-hero__inner { max-width: var(--container); margin: 0 auto; }
+.page-hero__crumb {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-hero__crumb::before { content: ""; width: 28px; height: 1px; background: var(--blue); }
+.page-hero h1 {
+  font-family: var(--f-display);
+  font-size: clamp(56px, 8.5vw, 136px);
+  line-height: 0.95; letter-spacing: -0.01em;
+  text-transform: uppercase; margin: 0 0 32px;
+  }
+.page-hero h1 .yel { color: var(--yellow); }
+.page-hero__row {
+  display: grid; grid-template-columns: 1.5fr 1fr;
+  gap: 60px; align-items: end;
+  border-top: 1px solid var(--line-strong); padding-top: 32px;
+}
+.page-hero__lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.4; max-width: 50ch; }
+.page-hero__meta {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;
+  color: var(--ink-mute);
+}
+.page-hero__meta .v { color: var(--ink); display: block; margin-top: 2px; }
+@media (max-width: 880px) { .page-hero__row { grid-template-columns: 1fr; gap: 24px; } }
+
+/* ---- Class cards (big rows) ---- */
+.classes {
+  padding: 60px var(--pad-x) 60px;
+  background: var(--bg);
+}
+.classes__inner { max-width: var(--container); margin: 0 auto; }
+.classes__list { display: grid; gap: 14px; }
+.crow {
+  display: grid;
+  grid-template-columns: 1.2fr 1.8fr 1fr;
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ink);
+  color: #fff;
+  min-height: 320px;
+}
+.crow--inv { background: var(--yellow); color: var(--ink); }
+.crow__img {
+  position: relative;
+  overflow: hidden;
+  background: var(--carbon);
+}
+.crow__img .ph { position: absolute; inset: 0; }
+.crow__img-tag {
+  position: absolute; top: 18px; left: 18px;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.2em; color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+  padding: 6px 10px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  z-index: 3;
+}
+.crow__body { padding: 40px 36px; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
+.crow__cat {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 14px;
+}
+.crow--inv .crow__cat { color: var(--ink); opacity: 0.55; }
+.crow__name {
+  font-family: var(--f-display);
+  font-size: clamp(36px, 4.2vw, 64px);
+  line-height: 0.98; letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.crow__desc {
+  font-size: 15px; line-height: 1.55;
+  opacity: 0.78; margin: 0;
+  max-width: 50ch;
+}
+.crow--inv .crow__desc { opacity: 0.85; }
+.crow__tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.tag {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.22);
+  padding: 6px 10px; border-radius: 999px;
+  color: rgba(255,255,255,0.85);
+}
+.crow--inv .tag { border-color: rgba(0,0,0,0.3); color: var(--ink); }
+
+.crow__meta {
+  border-left: 1px solid rgba(255,255,255,0.14);
+  padding: 40px 36px;
+  display: grid; gap: 22px;
+  align-content: center;
+}
+.crow--inv .crow__meta { border-color: rgba(0,0,0,0.18); }
+.cmeta {
+  display: grid; gap: 4px;
+}
+.cmeta__lbl {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  opacity: 0.55;
+}
+.cmeta__v {
+  font-family: var(--f-display);
+  font-size: 22px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+}
+.crow__cta {
+  margin-top: 8px;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--blue);
+  border-top: 1px solid rgba(255,255,255,0.16);
+  padding-top: 14px;
+}
+.crow--inv .crow__cta { color: var(--ink); border-color: rgba(0,0,0,0.2); }
+.crow__cta::after {
+  content: ""; width: 7px; height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-top: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+
+@media (max-width: 980px) {
+  .crow { grid-template-columns: 1fr; min-height: 0; }
+  .crow__img { aspect-ratio: 16/9; }
+  .crow__meta { border-left: 0; border-top: 1px solid rgba(255,255,255,0.14); }
+}
+
+/* ---- Schedule ---- */
+.schedule {
+  padding: 140px var(--pad-x);
+  background: var(--paper);
+}
+.schedule__inner { max-width: var(--container); margin: 0 auto; }
+.schedule__head {
+  display: grid; grid-template-columns: 1fr 1.4fr;
+  gap: 60px; align-items: end; margin-bottom: 56px;
+}
+.schedule h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; letter-spacing: -0.005em;
+  text-transform: uppercase; margin: 0;
+}
+.schedule__filters {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  align-self: end;
+  justify-content: flex-end;
+}
+.sfilter {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 200ms;
+}
+.sfilter.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sfilter:hover:not(.active) { background: var(--bg); }
+
+.schedule__wrap {
+  background: var(--ink);
+  border-radius: 12px;
+  overflow: hidden;
+  color: #fff;
+}
+.schedule__head-row {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  background: var(--carbon-2);
+}
+.schedule__head-row .h {
+  padding: 18px 16px;
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.schedule__head-row .h:last-child { border-right: 0; }
+.schedule__head-row .h .d {
+  display: block;
+  font-family: var(--f-display); font-size: 26px;
+  color: #fff; letter-spacing: -0.005em;
+  margin-top: 4px;
+}
+.schedule__head-row .h.today .d { color: var(--blue); }
+
+.schedule__row {
+  display: grid;
+  grid-template-columns: 80px repeat(7, 1fr);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.schedule__row:last-child { border-bottom: 0; }
+.schedule__row .t {
+  padding: 16px;
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.5);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center;
+}
+.schedule__row .c {
+  padding: 12px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  font-size: 12px;
+  line-height: 1.35;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background 150ms;
+  min-height: 70px;
+}
+.schedule__row .c:last-child { border-right: 0; }
+.schedule__row .c.has { background: rgba(255,255,255,0.02); }
+.schedule__row .c.has:hover { background: rgba(42,143,214,0.08); }
+.schedule__row .c .n { font-weight: 600; color: #fff; }
+.schedule__row .c .m {
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+.schedule__row .c.has--yellow { background: rgba(250,177,15,0.18); }
+.schedule__row .c.has--yellow .n { color: var(--yellow); }
+.schedule__row .c.has--blue { background: rgba(42,143,214,0.16); }
+.schedule__row .c.has--blue .n { color: var(--yellow); }
+
+.schedule__legend {
+  display: flex; gap: 24px;
+  padding: 18px 20px;
+  background: var(--carbon-2);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.schedule__legend span { display: inline-flex; align-items: center; gap: 8px; }
+.schedule__legend .sw {
+  width: 12px; height: 12px; border-radius: 3px;
+}
+
+@media (max-width: 980px) {
+  .schedule__head { grid-template-columns: 1fr; gap: 24px; }
+  .schedule__filters { justify-content: flex-start; }
+  .schedule__head-row, .schedule__row { min-width: 800px; }
+}
+
+/* ---- Coaches strip ---- */
+.coaches {
+  padding: 140px var(--pad-x);
+  background: var(--bg);
+}
+.coaches__inner { max-width: var(--container); margin: 0 auto; }
+.coaches__head {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 60px; align-items: end; margin-bottom: 48px;
+}
+.coaches h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; letter-spacing: -0.005em;
+  text-transform: uppercase; margin: 0;
+}
+.coaches__grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.coach {
+  position: relative;
+  aspect-ratio: 3/4;
+  overflow: hidden; border-radius: 10px;
+  background: var(--carbon);
+}
+.coach .ph { position: absolute; inset: 0; }
+.coach__info {
+  position: absolute; inset: 0;
+  padding: 22px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.9) 100%);
+  z-index: 2; color: #fff;
+}
+.coach__no {
+  position: absolute; top: 16px; left: 16px;
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; color: rgba(255,255,255,0.7);
+  z-index: 3;
+}
+.coach__name {
+  font-family: var(--f-display); font-size: 26px;
+  line-height: 1; text-transform: uppercase;
+  margin: 0 0 4px;
+}
+.coach__spec {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--blue);
+}
+@media (max-width: 880px) {
+  .coaches__head { grid-template-columns: 1fr; gap: 24px; }
+  .coaches__grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .coaches__grid { grid-template-columns: 1fr; }
+  .schedule__head, .coaches__head { margin-bottom: 32px; }
+}
+.crow__img .ph__label, .crow__img .ph__id, .coach .ph__label, .coach .ph__id { display: none; }
+</style>
+</head>
+<body>
+
+<div class="page-mask">
+  <div class="page-mask__flight" aria-hidden="true">
+    <img src="assets/imagotipo.png" alt="" width="591" height="591" decoding="async" />
+  </div>
+</div>
+
+<header class="nav" data-screen-label="01 Nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img class="nav__logo-img nav__logo-img--dark" src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" />
+      <img class="nav__logo-img nav__logo-img--light" src="assets/logo-preta.png" alt="ANTONOV CENTER — Bahia" width="253" height="38" decoding="async" />
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="index.html">Home</a>
+      <a href="planos.html">Planos</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__backdrop" aria-hidden="true"></div>
+  <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
+    <div class="nav__drawer-links" role="navigation"></div>
+    <a href="planos.html" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
+  </aside>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero" data-screen-label="02 Aulas Hero">
+  <div class="page-hero__inner">
+    <div class="page-hero__crumb">/ PROGRAMAÇÃO — AULAS & GRADE</div>
+    <h1>Aulas feitas<br/>pra <span class="yel">performar.</span></h1>
+    <div class="page-hero__row">
+      <p class="page-hero__lede reveal">
+        Programação focada em força, condicionamento, mobilidade e recuperação. Grupos pequenos, coaching claro, treino que você sustenta — sem caos, sem improviso.
+      </p>
+      <div class="page-hero__meta reveal">
+        <div>MODALIDADES<span class="v">12 ATIVAS</span></div>
+        <div>GRUPO MÁX<span class="v">14 PESSOAS</span></div>
+        <div>AULAS<span class="v">/ DIA · 28</span></div>
+        <div>COACHES<span class="v">/ ESCALA · 18</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLASSES -->
+<section class="classes" data-screen-label="03 Modalidades">
+  <div class="classes__inner">
+    <div class="classes__list reveal-up-stagger">
+
+      <article class="crow">
+        <div class="crow__img">
+          <span class="crow__img-tag">▸ STRENGTH</span>
+          <div class="ph h-fill"><span class="ph__label">CLASS · 01</span><span class="ph__caption">powerlifting · agachamento</span><span class="ph__id">IMG_C01</span></div>
+        </div>
+        <div class="crow__body">
+          <div>
+            <div class="crow__cat">/ 01 — FORÇA · STRENGTH FLOOR</div>
+            <h3 class="crow__name">Powerlifting<br/>Basics.</h3>
+            <p class="crow__desc">Fundamentos dos 3 grandes — agachamento, supino e levantamento terra. Técnica primeiro, carga depois. Programação progressiva semana a semana.</p>
+          </div>
+          <div class="crow__tags">
+            <span class="tag">60min</span>
+            <span class="tag">Iniciante OK</span>
+            <span class="tag">Grupo · 8</span>
+          </div>
+        </div>
+        <div class="crow__meta">
+          <div class="cmeta"><div class="cmeta__lbl">Horários</div><div class="cmeta__v">Seg · Qua · Sex</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Próximo</div><div class="cmeta__v">18:00 · Hoje</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Coach</div><div class="cmeta__v">Jaeldson R.</div></div>
+          <a href="planos.html" class="crow__cta">Reservar aula</a>
+        </div>
+      </article>
+
+      <article class="crow crow--inv">
+        <div class="crow__img">
+          <span class="crow__img-tag" style="background: rgba(0,0,0,0.45); color: #fff; border-color: rgba(255,255,255,0.2);">▸ HYROX</span>
+          <div class="ph h-fill"><span class="ph__label">CLASS · 02</span><span class="ph__caption">hyrox · circuito condicionamento</span><span class="ph__id">IMG_C02</span></div>
+        </div>
+        <div class="crow__body">
+          <div>
+            <div class="crow__cat">/ 02 — HYROX · ENGINE ROOM</div>
+            <h3 class="crow__name">Hyrox<br/>Engine.</h3>
+            <p class="crow__desc">Condicionamento híbrido pronto pra prova — 8 estações, ritmo controlado, supervisão técnica. Corra e levante na mesma sessão.</p>
+          </div>
+          <div class="crow__tags">
+            <span class="tag">75min</span>
+            <span class="tag">Intermediário</span>
+            <span class="tag">Grupo · 12</span>
+          </div>
+        </div>
+        <div class="crow__meta">
+          <div class="cmeta"><div class="cmeta__lbl">Horários</div><div class="cmeta__v">Ter · Qui · Sáb</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Próximo</div><div class="cmeta__v">19:30 · Amanhã</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Coach</div><div class="cmeta__v">Luiza M.</div></div>
+          <a href="planos.html" class="crow__cta">Reservar aula</a>
+        </div>
+      </article>
+
+      <article class="crow">
+        <div class="crow__img">
+          <span class="crow__img-tag">▸ RECOVERY</span>
+          <div class="ph h-fill"><span class="ph__label">CLASS · 03</span><span class="ph__caption">recovery flow · alongamento</span><span class="ph__id">IMG_C03</span></div>
+        </div>
+        <div class="crow__body">
+          <div>
+            <div class="crow__cat">/ 03 — RECUPERAÇÃO · FLOW STUDIO</div>
+            <h3 class="crow__name">Recovery<br/>Flow.</h3>
+            <p class="crow__desc">Fluxo focado em recuperação ativa — mobilidade, respiração e liberação miofascial. Para encerrar a semana ou desfazer fadiga acumulada.</p>
+          </div>
+          <div class="crow__tags">
+            <span class="tag">45min</span>
+            <span class="tag">Todos níveis</span>
+            <span class="tag">Grupo · 14</span>
+          </div>
+        </div>
+        <div class="crow__meta">
+          <div class="cmeta"><div class="cmeta__lbl">Horários</div><div class="cmeta__v">Diariamente</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Próximo</div><div class="cmeta__v">07:00 · Hoje</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Coach</div><div class="cmeta__v">Rafael C.</div></div>
+          <a href="planos.html" class="crow__cta">Reservar aula</a>
+        </div>
+      </article>
+
+      <article class="crow">
+        <div class="crow__img">
+          <span class="crow__img-tag">▸ ATHLETIC</span>
+          <div class="ph h-fill"><span class="ph__label">CLASS · 04</span><span class="ph__caption">condicionamento atlético · circuito</span><span class="ph__id">IMG_C04</span></div>
+        </div>
+        <div class="crow__body">
+          <div>
+            <div class="crow__cat">/ 04 — CONDICIONAMENTO</div>
+            <h3 class="crow__name">Athletic<br/>Conditioning.</h3>
+            <p class="crow__desc">Velocidade, agilidade, potência. Treino atlético com cones, escada e medicine ball — pra performance esportiva e endurance.</p>
+          </div>
+          <div class="crow__tags">
+            <span class="tag">60min</span>
+            <span class="tag">Atlético</span>
+            <span class="tag">Grupo · 10</span>
+          </div>
+        </div>
+        <div class="crow__meta">
+          <div class="cmeta"><div class="cmeta__lbl">Horários</div><div class="cmeta__v">Seg · Qua · Sex</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Próximo</div><div class="cmeta__v">20:00 · Hoje</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Coach</div><div class="cmeta__v">Júlia V.</div></div>
+          <a href="planos.html" class="crow__cta">Reservar aula</a>
+        </div>
+      </article>
+
+      <article class="crow">
+        <div class="crow__img">
+          <span class="crow__img-tag">▸ MOBILITY</span>
+          <div class="ph h-fill"><span class="ph__label">CLASS · 05</span><span class="ph__caption">mobilidade · core · controle</span><span class="ph__id">IMG_C05</span></div>
+        </div>
+        <div class="crow__body">
+          <div>
+            <div class="crow__cat">/ 05 — CORE & MOBILIDADE</div>
+            <h3 class="crow__name">Sculpt<br/>& Core.</h3>
+            <p class="crow__desc">Core, controle e estabilização. Trabalho fino de profundidade — pra postura, força utilitária e prevenção de lesão.</p>
+          </div>
+          <div class="crow__tags">
+            <span class="tag">50min</span>
+            <span class="tag">Todos níveis</span>
+            <span class="tag">Grupo · 12</span>
+          </div>
+        </div>
+        <div class="crow__meta">
+          <div class="cmeta"><div class="cmeta__lbl">Horários</div><div class="cmeta__v">Ter · Qui · Sáb</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Próximo</div><div class="cmeta__v">17:00 · Hoje</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Coach</div><div class="cmeta__v">Luiza M.</div></div>
+          <a href="planos.html" class="crow__cta">Reservar aula</a>
+        </div>
+      </article>
+
+      <article class="crow crow--inv">
+        <div class="crow__img">
+          <span class="crow__img-tag" style="background: rgba(0,0,0,0.45); color: #fff; border-color: rgba(255,255,255,0.2);">▸ BIO-CIRCUIT</span>
+          <div class="ph h-fill"><span class="ph__label">CLASS · 06</span><span class="ph__caption">circuito guiado bio-circuit</span><span class="ph__id">IMG_C06</span></div>
+        </div>
+        <div class="crow__body">
+          <div>
+            <div class="crow__cat">/ 06 — CIRCUITO GUIADO</div>
+            <h3 class="crow__name">Bio-<br/>Circuit.</h3>
+            <p class="crow__desc">Nosso circuito proprietário — 14 estações conectadas, full-body em 35 minutos, com leitura de carga e supervisão presente em cada rodada.</p>
+          </div>
+          <div class="crow__tags">
+            <span class="tag">35min</span>
+            <span class="tag">Iniciante OK</span>
+            <span class="tag">Reservar 48h</span>
+          </div>
+        </div>
+        <div class="crow__meta">
+          <div class="cmeta"><div class="cmeta__lbl">Horários</div><div class="cmeta__v">A cada 40min</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Próximo</div><div class="cmeta__v">16:40 · Hoje</div></div>
+          <div class="cmeta"><div class="cmeta__lbl">Coach</div><div class="cmeta__v">Escala</div></div>
+          <a href="planos.html" class="crow__cta">Reservar aula</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- SCHEDULE -->
+<section class="schedule" data-screen-label="04 Grade">
+  <div class="schedule__inner">
+    <div class="schedule__head">
+      <h2 class="reveal">Grade<br/>semanal.</h2>
+      <div class="schedule__filters reveal">
+        <button class="sfilter active">Todas</button>
+        <button class="sfilter">Força</button>
+        <button class="sfilter">Hyrox</button>
+        <button class="sfilter">Flow</button>
+        <button class="sfilter">Bio-Circuit</button>
+      </div>
+    </div>
+
+    <div class="schedule__wrap u-scroll-hint reveal">
+      <div class="schedule__head-row">
+        <div class="h">/ HORA</div>
+        <div class="h"><span>SEG</span><span class="d">17</span></div>
+        <div class="h"><span>TER</span><span class="d">18</span></div>
+        <div class="h today"><span>QUA</span><span class="d">19</span></div>
+        <div class="h"><span>QUI</span><span class="d">20</span></div>
+        <div class="h"><span>SEX</span><span class="d">21</span></div>
+        <div class="h"><span>SÁB</span><span class="d">22</span></div>
+        <div class="h"><span>DOM</span><span class="d">23</span></div>
+      </div>
+
+      <div class="schedule__row">
+        <div class="t">07:00</div>
+        <div class="c has has--blue"><span class="n">Recovery Flow</span><span class="m">45min · Rafael</span></div>
+        <div class="c has"><span class="n">Sculpt & Core</span><span class="m">50min · Luiza</span></div>
+        <div class="c has has--blue"><span class="n">Recovery Flow</span><span class="m">45min · Rafael</span></div>
+        <div class="c has"><span class="n">Sculpt & Core</span><span class="m">50min · Luiza</span></div>
+        <div class="c has has--blue"><span class="n">Recovery Flow</span><span class="m">45min · Rafael</span></div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c"></div>
+      </div>
+
+      <div class="schedule__row">
+        <div class="t">09:00</div>
+        <div class="c has"><span class="n">Bio-Circuit</span><span class="m">35min · Escala</span></div>
+        <div class="c has"><span class="n">Bio-Circuit</span><span class="m">35min · Escala</span></div>
+        <div class="c has"><span class="n">Bio-Circuit</span><span class="m">35min · Escala</span></div>
+        <div class="c has"><span class="n">Bio-Circuit</span><span class="m">35min · Escala</span></div>
+        <div class="c has"><span class="n">Bio-Circuit</span><span class="m">35min · Escala</span></div>
+        <div class="c has has--blue"><span class="n">Recovery Flow</span><span class="m">45min · Rafael</span></div>
+        <div class="c has has--blue"><span class="n">Recovery Flow</span><span class="m">45min · Rafael</span></div>
+      </div>
+
+      <div class="schedule__row">
+        <div class="t">12:00</div>
+        <div class="c"></div>
+        <div class="c has"><span class="n">Powerlifting</span><span class="m">60min · Jaeldson</span></div>
+        <div class="c"></div>
+        <div class="c has"><span class="n">Powerlifting</span><span class="m">60min · Jaeldson</span></div>
+        <div class="c"></div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c"></div>
+      </div>
+
+      <div class="schedule__row">
+        <div class="t">17:00</div>
+        <div class="c has"><span class="n">Sculpt & Core</span><span class="m">50min · Luiza</span></div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c has"><span class="n">Sculpt & Core</span><span class="m">50min · Luiza</span></div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c has"><span class="n">Athletic Cond.</span><span class="m">60min · Júlia</span></div>
+        <div class="c"></div>
+        <div class="c has has--blue"><span class="n">Recovery Flow</span><span class="m">45min · Rafael</span></div>
+      </div>
+
+      <div class="schedule__row">
+        <div class="t">18:00</div>
+        <div class="c has"><span class="n">Powerlifting</span><span class="m">60min · Jaeldson</span></div>
+        <div class="c has"><span class="n">Athletic Cond.</span><span class="m">60min · Júlia</span></div>
+        <div class="c has"><span class="n">Powerlifting</span><span class="m">60min · Jaeldson</span></div>
+        <div class="c has"><span class="n">Athletic Cond.</span><span class="m">60min · Júlia</span></div>
+        <div class="c has"><span class="n">Powerlifting</span><span class="m">60min · Jaeldson</span></div>
+        <div class="c"></div>
+        <div class="c"></div>
+      </div>
+
+      <div class="schedule__row">
+        <div class="t">19:30</div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c has has--yellow"><span class="n">Hyrox Engine</span><span class="m">75min · Luiza</span></div>
+        <div class="c has has--blue"><span class="n">Recovery Flow</span><span class="m">45min · Rafael</span></div>
+        <div class="c"></div>
+        <div class="c"></div>
+      </div>
+
+      <div class="schedule__legend">
+        <span><span class="sw" style="background: rgba(250,177,15,0.6);"></span> Hyrox</span>
+        <span><span class="sw" style="background: rgba(42,143,214,0.5);"></span> Flow / Recovery</span>
+        <span><span class="sw" style="background: rgba(255,255,255,0.18);"></span> Força / Condicionamento</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COACHES -->
+<section class="coaches" data-screen-label="05 Coaches">
+  <div class="coaches__inner">
+    <div class="coaches__head">
+      <h2 class="reveal">Quem<br/>comanda.</h2>
+      <p class="lede reveal">Coaches certificados, atletas em ativo. Cada um responde por uma zona e está em piso pelo menos 5 vezes por semana — disponível para ajustar, corrigir e empurrar.</p>
+    </div>
+    <div class="coaches__grid reveal-up-stagger">
+      <article class="coach">
+        <div class="ph h-fill"><span class="ph__label">COACH · 01</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="coach__no">/ 01</div>
+        <div class="coach__info">
+          <h3 class="coach__name">Jaeldson<br/>Rosa</h3>
+          <div class="coach__spec">Força · Head Coach</div>
+        </div>
+      </article>
+      <article class="coach">
+        <div class="ph h-fill"><span class="ph__label">COACH · 02</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="coach__no">/ 02</div>
+        <div class="coach__info">
+          <h3 class="coach__name">Luiza<br/>Marini</h3>
+          <div class="coach__spec">Hyrox · Performance</div>
+        </div>
+      </article>
+      <article class="coach">
+        <div class="ph h-fill"><span class="ph__label">COACH · 03</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="coach__no">/ 03</div>
+        <div class="coach__info">
+          <h3 class="coach__name">Rafael<br/>Choi</h3>
+          <div class="coach__spec">Mobilidade · Reset</div>
+        </div>
+      </article>
+      <article class="coach">
+        <div class="ph h-fill"><span class="ph__label">COACH · 04</span><span class="ph__caption">retrato vertical · fundo escuro</span></div>
+        <div class="coach__no">/ 04</div>
+        <div class="coach__info">
+          <h3 class="coach__name">Júlia<br/>Vasques</h3>
+          <div class="coach__spec">Atlético · Dados</div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer class="footer" data-screen-label="09 Footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div>
+        <h2 class="footer__cta-title reveal">Pronto<br />quando você<br />estiver.</h2>
+        <p class="footer__cta-text reveal">Comece com um tour ou uma aula experimental. A gente ajuda você a achar o plano, a rotina e o espaço pra desbloquear todo seu potencial.</p>
+        <a href="contato.html" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
+      </div>
+      <div class="footer__cols" style="grid-template-columns: 1fr 1fr; padding: 0;">
+        <div class="footer__col">
+          <h4>Navegação</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="planos.html">Planos</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="trabalhe-conosco.html">Trabalhe conosco</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Contato</h4>
+          <ul>
+            <li><a href="tel:+5574999631507">+55 74 99963-1507</a></li>
+            <li><a href="mailto:antonovacademia@gmail.com">antonovacademia@gmail.com</a></li>
+            <li><address class="footer__address">Av. 1º de Janeiro · ANTONOV<br />Irecê · Bahia · BR</address></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__cols">
+      <div class="footer__col">
+        <h4>Operação</h4>
+        <ul>
+          <li>Todos os dias<br />05:00h às 24:00h</li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Coordenadas</h4>
+        <ul>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">11°18'32"S</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">41°51'13"W</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">ALT. 772m</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="termos.html">Termos</a></li>
+          <li><a href="privacidade.html">Privacidade</a></li>
+          <li><a href="cookies.html">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Social</h4>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/antonovcenter" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/5574999631507" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="mailto:antonovacademia@gmail.com" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 6.66a2 2 0 0 1-2.06 0L2 7"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div>© 2026 ANTONOV CENTER · TODOS OS DIREITOS RESERVADOS · </div>
+      <div class="footer__bottom-links">
+        <span>OPERAÇÃO V1.0</span>
+        <span>DESENVOLVIDO POR <a href="https://www.instagram.com/asuavybe" target="_blank" rel="noopener noreferrer">Vybe LTDA</a></span>
+      </div>
+    </div>
+  </div>
+  <div class="footer__wordmark">ANTONOV</div>
+</footer>
+
+<script src="leads-config.js"></script>
+<script src="vip-leads.js"></script>
+<script src="app.js"></script>
+<script>
+// schedule filter toggle UI only
+document.querySelectorAll('.sfilter').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.sfilter').forEach(o => o.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

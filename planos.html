@@ -1,0 +1,809 @@
+﻿<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Planos — ANTONOV CENTER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+.page-hero {
+  padding: calc(var(--nav-h) + 100px) var(--pad-x) 80px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+.page-hero__inner { max-width: var(--container); margin: 0 auto; position: relative; z-index: 2; }
+.page-hero__crumb {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-hero__crumb::before { content: ""; width: 28px; height: 1px; background: var(--blue); }
+.page-hero h1 {
+  font-family: var(--f-display);
+  font-size: clamp(56px, 8.5vw, 136px);
+  line-height: 0.95; letter-spacing: -0.01em;
+  text-transform: uppercase; margin: 0 0 32px;
+  }
+.page-hero h1 .yel { color: var(--yellow); }
+.page-hero__row {
+  display: grid; grid-template-columns: 1.5fr 1fr;
+  gap: 60px; align-items: end;
+  border-top: 1px solid var(--line-strong); padding-top: 32px;
+}
+.page-hero__lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.4; max-width: 50ch; }
+.page-hero__meta {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;
+  color: var(--ink-mute);
+}
+.page-hero__meta .v { color: var(--ink); display: block; margin-top: 2px; }
+@media (max-width: 880px) { .page-hero__row { grid-template-columns: 1fr; gap: 24px; } }
+
+/* Pricing toggle */
+.pricing-section {
+  padding: 60px var(--pad-x) 140px;
+  background: var(--bg);
+}
+.pricing-section__inner { max-width: var(--container); margin: 0 auto; }
+
+.pricing__toggle {
+  display: flex; justify-content: center; align-items: center; gap: 16px;
+  margin: 0 auto 48px;
+  font-family: var(--f-mono); font-size: 12px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.pricing__toggle button {
+  position: relative;
+  width: 64px; height: 28px;
+  border-radius: 999px;
+  background: var(--ink);
+  cursor: pointer;
+  padding: 0;
+  border: 0;
+}
+.pricing__toggle button::after {
+  content: ""; position: absolute;
+  width: 22px; height: 22px;
+  background: var(--yellow); border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform 250ms ease;
+}
+.pricing__toggle button.active-year::after { transform: translateX(36px); }
+.pricing__toggle .label.active { color: var(--ink); font-weight: 600; }
+.pricing__toggle .badge {
+  background: var(--ink); color: var(--yellow);
+  padding: 4px 8px; border-radius: 999px;
+  font-size: 9px; letter-spacing: 0.18em;
+}
+
+/* Plans grid */
+.plans {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.plan {
+  background: var(--ink); color: #fff;
+  border-radius: 16px;
+  padding: 36px;
+  position: relative;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.plan--featured { background: var(--yellow); color: var(--ink); transform: scale(1.02); }
+.plan__no {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+  color: var(--blue);
+}
+.plan--featured .plan__no { color: var(--ink); }
+.plan__no::before { content: ""; width: 18px; height: 1px; background: currentColor; }
+.plan__tag {
+  position: absolute; top: 18px; right: 18px;
+  font-family: var(--f-mono); font-size: 9px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  background: rgba(255,255,255,0.12); color: #fff;
+  padding: 6px 10px; border-radius: 999px;
+}
+.plan--featured .plan__tag {
+  background: rgba(0,0,0,0.12);
+  color: var(--ink);
+}
+.plan__name {
+  font-family: var(--f-display);
+  font-size: clamp(44px, 4.5vw, 64px);
+  line-height: 0.98; text-transform: uppercase;
+  letter-spacing: -0.005em;
+  margin: 0 0 4px;
+}
+.plan__sub {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 28px;
+}
+.plan__price {
+  display: flex; align-items: baseline; gap: 8px;
+  margin-bottom: 8px;
+}
+.plan__currency { font-size: 18px; opacity: 0.7; }
+.plan__amount {
+  font-family: var(--f-display);
+  font-size: clamp(64px, 6vw, 96px);
+  line-height: 1; letter-spacing: -0.01em;
+}
+.plan__period { font-size: 14px; opacity: 0.7; }
+.plan__amount .yel { color: var(--blue); }
+.plan__lede {
+  font-size: 14px; line-height: 1.5;
+  margin: 0 0 28px;
+  opacity: 0.78;
+  max-width: 32ch;
+}
+.plan--featured .plan__lede { opacity: 0.85; }
+.plan__features {
+  list-style: none; padding: 0; margin: 0 0 32px;
+  display: grid; gap: 12px;
+  font-size: 14px;
+  border-top: 1px solid rgba(255,255,255,0.14);
+  padding-top: 24px;
+}
+.plan--featured .plan__features { border-color: rgba(0,0,0,0.18); }
+.plan__features li {
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.plan__features li::before {
+  content: ""; width: 18px; height: 18px;
+  background: var(--yellow); border-radius: 50%;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230E0E10' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  background-repeat: no-repeat; background-position: center;
+  background-size: 11px;
+  margin-top: 1px;
+}
+.plan--featured .plan__features li::before {
+  background-color: var(--ink);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FAB10F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+}
+.plan__cta {
+  margin-top: auto;
+  width: 100%;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 22px;
+  border-radius: 999px;
+  background: var(--blue); color: var(--ink);
+  font-size: 14px; font-weight: 500;
+  border: 0;
+  cursor: pointer;
+  transition: transform 200ms;
+}
+.plan--featured .plan__cta { background: var(--ink); color: var(--yellow); }
+.plan__cta:hover { transform: translateY(-1px); }
+.plan__cta .arrow {
+  width: 8px; height: 8px;
+  border-right: 1.5px solid currentColor;
+  border-top: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+.plan__feat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+.plan__feat-note {
+  display: block;
+  font-size: 12px;
+  opacity: 0.72;
+  line-height: 1.4;
+}
+
+@media (max-width: 980px) {
+  .plans { grid-template-columns: 1fr; }
+  .plan--featured { transform: none; }
+}
+
+/* Comparison table */
+.compare {
+  padding: 140px var(--pad-x);
+  background: var(--paper);
+}
+.compare__inner { max-width: var(--container); margin: 0 auto; }
+.compare__head {
+  display: grid; grid-template-columns: 1fr 1.4fr;
+  gap: 60px; align-items: end; margin-bottom: 60px;
+}
+.compare h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; letter-spacing: -0.005em;
+  text-transform: uppercase; margin: 0;
+}
+.compare__table {
+  background: var(--bg);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.compare__row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--line);
+}
+.compare__row:last-child { border-bottom: 0; }
+.compare__head-row {
+  background: var(--ink); color: #fff;
+}
+.compare__head-row .ch {
+  padding: 24px 20px;
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  border-right: 1px solid rgba(255,255,255,0.12);
+}
+.compare__head-row .ch:last-child { border-right: 0; }
+.compare__head-row .ch .pn {
+  font-family: var(--f-display);
+  font-size: 22px;
+  color: #fff; text-transform: uppercase;
+  display: block; margin-top: 4px;
+  letter-spacing: -0.005em;
+}
+.compare__head-row .ch.featured { background: var(--yellow); color: var(--ink); border-right-color: rgba(0,0,0,0.12); }
+.compare__head-row .ch.featured .pn { color: var(--ink); }
+
+.compare__cell {
+  padding: 22px 20px;
+  border-right: 1px solid var(--line);
+  font-size: 14px;
+  display: flex; align-items: center;
+}
+.compare__cell:last-child { border-right: 0; }
+.compare__cell--label {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+}
+.compare__check {
+  width: 20px; height: 20px;
+  background: var(--yellow); border-radius: 50%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230E0E10' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");
+  background-repeat: no-repeat; background-position: center;
+  background-size: 11px;
+}
+.compare__dash {
+  width: 16px; height: 1px;
+  background: var(--line-strong);
+}
+.compare__cell strong { color: var(--ink); font-weight: 600; }
+
+.compare__table.u-scroll-hint {
+  border-radius: 12px;
+}
+@media (max-width: 880px) {
+  .compare__head { grid-template-columns: 1fr; gap: 24px; }
+  .compare__row, .compare__head-row { min-width: 720px; }
+  .plans { padding-top: 80px; }
+  .compare, .addons, .faq { padding-top: 100px; padding-bottom: 100px; }
+}
+@media (max-width: 560px) {
+  .plan { padding: 32px 24px; }
+  .acc__head { padding: 22px 0; font-size: 17px; gap: 16px; }
+}
+
+/* Add-ons */
+.addons {
+  padding: 140px var(--pad-x);
+  background: var(--bg);
+}
+.addons__inner { max-width: var(--container); margin: 0 auto; }
+.addons h2 {
+  font-family: var(--f-display);
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.95; letter-spacing: -0.005em;
+  text-transform: uppercase; margin: 0 0 12px;
+}
+.addons__sub { color: var(--ink-soft); margin: 0 0 56px; max-width: 60ch; font-size: 16px; line-height: 1.55; }
+.addons__grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line-strong);
+}
+.addon {
+  padding: 40px 32px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 18px;
+}
+.addon:nth-child(3n) { border-right: 0; }
+.addon__no {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; color: var(--blue);
+}
+.addon__name {
+  font-family: var(--f-display);
+  font-size: 30px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+.addon__price {
+  font-family: var(--f-display);
+  font-size: 22px;
+  color: var(--ink);
+}
+.addon__price .pl { color: var(--ink-mute); font-size: 14px; }
+.addon__desc { font-size: 13px; line-height: 1.55; color: var(--ink-soft); margin: 0; }
+
+@media (max-width: 880px) {
+  .addons__grid { grid-template-columns: 1fr; }
+  .addon { border-right: 0; }
+}
+
+/* FAQ */
+.faq {
+  padding: 140px var(--pad-x);
+  background: var(--paper);
+}
+.faq__inner { max-width: var(--container); margin: 0 auto; }
+.faq__head {
+  display: grid; grid-template-columns: 1fr 1.6fr;
+  gap: 100px; align-items: start;
+}
+.faq h2 {
+  font-family: var(--f-display);
+  font-size: clamp(40px, 5.5vw, 80px);
+  line-height: 0.98; letter-spacing: -0.005em;
+  text-transform: uppercase; margin: 0 0 20px;
+}
+.faq__sub {
+  color: var(--ink-soft); line-height: 1.55;
+  margin: 0 0 32px;
+  max-width: 36ch;
+}
+.acc { display: grid; }
+.acc__item {
+  border-top: 1px solid var(--line-strong);
+}
+.acc__item:last-child { border-bottom: 1px solid var(--line-strong); }
+.acc__head {
+  padding: 28px 0;
+  display: flex; justify-content: space-between; align-items: center; gap: 24px;
+  cursor: pointer;
+  font-size: clamp(18px, 1.6vw, 22px);
+  color: var(--ink);
+  font-weight: 500;
+}
+.acc__head .ico {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  transition: background 200ms, color 200ms, transform 300ms;
+  position: relative;
+}
+.acc__head .ico::before, .acc__head .ico::after {
+  content: ""; position: absolute;
+  background: currentColor;
+}
+.acc__head .ico::before { width: 12px; height: 1.5px; }
+.acc__head .ico::after { width: 1.5px; height: 12px; transition: transform 300ms; }
+.acc__item.open .acc__head .ico { background: var(--ink); color: var(--bg); transform: rotate(180deg); }
+.acc__item.open .acc__head .ico::after { transform: scaleY(0); }
+.acc__body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 400ms ease, padding 400ms ease;
+}
+.acc__item.open .acc__body { max-height: 400px; padding-bottom: 24px; }
+.acc__body p { margin: 0; color: var(--ink-soft); line-height: 1.6; font-size: 15px; max-width: 64ch; }
+
+@media (max-width: 880px) { .faq__head { grid-template-columns: 1fr; gap: 32px; } }
+</style>
+</head>
+<body>
+
+<div class="page-mask">
+  <div class="page-mask__flight" aria-hidden="true">
+    <img src="assets/imagotipo.png" alt="" width="591" height="591" decoding="async" />
+  </div>
+</div>
+
+<header class="nav" data-screen-label="01 Nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img class="nav__logo-img nav__logo-img--dark" src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" />
+      <img class="nav__logo-img nav__logo-img--light" src="assets/logo-preta.png" alt="ANTONOV CENTER — Bahia" width="253" height="38" decoding="async" />
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="index.html">Home</a>
+      <a href="planos.html" class="active">Planos</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__backdrop" aria-hidden="true"></div>
+  <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
+    <div class="nav__drawer-links" role="navigation"></div>
+    <a href="planos.html" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
+  </aside>
+</header>
+
+<!-- HERO -->
+<section class="page-hero" data-screen-label="03 Planos Hero">
+  <div class="page-hero__inner">
+    <div class="page-hero__crumb">/ SEJA ANTONOV — ESCOLHA SEU PLANO</div>
+    <h1>Planos pra<br/> <span class="yel">decolar.</span></h1>
+    <div class="page-hero__row">
+      <p class="page-hero__lede reveal">
+        Mensalidades flexíveis projetadas em torno da sua rotina.
+      </p>
+      <div class="page-hero__meta reveal">
+        <div>PLANOS<span class="v">03 ATIVOS</span></div>
+        <div>AVALIAÇÃO<span class="v">GRÁTIS</span></div>
+        <div>EXPERIMENTAL<span class="v">GRÁTIS</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" data-screen-label="02 Planos">
+  <div class="pricing-section__inner">
+
+    <div class="pricing__toggle reveal">
+      <span class="label active" id="lbl-mes">MENSAL</span>
+      <button id="bill-toggle" aria-label="Alternar"></button>
+      <span class="label" id="lbl-ano">ANUAL <span class="badge">−8%</span></span>
+    </div>
+
+    <div class="plans reveal-up-stagger">
+      
+      <article class="plan">
+        <div class="plan__no">/ 01</div>
+        <h3 class="plan__name">Business<br />Class.</h3>
+     <!--   <div class="plan__sub">A operação completa</div> -->
+        <div class="plan__price">
+          <span class="plan__currency">R$</span>
+          <span class="plan__amount"><span data-price-monthly="134,90" data-price-yearly="124,90">134,90</span></span>
+          <span class="plan__period">/mês</span>
+        </div>
+       <p class="plan__lede">Acesso em horário especial.</p>
+        <ul class="plan__features"> 
+          <li>Acesso completo ao Hangar</li>
+          <li>Avaliação física grátis</li>
+          <li>Cardio e máquinas ilimitado</li>
+          <li>Horário especial (09 às 16h e 22 às 00h)</li>
+        </ul>
+        <button class="plan__cta">Assinar BUSINESS CLASS <span class="arrow"></span></button>
+        
+  </article>
+
+      <article class="plan plan--featured">
+     <!--   <span class="plan__tag">Mais escolhido</span> -->
+        <div class="plan__no">/ 02</div>
+        <h3 class="plan__name">First<br />Class.</h3>
+        <span class="plan__tag">Mais escolhido</span>
+     <!--   <div class="plan__sub">Pra começar com solidez</div> -->
+        <div class="plan__price">
+          <span class="plan__currency">R$</span>
+          <span class="plan__amount"><span data-price-monthly="189,90" data-price-yearly="169,90">189,90</span></span>
+          <span class="plan__period">/mês</span>
+        </div>
+       <p class="plan__lede">Acesso em horário comercial.</p>
+        <ul class="plan__features">
+          <li>Acesso completo ao Hangar</li>
+          <li>Avaliação física grátis</li>
+          <li>Cardio e máquinas ilimitado</li>
+          <li>Horário comercial (05 às 00h)</li>
+        </ul>
+        <button class="plan__cta">Assinar FIRST CLASS <span class="arrow"></span></button>
+      </article>
+
+      <article class="plan">
+        <div class="plan__no">/ 03</div>
+        <h3 class="plan__name">Diária.</h3>
+        <div class="plan__price">
+          <span class="plan__currency">R$</span>
+          <span class="plan__amount">50</span>
+          <span class="plan__period">/diária</span>
+        </div>
+        <p class="plan__lede">Acesso avulso, sem mensalidade.</p>
+        <ul class="plan__features">
+          <li><strong>1 diária</strong> — R$ 50</li>
+          <li><strong>3 diárias</strong> — R$ 110</li>
+          <li>
+            <span class="plan__feat-body">
+              <span class="plan__feat-main"><strong>10 diárias</strong> — R$ 300</span>
+              <span class="plan__feat-note">Prazo de uso: 6 meses</span>
+            </span>
+          </li>
+        </ul>
+        <button class="plan__cta">Comprar diária <span class="arrow"></span></button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE 
+<section class="compare" data-screen-label="04 Comparativo">
+  <div class="compare__inner">
+    <div class="compare__head">
+      <h2 class="reveal">Compare<br/>os planos.</h2>
+      <p class="lede reveal">Cada plano cobre uma intenção diferente. A maioria escolhe Unlimited — mas se você só quer um gym de qualidade, Essential já entrega o padrão ANTONOV.</p>
+    </div>
+    <div class="compare__table u-scroll-hint reveal">
+      <div class="compare__head-row compare__row">
+        <div class="ch">/ INCLUSO NO PLANO</div>
+        <div class="ch">Essential<span class="pn">R$289</span></div>
+        <div class="ch featured">Unlimited<span class="pn">R$489</span></div>
+        <div class="ch">VIP<span class="pn">R$789</span></div>
+      </div>
+
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Acesso ao gym floor</div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Horário estendido</div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Aulas em grupo</div>
+        <div class="compare__cell"><strong>—</strong></div>
+        <div class="compare__cell"><strong>Ilimitadas</strong></div>
+        <div class="compare__cell"><strong>Ilimitadas</strong></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Recovery Suite</div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Bio-Circuit guiado</div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Coach dedicado</div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><strong>4x/mês</strong></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Guest passes</div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><strong>2/mês</strong></div>
+        <div class="compare__cell"><strong>4/mês</strong></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Avaliação física + bioimpedância</div>
+        <div class="compare__cell"><strong>Trimestral</strong></div>
+        <div class="compare__cell"><strong>Mensal</strong></div>
+        <div class="compare__cell"><strong>Quinzenal</strong></div>
+      </div>
+      <div class="compare__row">
+        <div class="compare__cell compare__cell--label">Reserva prioritária</div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><div class="compare__dash"></div></div>
+        <div class="compare__cell"><div class="compare__check"></div></div>
+      </div>
+    </div>
+  </div>
+</section> 
+--> 
+<!-- ADD-ONS 
+<section class="addons" data-screen-label="05 Add-ons">
+  <div class="addons__inner">
+    <div class="reveal" style="margin-bottom: 16px;">
+      <div style="font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.22em; color: var(--blue); display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <span style="width: 28px; height: 1px; background: var(--blue);"></span>
+        / EXTRAS — A LA CARTE
+      </div>
+      <h2>Adicione<br/>conforme<br/>precisa.</h2>
+    </div>
+    <p class="addons__sub reveal">Pacotes complementares que você pode ligar e desligar a qualquer momento. Sem fidelidade — pague só pelo que usa de fato.</p>
+
+    <div class="addons__grid reveal-up-stagger">
+      <article class="addon">
+        <div class="addon__no">/ A01</div>
+        <h3 class="addon__name">Personal<br/>Training</h3>
+        <div class="addon__price">R$ 220 <span class="pl">/ sessão</span></div>
+        <p class="addon__desc">Sessão de 60min com coach dedicado. Programação 100% sob medida.</p>
+      </article>
+      <article class="addon">
+        <div class="addon__no">/ A02</div>
+        <h3 class="addon__name">Avaliação<br/>InBody</h3>
+        <div class="addon__price">R$ 180 <span class="pl">/ avaliação</span></div>
+        <p class="addon__desc">Bioimpedância segmentar + relatório técnico assinado pelo fisiologista.</p>
+      </article>
+      <article class="addon">
+        <div class="addon__no">/ A03</div>
+        <h3 class="addon__name">Fisioterapia<br/>Esportiva</h3>
+        <div class="addon__price">R$ 280 <span class="pl">/ sessão</span></div>
+        <p class="addon__desc">Tratamento e prevenção. Liberação miofascial, mobilidade e retorno guiado.</p>
+      </article>
+      <article class="addon">
+        <div class="addon__no">/ A04</div>
+        <h3 class="addon__name">Nutrição<br/>de Performance</h3>
+        <div class="addon__price">R$ 320 <span class="pl">/ consulta</span></div>
+        <p class="addon__desc">Plano alimentar baseado em treino e composição corporal. Revisão mensal.</p>
+      </article>
+      <article class="addon">
+        <div class="addon__no">/ A05</div>
+        <h3 class="addon__name">Recovery<br/>Day Pass</h3>
+        <div class="addon__price">R$ 140 <span class="pl">/ dia</span></div>
+        <p class="addon__desc">Acesso ao Recovery Suite por 1 dia — sauna, banho gelado, piscina, lounge.</p>
+      </article>
+      <article class="addon">
+        <div class="addon__no">/ A06</div>
+        <h3 class="addon__name">ANTONOV<br/>Pro</h3>
+        <div class="addon__price">R$ 1.890 <span class="pl">/ mês</span></div>
+        <p class="addon__desc">Programa de elite — 12 sessões 1-on-1, avaliação semanal, dados completos.</p>
+      </article>
+    </div>
+  </div>
+</section>
+--> 
+<!-- FAQ -->
+<section class="faq" data-screen-label="06 FAQ">
+  <div class="faq__inner">
+    <div class="faq__head">
+      <div>
+        <h2 class="reveal">Tudo o<br/>que você<br/>precisa saber.</h2>
+        <p class="faq__sub reveal">Respostas claras pra ajudar você a começar e escolher o plano certo. Algo não respondido? Fale com a gente.</p>
+        <a href="contato.html" class="btn btn--ghost reveal">Fale com a gente <span class="arrow"></span></a>
+      </div>
+
+      <div class="acc reveal" data-accordion>
+        <div class="acc__item open">
+          <div class="acc__head">O que está incluso na mensalidade?<div class="ico"></div></div>
+          <div class="acc__body"><p>Cada plano inclui acesso a tudo que a ANTONOV tem a ofereçer, alterando somente o horário de acesso.</p></div>
+        </div>
+        <div class="acc__item">
+          <div class="acc__head">Posso experimentar antes de assinar?<div class="ico"></div></div>
+          <div class="acc__body"><p>Sim. Oferecemos um tour guiado + 1 aula experimental gratuita. Basta agendar pelo link de contato. Sem compromisso.</p></div>
+        </div>
+        <div class="acc__item">
+          <div class="acc__head">Tem fidelidade ou multa de cancelamento?<div class="ico"></div></div>
+          <div class="acc__body"><p>Depende do plano. Os planos mensais e diários não tem fidelidade. O plano anual tem desconto de 8% com fidelidade de 12 meses e cobrança recorrente - não consome o limite do cartão.</p></div>
+        </div>
+      <!--  <div class="acc__item">
+          <div class="acc__head">As aulas precisam de reserva?<div class="ico"></div></div>
+          <div class="acc__body"><p>Sim. Toda aula é reservável pelo app dos membros até 48h antes. Bio-Circuit por slot fixo, demais por horário. Não comparecer 3x consecutivas pausa o privilégio de reserva por 7 dias.</p></div>
+        </div> -->    
+        <div class="acc__item">
+          <div class="acc__head">Preciso seguir um programa específico?<div class="ico"></div></div>
+          <div class="acc__body"><p>Não obrigatoriamente. Você pode treinar livre no Hangar. Mas se quiser progresso estruturado, todo membro tem acesso a uma avaliação inicial e uma rotina sugerida.</p></div>
+        </div>
+      <!--  <div class="acc__item">
+          <div class="acc__head">Posso trocar de plano depois?<div class="ico"></div></div>
+          <div class="acc__body"><p>Sim. Upgrade vale imediatamente (proporcional ao mês). Downgrade entra em vigor no ciclo seguinte. Sem taxa de troca.</p></div>
+        </div> -->  
+      <!--  <div class="acc__item">
+          <div class="acc__head">Tem estacionamento?<div class="ico"></div></div>
+          <div class="acc__body"><p>Sim. 120 vagas cobertas, valet opcional (R$ 25/sessão) e 8 carregadores EV. Membros Unlimited e VIP têm 4 valets de cortesia por mês.</p></div>
+        </div> -->  
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer class="footer" data-screen-label="09 Footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div>
+        <h2 class="footer__cta-title reveal">Pronto<br />quando você<br />estiver.</h2>
+        <p class="footer__cta-text reveal">Comece com um tour ou uma aula experimental. A gente ajuda você a achar o plano, a rotina e o espaço pra desbloquear todo seu potencial.</p>
+        <a href="contato.html" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
+      </div>
+      <div class="footer__cols" style="grid-template-columns: 1fr 1fr; padding: 0;">
+        <div class="footer__col">
+          <h4>Navegação</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="planos.html">Planos</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="trabalhe-conosco.html">Trabalhe conosco</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Contato</h4>
+          <ul>
+            <li><a href="tel:+5574999631507">+55 74 99963-1507</a></li>
+            <li><a href="mailto:antonovacademia@gmail.com">antonovacademia@gmail.com</a></li>
+            <li><address class="footer__address">Av. 1º de Janeiro · ANTONOV<br />Irecê · Bahia · BR</address></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__cols">
+      <div class="footer__col">
+        <h4>Operação</h4>
+        <ul>
+          <li>Todos os dias<br />05:00h às 24:00h</li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Coordenadas</h4>
+        <ul>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">11°18'32"S</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">41°51'13"W</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">ALT. 772m</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="termos.html">Termos</a></li>
+          <li><a href="privacidade.html">Privacidade</a></li>
+          <li><a href="cookies.html">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Social</h4>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/antonovcenter" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/5574999631507" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="mailto:antonovacademia@gmail.com" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 6.66a2 2 0 0 1-2.06 0L2 7"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div>© 2026 ANTONOV CENTER · TODOS OS DIREITOS RESERVADOS · </div>
+      <div class="footer__bottom-links">
+        <span>OPERAÇÃO V1.0</span>
+        <span>DESENVOLVIDO POR <a href="https://www.instagram.com/asuavybe" target="_blank" rel="noopener noreferrer">Vybe LTDA</a></span>
+      </div>
+    </div>
+  </div>
+  <div class="footer__wordmark">ANTONOV</div>
+</footer>
+
+<script src="leads-config.js"></script>
+<script src="vip-leads.js"></script>
+<script src="app.js"></script>
+<script>
+// pricing toggle
+(function () {
+  const btn = document.getElementById('bill-toggle');
+  const lblM = document.getElementById('lbl-mes');
+  const lblY = document.getElementById('lbl-ano');
+  const prices = document.querySelectorAll('[data-price-monthly]');
+  let yearly = false;
+  btn.addEventListener('click', () => {
+    yearly = !yearly;
+    btn.classList.toggle('active-year', yearly);
+    lblM.classList.toggle('active', !yearly);
+    lblY.classList.toggle('active', yearly);
+    prices.forEach(p => {
+      p.textContent = yearly ? p.dataset.priceYearly : p.dataset.priceMonthly;
+    });
+  });
+  lblM.classList.add('active');
+})();
+</script>
+</body>
+</html>

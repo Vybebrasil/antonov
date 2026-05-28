@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trabalhe Conosco — ANTONOV CENTER</title>
+<meta name="description" content="Faça parte da tripulação ANTONOV CENTER em Irecê. Vagas em coaching, atendimento, operações e mais." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+.page-hero {
+  padding: calc(var(--nav-h) + 100px) var(--pad-x) 80px;
+  background: var(--bg);
+}
+.page-hero__inner { max-width: var(--container); margin: 0 auto; }
+.page-hero__crumb {
+  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ink-mute);
+  margin-bottom: 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.page-hero__crumb::before { content: ""; width: 28px; height: 1px; background: var(--blue); }
+.page-hero h1 {
+  font-family: var(--f-display);
+  font-size: clamp(56px, 8.5vw, 136px);
+  line-height: 0.95; letter-spacing: -0.01em;
+  text-transform: uppercase; margin: 0 0 32px;
+}
+.page-hero h1 .yel { color: var(--yellow); }
+.page-hero__row {
+  display: grid; grid-template-columns: 1.5fr 1fr;
+  gap: 60px; align-items: end;
+  border-top: 1px solid var(--line-strong); padding-top: 32px;
+}
+.page-hero__lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.4; max-width: 50ch; }
+.page-hero__meta {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;
+  color: var(--ink-mute);
+}
+.page-hero__meta .v { color: var(--ink); display: block; margin-top: 2px; }
+@media (max-width: 880px) { .page-hero__row { grid-template-columns: 1fr; gap: 24px; } }
+
+.careers {
+  padding: 0 var(--pad-x) 140px;
+  background: var(--bg);
+}
+.careers__inner { max-width: var(--container); margin: 0 auto; }
+
+.careers__why {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 80px;
+}
+.careers__pillar {
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 32px 28px;
+}
+.careers__pillar-no {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.careers__pillar-no::before {
+  content: "";
+  width: 20px;
+  height: 1px;
+  background: var(--blue);
+}
+.careers__pillar h3 {
+  font-family: var(--f-display);
+  font-size: clamp(24px, 2.2vw, 32px);
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  letter-spacing: -0.005em;
+}
+.careers__pillar p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.careers__layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 16px;
+  align-items: start;
+}
+.careers__jobs-head {
+  margin-bottom: 28px;
+}
+.careers__jobs-head h2 {
+  font-family: var(--f-display);
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 0.98;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  letter-spacing: -0.005em;
+}
+.careers__jobs-head p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 42ch;
+}
+.careers__jobs {
+  display: grid;
+  gap: 12px;
+}
+.careers__job {
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 24px 28px;
+  transition: border-color 200ms;
+}
+.careers__job:hover { border-color: var(--blue); }
+.careers__job-tag {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 8px;
+}
+.careers__job h3 {
+  font-family: var(--f-display);
+  font-size: 22px;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+  line-height: 1;
+}
+.careers__job p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.careers__job-meta {
+  margin-top: 12px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.cform {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 16px;
+  padding: 56px;
+  position: relative;
+  overflow: hidden;
+}
+.cform__bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(60% 60% at 100% 0%, rgba(42,143,214,0.08) 0, transparent 60%);
+  pointer-events: none;
+}
+.cform__lbl {
+  font-family: var(--f-mono); font-size: 11px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 12px;
+}
+.cform__lbl::before { content: ""; width: 24px; height: 1px; background: var(--blue); }
+.cform h2 {
+  font-family: var(--f-display);
+  font-size: clamp(36px, 4vw, 52px);
+  line-height: 0.98; letter-spacing: -0.005em;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+.cform__sub {
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 40px;
+  font-size: 16px; line-height: 1.55;
+  max-width: 46ch;
+}
+.cform__row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.cform__field { display: flex; flex-direction: column; gap: 8px; }
+.cform__field label {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.cform__field label .req { color: var(--blue); }
+.cform__field input, .cform__field textarea, .cform__field select {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.18);
+  padding: 12px 0;
+  font: inherit;
+  color: #fff;
+  font-size: 16px;
+  transition: border-color 200ms;
+  font-family: inherit;
+}
+.cform__field input:focus, .cform__field textarea:focus, .cform__field select:focus {
+  outline: 0;
+  border-color: var(--blue);
+}
+.cform__field input::placeholder, .cform__field textarea::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+.cform__field select { color: rgba(255,255,255,0.55); appearance: none; cursor: pointer; }
+.cform__field select option { color: var(--ink); }
+.cform__field--full { grid-column: 1 / -1; }
+.cform__field textarea { resize: vertical; min-height: 100px; }
+.cform__submit {
+  margin-top: 36px;
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%;
+  padding: 22px 28px;
+  border-radius: 999px;
+  background: var(--yellow); color: var(--ink);
+  font-size: 15px; font-weight: 500;
+  border: 0;
+  cursor: pointer;
+  transition: transform 200ms;
+}
+.cform__submit:hover { transform: translateY(-1px); }
+.cform__submit .meta {
+  font-family: var(--f-mono); font-size: 10px;
+  letter-spacing: 0.22em;
+}
+.cform__submit .arrow {
+  width: 8px; height: 8px;
+  border-right: 1.5px solid currentColor;
+  border-top: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+
+@media (max-width: 980px) {
+  .careers__why { grid-template-columns: 1fr; }
+  .careers__layout { grid-template-columns: 1fr; }
+  .cform { padding: 40px 28px; }
+  .cform__row { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .careers__why, .careers__layout { gap: 32px; }
+  .cform { padding: 32px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-mask">
+  <div class="page-mask__flight" aria-hidden="true">
+    <img src="assets/imagotipo.png" alt="" width="591" height="591" decoding="async" />
+  </div>
+</div>
+
+<header class="nav" data-screen-label="01 Nav">
+  <div class="nav__inner">
+    <a href="index.html" class="nav__logo">
+      <img class="nav__logo-img nav__logo-img--dark" src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" />
+      <img class="nav__logo-img nav__logo-img--light" src="assets/logo-preta.png" alt="ANTONOV CENTER — Bahia" width="253" height="38" decoding="async" />
+    </a>
+    <nav class="nav__links" aria-label="Principal">
+      <a href="index.html">Home</a>
+      <a href="planos.html">Planos</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__backdrop" aria-hidden="true"></div>
+  <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
+    <div class="nav__drawer-links" role="navigation"></div>
+    <a href="planos.html" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
+  </aside>
+</header>
+
+<section class="page-hero" data-screen-label="02 Trabalhe Hero">
+  <div class="page-hero__inner">
+    <div class="page-hero__crumb">/ CARREIRAS — TRIPULAÇÃO ANTONOV</div>
+    <h1>Trabalhe<br /><span class="yel">conosco.</span></h1>
+    <div class="page-hero__row">
+      <p class="page-hero__lede reveal">
+        Estamos construindo um hangar de performance em Irecê. Se você vive treino, atendimento ou operação com excelência, queremos te conhecer.
+      </p>
+      <div class="page-hero__meta reveal">
+        <div>LOCAL<span class="v">IRECÊ · BAHIA</span></div>
+        <div>MODELO<span class="v">PRESENCIAL</span></div>
+        <div>PROCESSO<span class="v">CURRÍCULO + ENTREVISTA</span></div>
+        <div>CONTATO RH<span class="v">antonovacademia@gmail.com</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="careers" data-screen-label="03 Carreiras">
+  <div class="careers__inner">
+    <div class="careers__why reveal-up-stagger">
+      <article class="careers__pillar">
+        <div class="careers__pillar-no">/ 01</div>
+        <h3>Ambiente premium</h3>
+        <p>Espaço projetado, equipamentos de alto padrão e cultura de performance — sem improviso.</p>
+      </article>
+      <article class="careers__pillar">
+        <div class="careers__pillar-no">/ 02</div>
+        <h3>Time de tripulação</h3>
+        <p>Trabalho em equipe, feedback direto e oportunidade de crescer com a operação desde o início.</p>
+      </article>
+      <article class="careers__pillar">
+        <div class="careers__pillar-no">/ 03</div>
+        <h3>Rotina com propósito</h3>
+        <p>Horários organizados, treino incluso para a equipe e foco em entregar experiência memorável ao membro.</p>
+      </article>
+    </div>
+
+    <div class="careers__layout reveal">
+      <div>
+        <div class="careers__jobs-head">
+          <h2>Vagas<br />abertas.</h2>
+          <p>Envie seu currículo mesmo que a vaga ideal não esteja listada — mantemos banco de talentos ativo.</p>
+        </div>
+        <div class="careers__jobs">
+          <article class="careers__job">
+            <div class="careers__job-tag">/ COACHING</div>
+            <h3>Personal Trainer</h3>
+            <p>Atendimento individual e acompanhamento de alunos. Experiência com musculação e avaliação física.</p>
+            <div class="careers__job-meta">CLT ou PJ · TEMPO INTEGRAL</div>
+          </article>
+          <article class="careers__job">
+            <div class="careers__job-tag">/ OPERAÇÕES</div>
+            <h3>Recepção</h3>
+            <p>Primeiro contato com membros e visitantes. Organização, comunicação e postura comercial.</p>
+            <div class="careers__job-meta">ESCALA · MANHÃ / TARDE / NOITE</div>
+          </article>
+          <article class="careers__job">
+            <div class="careers__job-tag">/ OPERAÇÕES</div>
+            <h3>Manutenção &amp; limpeza</h3>
+            <p>Cuidado com o espaço e equipamentos. Atenção aos detalhes e disponibilidade em horários de pico.</p>
+            <div class="careers__job-meta">MEIO PERÍODO · INTEGRAL</div>
+          </article>
+          <article class="careers__job">
+            <div class="careers__job-tag">/ BANCO DE TALENTOS</div>
+            <h3>Outras áreas</h3>
+            <p>Marketing, financeiro, TI ou outra expertise? Conte como você pode somar ao ANTONOV.</p>
+            <div class="careers__job-meta">CADASTRO ABERTO</div>
+          </article>
+        </div>
+      </div>
+
+      <form class="cform" action="mailto:antonovacademia@gmail.com" method="post" enctype="text/plain" onsubmit="var btn=this.querySelector('.cform__submit'); setTimeout(function(){ btn.querySelector('.meta').textContent='✓ ENVIADO'; btn.style.background='#1F8A5B'; btn.style.color='#fff'; }, 100);">
+        <div class="cform__bg"></div>
+        <div class="cform__lbl">/ CANDIDATURA</div>
+        <h2>Envie seu<br />currículo.</h2>
+        <p class="cform__sub">Preencha o formulário ou envie direto para antonovacademia@gmail.com com o assunto “Trabalhe Conosco”.</p>
+
+        <div class="cform__row">
+          <div class="cform__field">
+            <label>Nome <span class="req">*</span></label>
+            <input type="text" name="nome" required placeholder="Seu nome completo" />
+          </div>
+          <div class="cform__field">
+            <label>WhatsApp <span class="req">*</span></label>
+            <input type="tel" name="telefone" required placeholder="(74) 99999-9999" />
+          </div>
+          <div class="cform__field cform__field--full">
+            <label>E-mail <span class="req">*</span></label>
+            <input type="email" name="email" required placeholder="seu@email.com" />
+          </div>
+          <div class="cform__field">
+            <label>Área de interesse <span class="req">*</span></label>
+            <select name="area" required>
+              <option value="">Selecione</option>
+              <option>Personal Trainer / Coaching</option>
+              <option>Recepção / Atendimento</option>
+              <option>Manutenção / Limpeza</option>
+              <option>Marketing / Comercial</option>
+              <option>Administrativo / Financeiro</option>
+              <option>Outra área</option>
+            </select>
+          </div>
+          <div class="cform__field">
+            <label>Disponibilidade</label>
+            <select name="disponibilidade">
+              <option>Tempo integral</option>
+              <option>Meio período</option>
+              <option>Plantão / escala</option>
+              <option>A combinar</option>
+            </select>
+          </div>
+          <div class="cform__field cform__field--full">
+            <label>LinkedIn ou portfólio (opcional)</label>
+            <input type="url" name="portfolio" placeholder="https://..." />
+          </div>
+          <div class="cform__field cform__field--full">
+            <label>Mensagem</label>
+            <textarea name="mensagem" placeholder="Conte sua experiência e por que quer fazer parte da tripulação."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="cform__submit">
+          <span>Enviar candidatura</span>
+          <span class="meta">VIA E-MAIL <span class="arrow"></span></span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer class="footer" data-screen-label="09 Footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div>
+        <h2 class="footer__cta-title reveal">Pronto<br />quando você<br />estiver.</h2>
+        <p class="footer__cta-text reveal">Comece com um tour ou uma aula experimental. A gente ajuda você a achar o plano, a rotina e o espaço pra desbloquear todo seu potencial.</p>
+        <a href="contato.html" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
+      </div>
+      <div class="footer__cols" style="grid-template-columns: 1fr 1fr; padding: 0;">
+        <div class="footer__col">
+          <h4>Navegação</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="planos.html">Planos</a></li>
+            <li><a href="contato.html">Contato</a></li>
+            <li><a href="trabalhe-conosco.html" aria-current="page">Trabalhe conosco</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Contato</h4>
+          <ul>
+            <li><a href="tel:+5574999631507">+55 74 99963-1507</a></li>
+            <li><a href="mailto:antonovacademia@gmail.com">antonovacademia@gmail.com</a></li>
+            <li><address class="footer__address">Av. 1º de Janeiro · ANTONOV<br />Irecê · Bahia · BR</address></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__cols">
+      <div class="footer__col">
+        <h4>Operação</h4>
+        <ul>
+          <li>Todos os dias<br />05:00h às 24:00h</li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Coordenadas</h4>
+        <ul>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">11°18'32"S</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">41°51'13"W</a></li>
+          <li><a href="https://share.google/tx92Zwkoj0yGdSOUj" target="_blank" rel="noopener noreferrer">ALT. 772m</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="termos.html">Termos</a></li>
+          <li><a href="privacidade.html">Privacidade</a></li>
+          <li><a href="cookies.html">Cookies</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Social</h4>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/antonovcenter" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/5574999631507" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
+          <a href="mailto:antonovacademia@gmail.com" aria-label="E-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 6.66a2 2 0 0 1-2.06 0L2 7"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div>© 2026 ANTONOV CENTER · TODOS OS DIREITOS RESERVADOS · </div>
+      <div class="footer__bottom-links">
+        <span>OPERAÇÃO V1.0</span>
+        <span>DESENVOLVIDO POR <a href="https://www.instagram.com/asuavybe" target="_blank" rel="noopener noreferrer">Vybe LTDA</a></span>
+      </div>
+    </div>
+  </div>
+  <div class="footer__wordmark">ANTONOV</div>
+</footer>
+
+<script src="leads-config.js"></script>
+<script src="vip-leads.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
