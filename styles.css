@@ -700,6 +700,197 @@ body.nav-open { overflow: hidden; }
   }
 }
 
+/* ---------- modalidades modal ---------- */
+.disc-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 290;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.disc-modal[hidden] { display: none !important; }
+.disc-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.74);
+  backdrop-filter: blur(8px);
+}
+.disc-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 720px);
+  max-height: min(92vh, 860px);
+  overflow: auto;
+  background: var(--carbon);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+.disc-modal__gallery {
+  position: relative;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.disc-modal__carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+  height: clamp(240px, 40vw, 400px);
+  background: var(--carbon-2);
+}
+.disc-modal__carousel.is-single .disc-modal__nav,
+.disc-modal__carousel.is-single + .disc-modal__dots {
+  display: none;
+}
+.disc-modal__track {
+  display: flex;
+  height: 100%;
+  transition: transform 420ms cubic-bezier(0.33, 0, 0.18, 1);
+  will-change: transform;
+}
+.disc-modal__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--carbon-2);
+}
+.disc-modal__slide img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.disc-modal__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(14, 14, 16, 0.55);
+  color: #fff;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 200ms, transform 200ms;
+}
+.disc-modal__nav:hover {
+  background: rgba(14, 14, 16, 0.82);
+  transform: translateY(-50%) scale(1.04);
+}
+.disc-modal__nav--prev { left: 12px; }
+.disc-modal__nav--next { right: 12px; }
+.disc-modal__nav::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0 auto;
+  border-top: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+}
+.disc-modal__nav--prev::after { transform: rotate(-135deg); margin-left: 14px; }
+.disc-modal__nav--next::after { transform: rotate(45deg); margin-right: 14px; }
+.disc-modal__nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+.disc-modal__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px 14px;
+}
+.disc-modal__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: width 220ms, background 220ms;
+}
+.disc-modal__dot.is-active {
+  width: 22px;
+  background: var(--yellow);
+}
+.disc-modal__body {
+  padding: 24px 26px 26px;
+}
+.disc-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+}
+.disc-modal__close:hover { background: rgba(255, 255, 255, 0.16); }
+.disc-modal__eyebrow {
+  margin: 0 0 12px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+.disc-modal__title {
+  margin: 0 0 12px;
+  font-family: var(--f-display);
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 0.95;
+  letter-spacing: -0.005em;
+  text-transform: uppercase;
+}
+.disc-modal__summary {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+}
+.disc-modal__details {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.68);
+  max-width: 54ch;
+}
+.disc-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.disc-grid .disc[role="button"]:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+@media (max-width: 640px) {
+  .disc-modal__dialog { border-radius: 12px; }
+  .disc-modal__carousel {
+    border-radius: 12px 12px 0 0;
+    height: clamp(200px, 52vw, 280px);
+  }
+  .disc-modal__body { padding: 20px 18px 22px; }
+  .disc-modal__nav { width: 36px; height: 36px; }
+}
+
 /* ---------- VIP modal (lista pré-inauguração) ---------- */
 .vip-modal {
   position: fixed;

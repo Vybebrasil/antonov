@@ -445,7 +445,7 @@
 }
 .disc .ph { position: absolute; inset: 0; }
 .disc .ph--disc-01 {
-  background: url("assets/disc-01.png") center / cover no-repeat;
+  background: url("assets/disc-01-barbells.png") center / cover no-repeat;
 }
 .disc__content {
   position: absolute; inset: 0;
@@ -1052,7 +1052,7 @@
     </div>
 
     <div class="disc-grid reveal-up-stagger">
-      <article class="disc">
+      <article class="disc" data-disc-images='["assets/disc-01-barbells.png","assets/disc-01-plates.png","assets/disc-01-dumbbells-rack.png","assets/disc-01-dumbbells-pro.png"]'>
         <div class="ph ph--disc-01 h-fill">
           <span class="ph__label">DISC · 01</span>
           <span class="ph__caption">treino de força · pesos livres</span>
@@ -1100,7 +1100,7 @@
         <div class="disc__arrow"></div>
         <div class="disc__content">
           <h3 class="disc__name">Cardio<br />Bay</h3>
-          <p class="disc__desc">Esteiras, bikes e remos premium. Vista pra cidade, foco total.</p>
+          <p class="disc__desc">Esteiras, bikes e escada. Vista pra cidade, foco total.</p>
         </div>
       </article>
 
@@ -1310,7 +1310,7 @@
       <div class="footer__col">
         <h4>Operação</h4>
         <ul>
-          <li>Todos os dias<br />05:00h às 24:00h</li>
+          <li>Todos os dias<br />05:00h às 00:00h</li>
         </ul>
       </div>
       <div class="footer__col">
@@ -1349,6 +1349,30 @@
   </div>
   <div class="footer__wordmark">ANTONOV</div>
 </footer>
+
+<div class="disc-modal" id="disc-modal" hidden aria-hidden="true">
+  <div class="disc-modal__backdrop" data-disc-close tabindex="-1"></div>
+  <div class="disc-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="disc-modal-title">
+    <button type="button" class="disc-modal__close" data-disc-close aria-label="Fechar">×</button>
+    <div class="disc-modal__gallery">
+      <div class="disc-modal__carousel" id="disc-modal-carousel">
+        <div class="disc-modal__track" id="disc-modal-track" aria-live="polite"></div>
+        <button type="button" class="disc-modal__nav disc-modal__nav--prev" data-disc-prev aria-label="Imagem anterior"></button>
+        <button type="button" class="disc-modal__nav disc-modal__nav--next" data-disc-next aria-label="Próxima imagem"></button>
+      </div>
+      <div class="disc-modal__dots" id="disc-modal-dots" role="tablist" aria-label="Galeria da modalidade"></div>
+    </div>
+    <div class="disc-modal__body">
+      <p class="disc-modal__eyebrow" id="disc-modal-eyebrow">/ MODALIDADE</p>
+      <h3 class="disc-modal__title" id="disc-modal-title">Detalhes da modalidade</h3>
+      <p class="disc-modal__summary" id="disc-modal-summary"></p>
+      <p class="disc-modal__details" id="disc-modal-details"></p>
+      <div class="disc-modal__actions">
+        <a href="contato.html" class="btn btn--yellow">Quero saber mais <span class="arrow"></span></a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="leads-config.js"></script>
 <script src="vip-leads.js"></script>

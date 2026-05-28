@@ -288,6 +288,184 @@
     });
   });
 
+  // ---------- modalidades modal + galeria ----------
+  const discModal = document.getElementById('disc-modal');
+  if (discModal) {
+    const modalEyebrow = document.getElementById('disc-modal-eyebrow');
+    const modalTitle = document.getElementById('disc-modal-title');
+    const modalSummary = document.getElementById('disc-modal-summary');
+    const modalDetails = document.getElementById('disc-modal-details');
+    const modalCarousel = document.getElementById('disc-modal-carousel');
+    const modalTrack = document.getElementById('disc-modal-track');
+    const modalDots = document.getElementById('disc-modal-dots');
+    const btnPrev = discModal.querySelector('[data-disc-prev]');
+    const btnNext = discModal.querySelector('[data-disc-next]');
+
+    const DISC_DETAILS = {
+      POWERLIFTING: 'Área com barras olímpicas, anilhas, racks e plataformas para progressão de força com técnica e segurança.',
+      FLEXIBILIDADE: 'Sessões focadas em mobilidade ativa, estabilidade e amplitude de movimento para melhorar postura e performance.',
+      CARDIO: 'Esteiras, bikes e escada com monitoramento de ritmo para treinos intervalados e de resistência com progressão controlada.',
+      CONDICIONAMENTO: 'Circuitos híbridos inspirados em provas funcionais para elevar condicionamento e potência no dia a dia.',
+      FLOW: 'Blocos de mobilidade, respiração e controle corporal para reduzir tensão, ganhar fluidez e recuperar melhor.',
+      RECOVERY: 'Recuperação estruturada com protocolos pós-treino para acelerar adaptação e manter constância sem sobrecarga.',
+      'SMALL GROUP': 'Turmas reduzidas com coaching próximo, correções técnicas e evolução individual dentro de uma rotina dinâmica.',
+    };
+
+    const DISC_IMAGES = {
+      POWERLIFTING: [
+        'assets/disc-01-barbells.png',
+        'assets/disc-01-plates.png',
+        'assets/disc-01-dumbbells-rack.png',
+        'assets/disc-01-dumbbells-pro.png',
+      ],
+      FLEXIBILIDADE: ['assets/disc-02.png'],
+      CARDIO: [
+        'assets/disc-03-treadmills.png',
+        'assets/disc-03-cardio-wide.png',
+        'assets/disc-03-bikes.png',
+        'assets/disc-03-treadmills-bikes.png',
+      ],
+      CONDICIONAMENTO: ['assets/foto-hero.png', 'assets/fotogeral.png', 'assets/disc-02.png'],
+      FLOW: ['assets/disc-02.png', 'assets/space-s01.png', 'assets/purpose-bg.png'],
+      RECOVERY: ['assets/purpose-bg.png', 'assets/fotogeral.png', 'assets/space-hightech.png'],
+      'SMALL GROUP': ['assets/fotogeral.png', 'assets/disc-01.png', 'assets/space-hightech.png'],
+    };
+
+    const DEFAULT_IMAGES = ['assets/fotogeral.png', 'assets/foto-hero.png', 'assets/space-hightech.png'];
+    let slideIndex = 0;
+    let slideCount = 0;
+
+    const imagesFromCard = (card) => {
+      const ph = card.querySelector('.ph');
+      const fromPh = [];
+      if (ph?.classList.contains('ph--disc-01')) {
+        fromPh.push(
+          'assets/disc-01-barbells.png',
+          'assets/disc-01-plates.png',
+          'assets/disc-01-dumbbells-rack.png',
+          'assets/disc-01-dumbbells-pro.png'
+        );
+      }
+      if (ph?.classList.contains('ph--disc-02')) fromPh.push('assets/disc-02.png');
+      if (ph?.classList.contains('ph--disc-03')) {
+        fromPh.push(
+          'assets/disc-03-treadmills.png',
+          'assets/disc-03-cardio-wide.png',
+          'assets/disc-03-bikes.png',
+          'assets/disc-03-treadmills-bikes.png'
+        );
+      }
+      return fromPh;
+    };
+
+    const getCardInfo = (card) => {
+      const rawCode = card.querySelector('.disc__no')?.textContent || '';
+      const code = rawCode.replace(/\s+/g, ' ').replace(/^\d+\s*\/\s*/u, '').trim().toUpperCase();
+      const titleEl = card.querySelector('.disc__name');
+      const title = (titleEl?.innerText || titleEl?.textContent || '').replace(/\s+/g, ' ').trim();
+      const summary = (card.querySelector('.disc__desc')?.textContent || '').replace(/\s+/g, ' ').trim();
+      const details = (card.dataset.discDetails || DISC_DETAILS[code] || 'Treino estruturado com metodologia Antonov, foco em evolução e suporte técnico durante toda a jornada.').trim();
+      let images = [];
+      const hasCustomGallery = Boolean(card.dataset.discImages);
+      if (hasCustomGallery) {
+        try {
+          images = JSON.parse(card.dataset.discImages);
+        } catch (err) { /* noop */ }
+        images = [...new Set(images.filter(Boolean))];
+      } else {
+        images = DISC_IMAGES[code] || [];
+        const cardPh = imagesFromCard(card);
+        images = [...new Set([...cardPh, ...images, ...DEFAULT_IMAGES])].slice(0, 5);
+      }
+      return { code, title, summary, details, images };
+    };
+
+    const updateCarousel = () => {
+      if (!modalTrack) return;
+      modalTrack.style.transform = `translate3d(-${slideIndex * 100}%, 0, 0)`;
+      if (btnPrev) btnPrev.disabled = slideIndex <= 0;
+      if (btnNext) btnNext.disabled = slideIndex >= slideCount - 1;
+      modalDots?.querySelectorAll('.disc-modal__dot').forEach((dot, i) => {
+        dot.classList.toggle('is-active', i === slideIndex);
+        dot.setAttribute('aria-selected', i === slideIndex ? 'true' : 'false');
+      });
+    };
+
+    const goToSlide = (index) => {
+      if (!slideCount) return;
+      slideIndex = Math.max(0, Math.min(slideCount - 1, index));
+      updateCarousel();
+    };
+
+    const buildGallery = (images, title) => {
+      if (!modalTrack || !modalDots) return;
+      const list = images.length ? images : DEFAULT_IMAGES;
+      slideCount = list.length;
+      slideIndex = 0;
+      if (modalCarousel) {
+        modalCarousel.classList.toggle('is-single', slideCount <= 1);
+      }
+      modalTrack.innerHTML = list.map((src, i) => `
+        <figure class="disc-modal__slide">
+          <img src="${src}" alt="${title} — imagem ${i + 1}" width="720" height="450" loading="lazy" decoding="async" />
+        </figure>`).join('');
+      modalDots.innerHTML = list.map((_, i) =>
+        `<button type="button" class="disc-modal__dot${i === 0 ? ' is-active' : ''}" data-disc-dot="${i}" role="tab" aria-label="Imagem ${i + 1}" aria-selected="${i === 0 ? 'true' : 'false'}"></button>`
+      ).join('');
+      modalDots.querySelectorAll('[data-disc-dot]').forEach((dot) => {
+        dot.addEventListener('click', () => goToSlide(Number(dot.dataset.discDot)));
+      });
+      if (btnPrev) btnPrev.disabled = slideCount <= 1;
+      if (btnNext) btnNext.disabled = slideCount <= 1;
+      updateCarousel();
+    };
+
+    const openDiscModal = (card) => {
+      const info = getCardInfo(card);
+      if (modalEyebrow) modalEyebrow.textContent = info.code ? `/ ${info.code}` : '/ MODALIDADE';
+      if (modalTitle) modalTitle.textContent = info.title;
+      if (modalSummary) modalSummary.textContent = info.summary;
+      if (modalDetails) modalDetails.textContent = info.details;
+      buildGallery(info.images, info.title);
+      discModal.hidden = false;
+      discModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('no-scroll');
+      discModal.querySelector('.disc-modal__close')?.focus();
+    };
+
+    const closeDiscModal = () => {
+      discModal.hidden = true;
+      discModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('no-scroll');
+    };
+
+    btnPrev?.addEventListener('click', () => goToSlide(slideIndex - 1));
+    btnNext?.addEventListener('click', () => goToSlide(slideIndex + 1));
+
+    document.querySelectorAll('.disc-grid .disc').forEach((card) => {
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.addEventListener('click', () => openDiscModal(card));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openDiscModal(card);
+        }
+      });
+    });
+
+    discModal.querySelectorAll('[data-disc-close]').forEach((el) => {
+      el.addEventListener('click', closeDiscModal);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (discModal.hidden) return;
+      if (e.key === 'Escape') closeDiscModal();
+      if (e.key === 'ArrowLeft') goToSlide(slideIndex - 1);
+      if (e.key === 'ArrowRight') goToSlide(slideIndex + 1);
+    });
+  }
+
   // ---------- horizontal scroll-snap class indicator ----------
   document.querySelectorAll('[data-snap]').forEach((track) => {
     const dotsHost = document.querySelector(track.dataset.snap);
