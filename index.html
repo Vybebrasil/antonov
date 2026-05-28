@@ -1,7 +1,8 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-br">
 <head>
 <meta charset="utf-8" />
+<script>try{if(sessionStorage.getItem('antonov-nav')==='1')document.documentElement.classList.add('antonov-loading-pending');}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ANTONOV CENTER — Projetado para decolar</title>
 <meta name="description" content="Centro de performance e lifestyle premium. Engenharia, treino e recuperação em um só lugar." />
@@ -906,7 +907,12 @@
 <body>
 
 <!-- page transition mask -->
-<div class="page-mask">
+<div class="page-mask" aria-hidden="true" role="presentation">
+  <div class="page-mask__loader" aria-live="polite" aria-busy="true">
+    <img class="page-mask__logo" src="assets/logo.png" alt="" width="211" height="61" decoding="async" />
+    <div class="page-mask__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+    <p class="page-mask__status" id="page-mask-status">Preparando hangar…</p>
+  </div>
   <div class="page-mask__flight" aria-hidden="true">
     <img src="assets/imagotipo.png" alt="" width="591" height="591" decoding="async" />
   </div>
@@ -962,7 +968,7 @@
         </p>
         <div class="hero__cta">
           <a href="planos.html" class="btn btn--yellow">Comece agora <span class="arrow"></span></a>
-          <button type="button" class="btn btn--ghost-light" data-vip-open>Lista VIP pré-inauguração</button>
+          <button type="button" class="btn btn--ghost-light" data-vip-open>Pré-cadastro de inauguração</button>
         <!-- <a href="estudio.html" class="btn btn--ghost-light">Conheça o espaço</a> -->
         </div>
       </div>

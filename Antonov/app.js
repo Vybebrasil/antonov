@@ -3,11 +3,7 @@
   'use strict';
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const maskInMs = () => (reducedMotion.matches ? 80 : 700);
-  const flightMs = () => (reducedMotion.matches ? 80 : 1350);
-  const maskOutMs = () => (reducedMotion.matches ? 80 : 700);
-  const transitionMs = () => maskInMs() + flightMs() + maskOutMs();
-  const revealFallbackMs = () => (reducedMotion.matches ? 400 : transitionMs() + 400);
+  const revealFallbackMs = () => (reducedMotion.matches ? 200 : 500);
 
   // ---------- nav scroll state + mobile drawer ----------
   const nav = document.querySelector('.nav');
@@ -97,66 +93,124 @@
     });
   }, revealFallbackMs());
 
-  // ---------- page transition (máscara → imagotipo → máscara) ----------
+  // ---------- page transition (covering -> hovering -> takeoff) ----------
   const mask = document.querySelector('.page-mask');
-  const TRANSITION_KEY = 'antonov-transition';
-  let transitionActive = false;
+  const NAV_KEY = 'antonov-nav';
+  const maskCoverMs = () => (reducedMotion.matches ? 60 : 380);
+  const maskRevealMs = () => (reducedMotion.matches ? 60 : 520);
+  const flightTakeoffMs = () => (reducedMotion.matches ? 0 : 1150);
+  let transitionBusy = false;
 
-  const resetFlightAnimation = (flight) => {
+  const clearTransitionState = () => {
+    if (!mask) return;
+    mask.classList.remove('is-visible', 'is-loading', 'is-covering', 'is-hovering', 'is-takeoff', 'is-exiting');
+    mask.setAttribute('aria-hidden', 'true');
+  };
+
+  const showTransitionMask = () => {
+    if (!mask) return;
+    mask.setAttribute('aria-hidden', 'false');
+    mask.classList.add('is-visible', 'is-loading');
+    mask.classList.remove('is-exiting');
+    document.body.classList.add('page-is-loading');
+    document.documentElement.classList.remove('antonov-loading-pending');
+  };
+
+  const setTransitionPhase = (phase) => {
+    if (!mask) return;
+    mask.classList.remove('is-covering', 'is-hovering', 'is-takeoff');
+    if (phase) mask.classList.add(`is-${phase}`);
+  };
+
+  const restartFlightAnimation = () => {
+    const flight = mask?.querySelector('.page-mask__flight');
     if (!flight) return;
     flight.style.animation = 'none';
     void flight.offsetWidth;
     flight.style.animation = '';
   };
 
-  const hideMask = () => {
-    if (!mask) return;
-    mask.classList.remove('in', 'out', 'flight');
-  };
-
-  const playPageTransition = (onDone) => {
+  const closeTransitionMask = (onDone) => {
     if (!mask) {
+      document.body.classList.remove('page-is-loading');
+      transitionBusy = false;
       onDone?.();
       return;
     }
-    if (transitionActive) return;
-    transitionActive = true;
-
-    const flight = mask.querySelector('.page-mask__flight');
-    hideMask();
-    void mask.offsetWidth;
-    mask.classList.add('in');
-
+    mask.classList.remove('is-loading', 'is-covering', 'is-hovering', 'is-takeoff');
+    mask.classList.add('is-exiting');
     setTimeout(() => {
-      resetFlightAnimation(flight);
-      mask.classList.add('flight');
+      clearTransitionState();
+      document.body.classList.remove('page-is-loading');
+      transitionBusy = false;
+      onDone?.();
+    }, maskRevealMs());
+  };
 
-      setTimeout(() => {
-        mask.classList.remove('in', 'flight');
-        mask.classList.add('out');
+  const runTakeoffAndReveal = () => {
+    if (!mask) return closeTransitionMask();
+    if (!reducedMotion.matches && flightTakeoffMs() > 0) {
+      setTransitionPhase('takeoff');
+      restartFlightAnimation();
+      setTimeout(() => closeTransitionMask(), flightTakeoffMs());
+      return;
+    }
+    closeTransitionMask();
+  };
 
-        setTimeout(() => {
-          hideMask();
-          transitionActive = false;
-          onDone?.();
-        }, maskOutMs());
-      }, flightMs());
-    }, maskInMs());
+  const runDestinationLoadSequence = () => {
+    if (!mask || transitionBusy) return;
+    transitionBusy = true;
+    showTransitionMask();
+    setTransitionPhase('hovering');
+    restartFlightAnimation();
+
+    let finalized = false;
+    const done = () => {
+      if (finalized) return;
+      finalized = true;
+      setTimeout(runTakeoffAndReveal, reducedMotion.matches ? 20 : 140);
+    };
+
+    if (document.readyState === 'complete') {
+      setTimeout(done, reducedMotion.matches ? 20 : 120);
+    } else {
+      window.addEventListener('load', done, { once: true });
+      setTimeout(done, reducedMotion.matches ? 350 : 4500);
+    }
+  };
+
+  const navigateWithTransition = (href) => {
+    if (transitionBusy) return;
+    transitionBusy = true;
+    try {
+      sessionStorage.setItem(NAV_KEY, '1');
+    } catch (err) { /* noop */ }
+
+    showTransitionMask();
+    setTransitionPhase('covering');
+    setTimeout(() => setTransitionPhase('hovering'), reducedMotion.matches ? 20 : 120);
+    setTimeout(() => { window.location.href = href; }, maskCoverMs());
   };
 
   if (mask) {
-    const skipIntro = sessionStorage.getItem(TRANSITION_KEY) === '1';
-    sessionStorage.removeItem(TRANSITION_KEY);
+    let pendingNav = false;
+    try {
+      pendingNav = sessionStorage.getItem(NAV_KEY) === '1';
+      if (pendingNav) sessionStorage.removeItem(NAV_KEY);
+    } catch (err) { /* noop */ }
 
-    if (skipIntro) {
-      hideMask();
-    } else {
-      requestAnimationFrame(() => playPageTransition());
-    }
+    if (pendingNav) runDestinationLoadSequence();
+    else clearTransitionState();
   }
 
   window.addEventListener('pageshow', (e) => {
-    if (e.persisted) sessionStorage.removeItem(TRANSITION_KEY);
+    if (e.persisted) {
+      try { sessionStorage.removeItem(NAV_KEY); } catch (err) { /* noop */ }
+      clearTransitionState();
+      document.body.classList.remove('page-is-loading');
+      transitionBusy = false;
+    }
   });
 
   document.addEventListener('click', (e) => {
@@ -171,12 +225,8 @@
     if (a.dataset.noTransition !== undefined) return;
 
     e.preventDefault();
-    if (mask) {
-      sessionStorage.setItem(TRANSITION_KEY, '1');
-      playPageTransition(() => { window.location.href = href; });
-    } else {
-      window.location.href = href;
-    }
+    if (mask) navigateWithTransition(href);
+    else window.location.href = href;
   });
 
   // ---------- counter animation ----------

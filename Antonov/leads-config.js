@@ -1,4 +1,4 @@
-/* Configure o destino dos leads VIP (lista pré-inauguração). */
+/* Configure o destino dos leads do pré-cadastro de inauguração. */
 window.ANTONOV_VIP_LEADS = {
   /* 'local' = salva no navegador (demo) | 'webhook' | 'supabase' */
   provider: 'local',
@@ -17,6 +17,7 @@ window.ANTONOV_VIP_LEADS = {
       email text not null,
       telefone text not null,
       interesse text,
+      mensagem text,
       origem text,
       page text,
       created_at timestamptz default now()
