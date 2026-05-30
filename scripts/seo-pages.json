@@ -1,0 +1,66 @@
+{
+  "siteUrl": "https://www.antonovcenter.com.br",
+  "image": "https://www.antonovcenter.com.br/assets/foto-hero.png",
+  "pages": {
+    "index.html": {
+      "seoPage": "home",
+      "path": "/",
+      "title": "Academia em Irecê | Antonov Center — Treino e performance",
+      "description": "Academia premium em Irecê, BA. Musculação, cardio, avaliação física e tour gratuito. Antonov Center — projetado para decolar."
+    },
+    "planos.html": {
+      "seoPage": "planos",
+      "path": "/planos",
+      "title": "Planos e mensalidades | Academia Antonov — Irecê, BA",
+      "description": "Conheça os planos da Antonov Center em Irecê: Business Class, First Class e diárias. Estrutura completa e horários flexíveis."
+    },
+    "contato.html": {
+      "seoPage": "contato",
+      "path": "/contato",
+      "title": "Agende um tour | Antonov Center — Irecê",
+      "description": "Fale com a Antonov Center em Irecê. Agende tour guiado, aula experimental grátis e tire dúvidas sobre planos. WhatsApp e e-mail."
+    },
+    "aulas.html": {
+      "seoPage": "aulas",
+      "path": "/aulas",
+      "title": "Aulas e modalidades | Antonov Center — Irecê",
+      "description": "Modalidades de treino na Antonov Center, Irecê: hipertrofia, condicionamento, mobilidade e mais. Espaço pensado para performance."
+    },
+    "estudio.html": {
+      "seoPage": "estudio",
+      "path": "/estudio",
+      "title": "Estrutura e equipamentos | Antonov Center — Irecê",
+      "description": "Conheça o hangar Antonov em Irecê: 3.000 m², equipamentos premium, zonas de força, cardio e recovery. Visite o estúdio."
+    },
+    "sobre.html": {
+      "seoPage": "sobre",
+      "path": "/sobre",
+      "title": "Sobre o hangar | Antonov Center — Irecê, Bahia",
+      "description": "Manifesto e história da Antonov Center, academia de performance em Irecê, Bahia. Força, tecnologia e cultura de treino."
+    },
+    "trabalhe-conosco.html": {
+      "seoPage": "trabalhe",
+      "path": "/trabalhe-conosco",
+      "title": "Vagas e currículos | Antonov Center — Irecê",
+      "description": "Trabalhe na Antonov Center em Irecê. Vagas em coaching, recepção, operações e mais. Envie seu currículo para a tripulação."
+    },
+    "termos.html": {
+      "seoPage": "termos",
+      "path": "/termos",
+      "title": "Termos de uso | Antonov Center — Irecê",
+      "description": "Termos de uso do ANTONOV CENTER em Irecê: regras de matrícula, uso das instalações e serviços da academia."
+    },
+    "privacidade.html": {
+      "seoPage": "privacidade",
+      "path": "/privacidade",
+      "title": "Política de privacidade | Antonov Center",
+      "description": "Política de privacidade e proteção de dados do ANTONOV CENTER em Irecê, em conformidade com a LGPD."
+    },
+    "cookies.html": {
+      "seoPage": "cookies",
+      "path": "/cookies",
+      "title": "Política de cookies | Antonov Center",
+      "description": "Política de cookies do ANTONOV CENTER — tipos, finalidades e como gerenciar preferências no site."
+    }
+  }
+}
