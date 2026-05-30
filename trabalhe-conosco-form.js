@@ -1,23 +1,13 @@
-/* Formulário de tour — contato.html */
+/* Formulário de currículo — trabalhe-conosco.html */
 (function () {
   'use strict';
 
-  const form = document.getElementById('contato-tour-form');
+  const form = document.getElementById('trabalhe-curriculo-form');
   if (!form) return;
 
   const cfg = () => window.ANTONOV_LEADS || { provider: 'neon', apiUrl: '/api/leads' };
-  const chips = form.querySelectorAll('.cform__chip');
-  const interesseInput = document.getElementById('contato-interesse');
-  const errorEl = document.getElementById('cform-error');
+  const errorEl = document.getElementById('trabalhe-form-error');
   const submitBtn = form.querySelector('.cform__submit');
-
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      chips.forEach((c) => c.classList.remove('active'));
-      chip.classList.add('active');
-      if (interesseInput) interesseInput.value = chip.textContent.trim();
-    });
-  });
 
   async function sendLead(lead) {
     const c = cfg();
@@ -33,16 +23,18 @@
       } catch {
         /* resposta não-JSON */
       }
-      if (!res.ok) throw new Error(data.error || 'Não foi possível agendar. Tente novamente.');
+      if (!res.ok) throw new Error(data.error || 'Não foi possível enviar. Tente novamente.');
       return;
     }
     if (c.provider === 'local') return;
-    throw new Error('Destino de leads não configurado.');
+    throw new Error('Destino de candidaturas não configurado.');
   }
 
   function showSuccess() {
-    const label = submitBtn.querySelector('span');
-    if (label) label.textContent = '✓ Tour agendado';
+    const label = submitBtn.querySelector('span:first-child');
+    const meta = submitBtn.querySelector('.meta');
+    if (label) label.textContent = '✓ Candidatura enviada';
+    if (meta) meta.textContent = 'SALVO NO SISTEMA';
     submitBtn.style.background = '#1F8A5B';
     submitBtn.style.color = '#fff';
     submitBtn.disabled = true;
@@ -57,29 +49,33 @@
     }
 
     const fd = new FormData(form);
-    const interesse = String(fd.get('interesse') || '').trim();
-    if (!interesse) {
+    const area = String(fd.get('area') || '').trim();
+    if (!area) {
       if (errorEl) {
-        errorEl.textContent = 'Selecione seu interesse principal.';
+        errorEl.textContent = 'Selecione a área de interesse.';
         errorEl.hidden = false;
       }
       return;
     }
 
-    const mensagem = String(fd.get('mensagem') || '').trim();
+    let mensagem = String(fd.get('mensagem') || '').trim();
+    const portfolio = String(fd.get('portfolio') || '').trim();
+    if (portfolio) {
+      mensagem = mensagem ? `Portfólio: ${portfolio}\n\n${mensagem}` : `Portfólio: ${portfolio}`;
+    }
+
     const lead = {
       nome: String(fd.get('nome') || '').trim(),
       telefone: String(fd.get('telefone') || '').trim(),
       email: String(fd.get('email') || '').trim(),
-      interesse,
+      interesse: area,
       mensagem: mensagem || null,
-      melhor_dia: String(fd.get('melhor_dia') || '').trim() || null,
-      melhor_turno: String(fd.get('melhor_turno') || '').trim() || null,
-      origem: 'contato-tour',
+      melhor_turno: String(fd.get('disponibilidade') || '').trim() || null,
+      origem: 'trabalhe-conosco-curriculo',
       page: location.pathname,
     };
 
-    const label = submitBtn.querySelector('span');
+    const label = submitBtn.querySelector('span:first-child');
     const prevLabel = label ? label.textContent : '';
     submitBtn.disabled = true;
     if (label) label.textContent = 'Enviando…';

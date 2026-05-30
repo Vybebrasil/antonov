@@ -57,19 +57,32 @@
     }
 
     const fd = new FormData(form);
+    const interesse = String(fd.get('interesse') || '').trim();
+    if (!interesse) {
+      if (errorEl) {
+        errorEl.textContent = 'Selecione seu interesse principal.';
+        errorEl.hidden = false;
+      }
+      return;
+    }
+
+    const mensagem = String(fd.get('mensagem') || '').trim();
     const lead = {
       nome: String(fd.get('nome') || '').trim(),
       telefone: String(fd.get('telefone') || '').trim(),
       email: String(fd.get('email') || '').trim(),
-      interesse: String(fd.get('interesse') || '').trim(),
-      mensagem: String(fd.get('mensagem') || '').trim(),
-      melhor_dia: String(fd.get('melhor_dia') || '').trim(),
-      melhor_turno: String(fd.get('melhor_turno') || '').trim(),
+      interesse,
+      mensagem: mensagem || null,
+      melhor_dia: String(fd.get('melhor_dia') || '').trim() || null,
+      melhor_turno: String(fd.get('melhor_turno') || '').trim() || null,
       origem: 'contato-tour',
       page: location.pathname,
     };
 
+    const label = submitBtn.querySelector('span');
+    const prevLabel = label ? label.textContent : '';
     submitBtn.disabled = true;
+    if (label) label.textContent = 'Enviando…';
     try {
       await sendLead(lead);
       showSuccess();
@@ -79,6 +92,7 @@
         errorEl.hidden = false;
       }
       submitBtn.disabled = false;
+      if (label) label.textContent = prevLabel;
     }
   });
 })();

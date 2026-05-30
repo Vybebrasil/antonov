@@ -240,6 +240,12 @@
   transition: transform 200ms;
 }
 .cform__submit:hover { transform: translateY(-1px); }
+.cform__error {
+  color: #ff7a7a;
+  font-size: 0.85rem;
+  margin: 12px 0 0;
+  letter-spacing: 0.04em;
+}
 .cform__submit .meta {
   font-family: var(--f-mono); font-size: 10px;
   letter-spacing: 0.22em;
@@ -369,28 +375,28 @@
         </div>
       </div>
 
-      <form class="cform" action="mailto:antonovacademia@gmail.com" method="post" enctype="text/plain" onsubmit="var btn=this.querySelector('.cform__submit'); setTimeout(function(){ btn.querySelector('.meta').textContent='✓ ENVIADO'; btn.style.background='#1F8A5B'; btn.style.color='#fff'; }, 100);">
+      <form class="cform" id="trabalhe-curriculo-form" novalidate>
         <div class="cform__bg"></div>
         <div class="cform__lbl">/ CANDIDATURA</div>
         <h2>Envie seu<br />currículo.</h2>
-        <p class="cform__sub">Preencha o formulário ou envie direto para antonovacademia@gmail.com com o assunto “Trabalhe Conosco”.</p>
+        <p class="cform__sub">Preencha o formulário abaixo. Nossa equipe analisa cada candidatura e entra em contato pelo WhatsApp ou e-mail informado.</p>
 
         <div class="cform__row">
           <div class="cform__field">
-            <label>Nome <span class="req">*</span></label>
-            <input type="text" name="nome" required placeholder="Seu nome completo" />
+            <label for="trabalhe-nome">Nome <span class="req">*</span></label>
+            <input id="trabalhe-nome" type="text" name="nome" required autocomplete="name" placeholder="Seu nome completo" />
           </div>
           <div class="cform__field">
-            <label>WhatsApp <span class="req">*</span></label>
-            <input type="tel" name="telefone" required placeholder="(74) 99999-9999" />
+            <label for="trabalhe-tel">WhatsApp <span class="req">*</span></label>
+            <input id="trabalhe-tel" type="tel" name="telefone" required autocomplete="tel" placeholder="(74) 99999-9999" />
           </div>
           <div class="cform__field cform__field--full">
-            <label>E-mail <span class="req">*</span></label>
-            <input type="email" name="email" required placeholder="seu@email.com" />
+            <label for="trabalhe-email">E-mail <span class="req">*</span></label>
+            <input id="trabalhe-email" type="email" name="email" required autocomplete="email" placeholder="seu@email.com" />
           </div>
           <div class="cform__field">
-            <label>Área de interesse <span class="req">*</span></label>
-            <select name="area" required>
+            <label for="trabalhe-area">Área de interesse <span class="req">*</span></label>
+            <select id="trabalhe-area" name="area" required>
               <option value="">Selecione</option>
               <option>Personal Trainer / Coaching</option>
               <option>Recepção / Atendimento</option>
@@ -401,8 +407,8 @@
             </select>
           </div>
           <div class="cform__field">
-            <label>Disponibilidade</label>
-            <select name="disponibilidade">
+            <label for="trabalhe-disp">Disponibilidade</label>
+            <select id="trabalhe-disp" name="disponibilidade">
               <option>Tempo integral</option>
               <option>Meio período</option>
               <option>Plantão / escala</option>
@@ -410,18 +416,19 @@
             </select>
           </div>
           <div class="cform__field cform__field--full">
-            <label>LinkedIn ou portfólio (opcional)</label>
-            <input type="url" name="portfolio" placeholder="https://..." />
+            <label for="trabalhe-portfolio">LinkedIn ou portfólio (opcional)</label>
+            <input id="trabalhe-portfolio" type="url" name="portfolio" placeholder="https://..." />
           </div>
           <div class="cform__field cform__field--full">
-            <label>Mensagem</label>
-            <textarea name="mensagem" placeholder="Conte sua experiência e por que quer fazer parte da tripulação."></textarea>
+            <label for="trabalhe-msg">Mensagem</label>
+            <textarea id="trabalhe-msg" name="mensagem" placeholder="Conte sua experiência e por que quer fazer parte da tripulação."></textarea>
           </div>
         </div>
 
+        <p class="cform__error" id="trabalhe-form-error" hidden></p>
         <button type="submit" class="cform__submit">
           <span>Enviar candidatura</span>
-          <span class="meta">VIA E-MAIL <span class="arrow"></span></span>
+          <span class="meta">CANDIDATURA <span class="arrow"></span></span>
         </button>
       </form>
     </div>
@@ -504,6 +511,7 @@
 
 <script src="leads-config.js"></script>
 <script src="vip-leads.js"></script>
+<script src="trabalhe-conosco-form.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -36,6 +36,9 @@ function sanitizeLead(raw) {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: 'E-mail inválido.' };
   if (!telefone || telefone.length < 8) return { error: 'Telefone inválido.' };
   if (!origem) return { error: 'Origem do lead é obrigatória.' };
+  if (origem === 'trabalhe-conosco-curriculo' && !interesse) {
+    return { error: 'Área de interesse é obrigatória.' };
+  }
 
   return {
     lead: { nome, email, telefone, interesse, mensagem, origem, page, melhor_dia, melhor_turno },
