@@ -31,22 +31,88 @@ if (!url) {
 const sql = neon(url);
 
 await sql`
-  CREATE TABLE IF NOT EXISTS leads (
+  CREATE TABLE IF NOT EXISTS leads_pre_matricula (
     id BIGSERIAL PRIMARY KEY,
     nome TEXT NOT NULL,
     email TEXT NOT NULL,
     telefone TEXT NOT NULL,
-    interesse TEXT,
+    interesse TEXT NOT NULL,
     mensagem TEXT,
-    origem TEXT NOT NULL,
     page TEXT,
-    melhor_dia TEXT,
-    melhor_turno TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 `;
 
-await sql`CREATE INDEX IF NOT EXISTS leads_origem_idx ON leads (origem);`;
-await sql`CREATE INDEX IF NOT EXISTS leads_created_at_idx ON leads (created_at DESC);`;
+await sql`
+  CREATE TABLE IF NOT EXISTS leads_curriculos (
+    id BIGSERIAL PRIMARY KEY,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL,
+    telefone TEXT NOT NULL,
+    area TEXT NOT NULL,
+    disponibilidade TEXT,
+    mensagem TEXT,
+    page TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+`;
 
-console.log('Tabela leads criada/verificada com sucesso.');
+await sql`
+  CREATE TABLE IF NOT EXISTS leads_tour (
+    id BIGSERIAL PRIMARY KEY,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL,
+    telefone TEXT NOT NULL,
+    interesse TEXT NOT NULL,
+    melhor_dia TEXT,
+    melhor_turno TEXT,
+    mensagem TEXT,
+    page TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+`;
+
+await sql`CREATE INDEX IF NOT EXISTS leads_pre_matricula_created_at_idx ON leads_pre_matricula (created_at DESC);`;
+await sql`CREATE INDEX IF NOT EXISTS leads_curriculos_created_at_idx ON leads_curriculos (created_at DESC);`;
+await sql`CREATE INDEX IF NOT EXISTS leads_tour_created_at_idx ON leads_tour (created_at DESC);`;
+
+/* Migra dados da tabela antiga `leads`, se existir */
+const legacy = await sql`
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'leads'
+  ) AS exists
+`;
+
+if (legacy[0]?.exists) {
+  const [{ n: preCount }] = await sql`SELECT COUNT(*)::int AS n FROM leads_pre_matricula`;
+  if (preCount === 0) {
+    await sql`
+      INSERT INTO leads_pre_matricula (nome, email, telefone, interesse, mensagem, page, created_at)
+      SELECT nome, email, telefone, COALESCE(interesse, '—'), mensagem, page, created_at
+      FROM leads WHERE origem = 'pre-cadastro-inauguracao'
+    `;
+  }
+
+  const [{ n: curCount }] = await sql`SELECT COUNT(*)::int AS n FROM leads_curriculos`;
+  if (curCount === 0) {
+    await sql`
+      INSERT INTO leads_curriculos (nome, email, telefone, area, disponibilidade, mensagem, page, created_at)
+      SELECT nome, email, telefone, COALESCE(interesse, '—'), melhor_turno, mensagem, page, created_at
+      FROM leads WHERE origem = 'trabalhe-conosco-curriculo'
+    `;
+  }
+
+  const [{ n: tourCount }] = await sql`SELECT COUNT(*)::int AS n FROM leads_tour`;
+  if (tourCount === 0) {
+    await sql`
+      INSERT INTO leads_tour (nome, email, telefone, interesse, melhor_dia, melhor_turno, mensagem, page, created_at)
+      SELECT nome, email, telefone, COALESCE(interesse, '—'), melhor_dia, melhor_turno, mensagem, page, created_at
+      FROM leads WHERE origem = 'contato-tour'
+    `;
+  }
+
+  console.log('Migração da tabela leads (legado) concluída, se havia registros.');
+}
+
+console.log('Tabelas leads_pre_matricula, leads_curriculos e leads_tour prontas.');

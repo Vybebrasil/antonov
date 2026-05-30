@@ -5,14 +5,19 @@
   const form = document.getElementById('trabalhe-curriculo-form');
   if (!form) return;
 
-  const cfg = () => window.ANTONOV_LEADS || { provider: 'neon', apiUrl: '/api/leads' };
+  const cfg = () =>
+    window.ANTONOV_LEADS || {
+      provider: 'neon',
+      apiUrls: { curriculos: '/api/leads/curriculos' },
+    };
   const errorEl = document.getElementById('trabalhe-form-error');
   const submitBtn = form.querySelector('.cform__submit');
 
   async function sendLead(lead) {
     const c = cfg();
-    if (c.provider === 'neon' && c.apiUrl) {
-      const res = await fetch(c.apiUrl, {
+    const neonUrl = c.apiUrls?.curriculos || c.apiUrl;
+    if (c.provider === 'neon' && neonUrl) {
+      const res = await fetch(neonUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(lead),
@@ -58,20 +63,17 @@
       return;
     }
 
-    let mensagem = String(fd.get('mensagem') || '').trim();
-    const portfolio = String(fd.get('portfolio') || '').trim();
-    if (portfolio) {
-      mensagem = mensagem ? `Portfólio: ${portfolio}\n\n${mensagem}` : `Portfólio: ${portfolio}`;
-    }
+    const mensagem = String(fd.get('mensagem') || '').trim() || null;
+    const portfolio = String(fd.get('portfolio') || '').trim() || null;
 
     const lead = {
       nome: String(fd.get('nome') || '').trim(),
       telefone: String(fd.get('telefone') || '').trim(),
       email: String(fd.get('email') || '').trim(),
-      interesse: area,
-      mensagem: mensagem || null,
-      melhor_turno: String(fd.get('disponibilidade') || '').trim() || null,
-      origem: 'trabalhe-conosco-curriculo',
+      area,
+      disponibilidade: String(fd.get('disponibilidade') || '').trim() || null,
+      mensagem,
+      portfolio,
       page: location.pathname,
     };
 

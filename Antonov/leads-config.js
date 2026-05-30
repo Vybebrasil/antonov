@@ -1,10 +1,14 @@
-/* Destino dos leads — pré-cadastro e formulário de contato */
+/* Destino dos leads — endpoints por tipo de formulário */
 window.ANTONOV_LEADS = {
-  /* 'neon' = API + Neon Postgres | 'local' = só navegador (demo) | 'webhook' */
   provider: 'neon',
+  apiUrls: {
+    preMatricula: '/api/leads/pre-matricula',
+    curriculos: '/api/leads/curriculos',
+    tour: '/api/leads/tour',
+  },
+  /* legado — roteador por origem */
   apiUrl: '/api/leads',
   webhookUrl: '',
 };
 
-/* Compatível com vip-leads.js */
 window.ANTONOV_VIP_LEADS = window.ANTONOV_LEADS;

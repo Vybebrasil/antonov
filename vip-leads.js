@@ -83,8 +83,9 @@
 
   async function sendLead(lead) {
     const c = cfg();
-    if (c.provider === 'neon' && c.apiUrl) {
-      const res = await fetch(c.apiUrl, {
+    const neonUrl = c.apiUrls?.preMatricula || c.apiUrl;
+    if (c.provider === 'neon' && neonUrl) {
+      const res = await fetch(neonUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(lead),
@@ -218,8 +219,6 @@
         email: String(fd.get('email') || '').trim(),
         interesse: String(fd.get('interesse') || '').trim(),
         mensagem: String(fd.get('mensagem') || '').trim(),
-        origem: 'pre-cadastro-inauguracao',
-        created_at: new Date().toISOString(),
         page: location.pathname,
       };
       const btn = form.querySelector('.vip-form__submit');

@@ -5,7 +5,11 @@
   const form = document.getElementById('contato-tour-form');
   if (!form) return;
 
-  const cfg = () => window.ANTONOV_LEADS || { provider: 'neon', apiUrl: '/api/leads' };
+  const cfg = () =>
+    window.ANTONOV_LEADS || {
+      provider: 'neon',
+      apiUrls: { tour: '/api/leads/tour' },
+    };
   const chips = form.querySelectorAll('.cform__chip');
   const interesseInput = document.getElementById('contato-interesse');
   const errorEl = document.getElementById('cform-error');
@@ -21,8 +25,9 @@
 
   async function sendLead(lead) {
     const c = cfg();
-    if (c.provider === 'neon' && c.apiUrl) {
-      const res = await fetch(c.apiUrl, {
+    const neonUrl = c.apiUrls?.tour || c.apiUrl;
+    if (c.provider === 'neon' && neonUrl) {
+      const res = await fetch(neonUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(lead),
@@ -75,7 +80,6 @@
       mensagem: mensagem || null,
       melhor_dia: String(fd.get('melhor_dia') || '').trim() || null,
       melhor_turno: String(fd.get('melhor_turno') || '').trim() || null,
-      origem: 'contato-tour',
       page: location.pathname,
     };
 
