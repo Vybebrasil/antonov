@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-br">
 <head>
 <meta charset="utf-8" />
@@ -159,6 +159,12 @@
 .cform__submit .meta {
   font-family: var(--f-mono); font-size: 10px;
   letter-spacing: 0.22em;
+}
+.cform__error {
+  color: #ff7a7a;
+  font-size: 0.85rem;
+  margin: 12px 0 0;
+  letter-spacing: 0.04em;
 }
 .cform__submit .arrow {
   width: 8px; height: 8px;
@@ -435,7 +441,7 @@
   <div class="contact__inner">
     <div class="contact__grid reveal">
 
-      <form class="cform" onsubmit="event.preventDefault(); this.querySelector('.cform__submit .meta').textContent = '✓ ENVIADO'; this.querySelector('.cform__submit').style.background = '#1F8A5B'; this.querySelector('.cform__submit').style.color = '#fff';">
+      <form class="cform" id="contato-tour-form" novalidate>
         <div class="cform__bg"></div>
         <div class="cform__lbl">/ AGENDE SUA VISITA</div>
         <h2>Marque um tour<br/>guiado.</h2>
@@ -443,20 +449,20 @@
 
         <div class="cform__row">
           <div class="cform__field">
-            <label>Nome <span class="req">*</span></label>
-            <input type="text" required placeholder="Como devemos te chamar?" />
+            <label for="contato-nome">Nome <span class="req">*</span></label>
+            <input id="contato-nome" name="nome" type="text" required autocomplete="name" placeholder="Como devemos te chamar?" />
           </div>
           <div class="cform__field">
-            <label>Telefone <span class="req">*</span></label>
-            <input type="tel" required placeholder="(11) 90000-0000" />
+            <label for="contato-tel">Telefone <span class="req">*</span></label>
+            <input id="contato-tel" name="telefone" type="tel" required autocomplete="tel" placeholder="(74) 99999-9999" />
           </div>
           <div class="cform__field cform__field--full">
-            <label>E-mail <span class="req">*</span></label>
-            <input type="email" required placeholder="seu@email.com" />
+            <label for="contato-email">E-mail <span class="req">*</span></label>
+            <input id="contato-email" name="email" type="email" required autocomplete="email" placeholder="seu@email.com" />
           </div>
           <div class="cform__field">
-            <label>Melhor dia</label>
-            <select>
+            <label for="contato-dia">Melhor dia</label>
+            <select id="contato-dia" name="melhor_dia">
               <option>Hoje · 19/Mar</option>
               <option>Amanhã · 20/Mar</option>
               <option>Sex · 21/Mar</option>
@@ -465,8 +471,8 @@
             </select>
           </div>
           <div class="cform__field">
-            <label>Melhor turno</label>
-            <select>
+            <label for="contato-turno">Melhor turno</label>
+            <select id="contato-turno" name="melhor_turno">
               <option>Manhã · 07–12h</option>
               <option>Tarde · 12–17h</option>
               <option>Início da noite · 17–20h</option>
@@ -475,7 +481,8 @@
           </div>
           <div class="cform__field cform__field--full">
             <label>Interesse principal</label>
-            <div class="cform__chips">
+            <input type="hidden" name="interesse" id="contato-interesse" value="Hipertrofia" />
+            <div class="cform__chips" role="group" aria-label="Interesse principal">
               <button type="button" class="cform__chip active">Hipertrofia</button>
               <button type="button" class="cform__chip">Ganho de massa</button>
               <button type="button" class="cform__chip">Condicionamento físico</button>
@@ -485,11 +492,12 @@
             </div>
           </div>
           <div class="cform__field cform__field--full">
-            <label>Mensagem (opcional)</label>
-            <textarea placeholder="Algo que a gente deve saber antes do tour?"></textarea>
+            <label for="contato-msg">Mensagem (opcional)</label>
+            <textarea id="contato-msg" name="mensagem" placeholder="Algo que a gente deve saber antes do tour?"></textarea>
           </div>
         </div>
 
+        <p class="cform__error" id="cform-error" hidden></p>
         <button type="submit" class="cform__submit">
           <span>Agendar tour</span>
         </button>
@@ -686,12 +694,7 @@
 
 <script src="leads-config.js"></script>
 <script src="vip-leads.js"></script>
+<script src="contato-form.js"></script>
 <script src="app.js"></script>
-<script>
-// chip toggle
-document.querySelectorAll('.cform__chip').forEach(c => {
-  c.addEventListener('click', () => c.classList.toggle('active'));
-});
-</script>
 </body>
 </html>

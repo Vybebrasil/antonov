@@ -83,6 +83,21 @@
 
   async function sendLead(lead) {
     const c = cfg();
+    if (c.provider === 'neon' && c.apiUrl) {
+      const res = await fetch(c.apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(lead),
+      });
+      let data = {};
+      try {
+        data = await res.json();
+      } catch {
+        /* resposta não-JSON */
+      }
+      if (!res.ok) throw new Error(data.error || 'Falha ao enviar. Tente novamente.');
+      return;
+    }
     if (c.provider === 'webhook' && c.webhookUrl) {
       const res = await fetch(c.webhookUrl, {
         method: 'POST',
@@ -113,6 +128,9 @@
       });
       if (!res.ok) throw new Error('Falha ao registrar. Tente novamente.');
       return;
+    }
+    if (c.provider !== 'local') {
+      throw new Error('Destino de leads não configurado.');
     }
   }
 
@@ -205,16 +223,19 @@
         page: location.pathname,
       };
       const btn = form.querySelector('.vip-form__submit');
+      const btnLabel = btn.querySelector('.vip-form__submit-label');
+      const prevLabel = btnLabel ? btnLabel.textContent : '';
       btn.disabled = true;
+      if (btnLabel) btnLabel.textContent = 'Enviando…';
       try {
         await sendLead(lead);
-        saveLocal(lead);
+        if (cfg().provider === 'local') saveLocal(lead);
         showSuccess();
       } catch (err) {
         errorEl.textContent = err.message || 'Não foi possível enviar. Tente de novo.';
         errorEl.hidden = false;
-      } finally {
         btn.disabled = false;
+        if (btnLabel) btnLabel.textContent = prevLabel;
       }
     });
 
