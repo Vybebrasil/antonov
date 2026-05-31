@@ -1,6 +1,15 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "antonovcenter.com.br" }],
+      "destination": "https://www.antonovcenter.com.br/:path*",
+      "permanent": true,
+      "statusCode": 308
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

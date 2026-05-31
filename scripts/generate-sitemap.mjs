@@ -21,24 +21,26 @@ function loadEnv() {
 
 loadEnv();
 
-const siteUrl = (process.env.SITE_URL || 'https://www.antonovcenter.com.br').replace(
-  /\/$/,
-  ''
-);
+const seoPages = JSON.parse(readFileSync(join(__dirname, 'seo-pages.json'), 'utf8'));
+const siteUrl = (process.env.SITE_URL || seoPages.siteUrl).replace(/\/$/, '');
 const lastmod = new Date().toISOString().slice(0, 10);
 
-const pages = [
-  { path: '/', priority: '1.0', changefreq: 'weekly' },
-  { path: '/planos', priority: '0.9', changefreq: 'weekly' },
-  { path: '/contato', priority: '0.9', changefreq: 'monthly' },
-  { path: '/aulas', priority: '0.8', changefreq: 'monthly' },
-  { path: '/estudio', priority: '0.8', changefreq: 'monthly' },
-  { path: '/sobre', priority: '0.8', changefreq: 'monthly' },
-  { path: '/trabalhe-conosco', priority: '0.6', changefreq: 'monthly' },
-  { path: '/termos', priority: '0.3', changefreq: 'yearly' },
-  { path: '/privacidade', priority: '0.3', changefreq: 'yearly' },
-  { path: '/cookies', priority: '0.3', changefreq: 'yearly' },
-];
+const priorityMap = {
+  '/': { priority: '1.0', changefreq: 'weekly' },
+  '/planos': { priority: '0.9', changefreq: 'weekly' },
+  '/contato': { priority: '0.9', changefreq: 'monthly' },
+  '/aulas': { priority: '0.8', changefreq: 'monthly' },
+  '/estudio': { priority: '0.8', changefreq: 'monthly' },
+  '/sobre': { priority: '0.8', changefreq: 'monthly' },
+  '/trabalhe-conosco': { priority: '0.6', changefreq: 'monthly' },
+};
+
+const pages = Object.values(seoPages.pages)
+  .filter((p) => !p.noindex)
+  .map((p) => ({
+    path: p.path,
+    ...(priorityMap[p.path] || { priority: '0.5', changefreq: 'monthly' }),
+  }));
 
 const urls = pages
   .map(
@@ -66,4 +68,4 @@ Sitemap: ${siteUrl}/sitemap.xml
 `;
 writeFileSync(join(root, 'robots.txt'), robots, 'utf8');
 
-console.log(`sitemap.xml e robots.txt gerados para ${siteUrl}`);
+console.log(`sitemap.xml e robots.txt gerados para ${siteUrl} (${pages.length} URLs)`);

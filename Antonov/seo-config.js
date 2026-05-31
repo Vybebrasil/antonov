@@ -1,6 +1,7 @@
-/* SEO global — atualize siteUrl quando o domínio próprio estiver no ar */
+/* SEO global — siteUrl = URL pública atual; productionSiteUrl = domínio final no go-live */
 window.ANTONOV_SEO = {
-  siteUrl: 'https://www.antonovcenter.com.br',
+  siteUrl: 'https://antonov-one.vercel.app',
+  productionSiteUrl: 'https://www.antonovcenter.com.br',
   siteName: 'Antonov Center',
   locale: 'pt_BR',
   defaultImage: '/assets/foto-hero.png',
@@ -9,7 +10,7 @@ window.ANTONOV_SEO = {
     street: 'Av. 1º de Janeiro',
     city: 'Irecê',
     region: 'BA',
-    postalCode: '',
+    postalCode: '44860-201',
     country: 'BR',
     phone: '+5574999631507',
     email: 'antonovacademia@gmail.com',

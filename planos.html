@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-br">
 <head>
 <meta charset="utf-8" />
@@ -14,18 +14,18 @@
 <title>Planos e mensalidades | Academia Antonov — Irecê, BA</title>
 <meta name="description" content="Conheça os planos da Antonov Center em Irecê: Business Class, First Class e diárias. Estrutura completa e horários flexíveis." />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://www.antonovcenter.com.br/planos" />
+<link rel="canonical" href="https://antonov-one.vercel.app/planos" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="pt_BR" />
 <meta property="og:site_name" content="Antonov Center" />
 <meta property="og:title" content="Planos e mensalidades | Academia Antonov — Irecê, BA" />
 <meta property="og:description" content="Conheça os planos da Antonov Center em Irecê: Business Class, First Class e diárias. Estrutura completa e horários flexíveis." />
-<meta property="og:url" content="https://www.antonovcenter.com.br/planos" />
-<meta property="og:image" content="https://www.antonovcenter.com.br/assets/foto-hero.png" />
+<meta property="og:url" content="https://antonov-one.vercel.app/planos" />
+<meta property="og:image" content="https://antonov-one.vercel.app/assets/foto-hero.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Planos e mensalidades | Academia Antonov — Irecê, BA" />
 <meta name="twitter:description" content="Conheça os planos da Antonov Center em Irecê: Business Class, First Class e diárias. Estrutura completa e horários flexíveis." />
-<meta name="twitter:image" content="https://www.antonovcenter.com.br/assets/foto-hero.png" />
+<meta name="twitter:image" content="https://antonov-one.vercel.app/assets/foto-hero.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -440,33 +440,36 @@
 
 <div class="page-mask" aria-hidden="true" role="presentation">
   <div class="page-mask__loader" aria-live="polite" aria-busy="true">
-    <img class="page-mask__logo" src="assets/logo.png" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" />
+    <img class="page-mask__logo" src="assets/logo.png" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" >
     <div class="page-mask__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
     <p class="page-mask__status" id="page-mask-status">Preparando hangar…</p>
   </div>
   <div class="page-mask__flight" aria-hidden="true">
-    <img src="assets/imagotipo.png" alt="Símbolo Antonov Center" width="591" height="591" decoding="async" />
+    <img src="assets/imagotipo.png" alt="Símbolo Antonov Center" width="591" height="591" decoding="async" loading="lazy">
   </div>
 </div>
 
 <header class="nav" data-screen-label="01 Nav">
   <div class="nav__inner">
-    <a href="index.html" class="nav__logo">
-      <img class="nav__logo-img nav__logo-img--dark" src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" />
-      <img class="nav__logo-img nav__logo-img--light" src="assets/logo-preta.png" alt="ANTONOV CENTER — Bahia" width="253" height="38" decoding="async" />
+    <a href="/" class="nav__logo">
+      <img class="nav__logo-img nav__logo-img--dark" src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" >
+      <img class="nav__logo-img nav__logo-img--light" src="assets/logo-preta.png" alt="ANTONOV CENTER — Bahia" width="253" height="38" decoding="async" >
     </a>
-    <nav class="nav__links" aria-label="Principal">
-      <a href="index.html">Home</a>
-      <a href="planos.html" class="active">Planos</a>
-      <a href="contato.html">Contato</a>
+        <nav class="nav__links" aria-label="Principal">
+      <a href="/">Home</a>
+      <a href="/aulas">Aulas</a>
+      <a href="/estudio">Estúdio</a>
+      <a href="/planos" class="active">Planos</a>
+      <a href="/sobre">Sobre</a>
+      <a href="/contato">Contato</a>
     </nav>
-    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <a href="/planos" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
     <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
   </div>
   <div class="nav__backdrop" aria-hidden="true"></div>
   <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
     <div class="nav__drawer-links" role="navigation"></div>
-    <a href="planos.html" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
+    <a href="/planos" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
   </aside>
 </header>
 
@@ -699,7 +702,7 @@
       <div>
         <h2 class="reveal">Tudo o<br/>que você<br/>precisa saber.</h2>
         <p class="faq__sub reveal">Respostas claras pra ajudar você a começar e escolher o plano certo. Algo não respondido? Fale com a gente.</p>
-        <a href="contato.html" class="btn btn--ghost reveal">Fale com a gente <span class="arrow"></span></a>
+        <a href="/contato" class="btn btn--ghost reveal">Fale com a gente <span class="arrow"></span></a>
       </div>
 
       <div class="acc reveal" data-accordion>
@@ -723,6 +726,14 @@
           <div class="acc__head">Preciso seguir um programa específico?<div class="ico"></div></div>
           <div class="acc__body"><p>Não obrigatoriamente. Você pode treinar livre no Hangar. Mas se quiser progresso estruturado, todo membro tem acesso a uma avaliação inicial e uma rotina sugerida.</p></div>
         </div>
+        <div class="acc__item">
+          <div class="acc__head">Onde fica a Antonov Center em Irecê?<div class="ico"></div></div>
+          <div class="acc__body"><p>Na Av. 1º de Janeiro, Irecê, Bahia — hangar de 3.000 m². Use o mapa em <a href="/contato">Contato</a> ou agende um tour para visitar.</p></div>
+        </div>
+        <div class="acc__item">
+          <div class="acc__head">Como agendar tour ou aula experimental?<div class="ico"></div></div>
+          <div class="acc__body"><p>Pelo formulário em <a href="/contato">Contato</a>, WhatsApp +55 74 99963-1507 ou e-mail antonovacademia@gmail.com. Tour guiado e 1 aula grátis, sem compromisso.</p></div>
+        </div>
       <!--  <div class="acc__item">
           <div class="acc__head">Posso trocar de plano depois?<div class="ico"></div></div>
           <div class="acc__body"><p>Sim. Upgrade vale imediatamente (proporcional ao mês). Downgrade entra em vigor no ciclo seguinte. Sem taxa de troca.</p></div>
@@ -743,16 +754,19 @@
       <div>
         <h2 class="footer__cta-title reveal">Pronto<br />quando você<br />estiver.</h2>
         <p class="footer__cta-text reveal">Comece com um tour ou uma aula experimental. A gente ajuda você a achar o plano, a rotina e o espaço pra desbloquear todo seu potencial.</p>
-        <a href="contato.html" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
+        <a href="/contato" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
       </div>
       <div class="footer__cols" style="grid-template-columns: 1fr 1fr; padding: 0;">
         <div class="footer__col">
           <h4>Navegação</h4>
           <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="planos.html">Planos</a></li>
-            <li><a href="contato.html">Contato</a></li>
-            <li><a href="trabalhe-conosco.html">Trabalhe conosco</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/aulas">Aulas</a></li>
+            <li><a href="/estudio">Estúdio</a></li>
+            <li><a href="/planos">Planos</a></li>
+            <li><a href="/sobre">Sobre</a></li>
+            <li><a href="/contato">Contato</a></li>
+            <li><a href="/trabalhe-conosco">Trabalhe conosco</a></li>
           </ul>
         </div>
         <div class="footer__col">
@@ -784,9 +798,9 @@
       <div class="footer__col">
         <h4>Legal</h4>
         <ul>
-          <li><a href="termos.html">Termos</a></li>
-          <li><a href="privacidade.html">Privacidade</a></li>
-          <li><a href="cookies.html">Cookies</a></li>
+          <li><a href="/termos">Termos</a></li>
+          <li><a href="/privacidade">Privacidade</a></li>
+          <li><a href="/cookies">Cookies</a></li>
         </ul>
       </div>
       <div class="footer__col">

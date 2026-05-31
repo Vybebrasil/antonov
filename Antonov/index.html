@@ -11,21 +11,22 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Antonov" />
 <link rel="manifest" href="/assets/site.webmanifest" />
+<link rel="preload" as="image" href="/assets/foto-hero.webp" type="image/webp" fetchpriority="high" />
 <title>Academia em Irecê | Antonov Center — Treino e performance</title>
 <meta name="description" content="Academia premium em Irecê, BA. Musculação, cardio, avaliação física e tour gratuito. Antonov Center — projetado para decolar." />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://www.antonovcenter.com.br/" />
+<link rel="canonical" href="https://antonov-one.vercel.app/" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="pt_BR" />
 <meta property="og:site_name" content="Antonov Center" />
 <meta property="og:title" content="Academia em Irecê | Antonov Center — Treino e performance" />
 <meta property="og:description" content="Academia premium em Irecê, BA. Musculação, cardio, avaliação física e tour gratuito. Antonov Center — projetado para decolar." />
-<meta property="og:url" content="https://www.antonovcenter.com.br" />
-<meta property="og:image" content="https://www.antonovcenter.com.br/assets/foto-hero.png" />
+<meta property="og:url" content="https://antonov-one.vercel.app" />
+<meta property="og:image" content="https://antonov-one.vercel.app/assets/foto-hero.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Academia em Irecê | Antonov Center — Treino e performance" />
 <meta name="twitter:description" content="Academia premium em Irecê, BA. Musculação, cardio, avaliação física e tour gratuito. Antonov Center — projetado para decolar." />
-<meta name="twitter:image" content="https://www.antonovcenter.com.br/assets/foto-hero.png" />
+<meta name="twitter:image" content="https://antonov-one.vercel.app/assets/foto-hero.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -71,7 +72,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: url("assets/foto-hero.png") center / cover no-repeat;
+  background: image-set(url("assets/foto-hero.webp") type("image/webp"), url("assets/foto-hero.png") type("image/png")) center / cover no-repeat;
   filter: grayscale(100%), brightness(0.1);
   
 }
@@ -467,7 +468,7 @@
 }
 .disc .ph { position: absolute; inset: 0; }
 .disc .ph--disc-01 {
-  background: url("assets/disc-01-barbells.png") center / cover no-repeat;
+  background: image-set(url("assets/disc-01-barbells.webp") type("image/webp"), url("assets/disc-01-barbells.png") type("image/png")) center / cover no-repeat;
 }
 .disc__content {
   position: absolute; inset: 0;
@@ -565,10 +566,10 @@
 .space-cell--big { grid-row: span 2; }
 .space-cell .ph { position: absolute; inset: 0; }
 .space-cell .ph--space-espaco {
-  background: url("assets/fotogeral.png") center / cover no-repeat;
+  background: image-set(url("assets/fotogeral.webp") type("image/webp"), url("assets/fotogeral.png") type("image/png")) center / cover no-repeat;
 }
 .space-cell .ph--space-hightech {
-  background: url("assets/space-hightech.png") center / cover no-repeat;
+  background: image-set(url("assets/space-hightech.webp") type("image/webp"), url("assets/space-hightech.png") type("image/png")) center / cover no-repeat;
   filter: brightness(0.82) contrast(1.05) saturate(1.02);
 }
 .space-cell--hightech .ph--space-hightech::before {
@@ -920,40 +921,43 @@
 <!-- page transition mask -->
 <div class="page-mask" aria-hidden="true" role="presentation">
   <div class="page-mask__loader" aria-live="polite" aria-busy="true">
-    <img class="page-mask__logo" src="assets/logo.png" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" />
+    <img class="page-mask__logo" src="assets/logo.png" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" >
     <div class="page-mask__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
     <p class="page-mask__status" id="page-mask-status">Preparando hangar…</p>
   </div>
   <div class="page-mask__flight" aria-hidden="true">
-    <img src="assets/imagotipo.png" alt="Símbolo Antonov Center" width="591" height="591" decoding="async" />
+    <img src="assets/imagotipo.png" alt="Símbolo Antonov Center" width="591" height="591" decoding="async" loading="lazy">
   </div>
 </div>
 
 <!-- ============= NAV ============= -->
 <header class="nav on-dark" data-screen-label="01 Nav">
   <div class="nav__inner">
-    <a href="index.html" class="nav__logo" data-no-transition>
-      <img src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" />
+    <a href="/" class="nav__logo" data-no-transition>
+      <img src="assets/logo.png" alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" loading="lazy">
     </a>
-    <nav class="nav__links" aria-label="Principal">
-      <a href="index.html" class="active">Home</a>
-      <a href="planos.html">Planos</a>
-      <a href="contato.html">Contato</a>
+        <nav class="nav__links" aria-label="Principal">
+      <a href="/" class="active">Home</a>
+      <a href="/aulas">Aulas</a>
+      <a href="/estudio">Estúdio</a>
+      <a href="/planos">Planos</a>
+      <a href="/sobre">Sobre</a>
+      <a href="/contato">Contato</a>
     </nav>
-    <a href="planos.html" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <a href="/planos" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
     <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
   </div>
   <div class="nav__backdrop" aria-hidden="true"></div>
   <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
     <div class="nav__drawer-links" role="navigation"></div>
-    <a href="planos.html" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
+    <a href="/planos" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
   </aside>
 </header>
 
 <!-- ============= HERO ============= -->
 <section class="hero" data-screen-label="02 Hero">
   <div class="hero__bg"></div>
-  <img class="hero__wireframe" src="assets/wireframe-side.png" alt="Hangar Antonov Center — estrutura da academia em Irecê" />
+  <img class="hero__wireframe" src="assets/wireframe-side.png" alt="Hangar Antonov Center — estrutura da academia em Irecê"  fetchpriority="high" decoding="async">
   <div class="hero__photo ph">
     <span class="ph__label">HANGAR 1º DE JANEIRO</span>
     <span class="ph__id">IMG_001 / 1920×1080</span>
@@ -979,9 +983,9 @@
           Academia em Irecê, BA. Performance como operação — força, condicionamento e recuperação em um hangar de 3.000 m² projetado para decolar.
         </p>
         <div class="hero__cta">
-          <a href="planos.html" class="btn btn--yellow">Comece agora <span class="arrow"></span></a>
+          <a href="/planos" class="btn btn--yellow">Comece agora <span class="arrow"></span></a>
           <button type="button" class="btn btn--ghost-light" data-vip-open>Lista VIP pré-inauguração</button>
-          <a href="estudio.html" class="btn btn--ghost-light">Conheça o espaço</a>
+          <a href="/estudio" class="btn btn--ghost-light">Conheça o espaço</a>
         </div>
       </div>
       <div class="hero__stat">
@@ -1305,16 +1309,19 @@
       <div>
         <h2 class="footer__cta-title reveal">Pronto<br />quando você<br />estiver.</h2>
         <p class="footer__cta-text reveal">Comece com um tour ou uma aula experimental. A gente ajuda você a achar o plano, a rotina e o espaço pra desbloquear todo seu potencial.</p>
-        <a href="contato.html" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
+        <a href="/contato" class="btn btn--yellow">Agendar visita <span class="arrow"></span></a>
       </div>
       <div class="footer__cols footer__cols--compact">
         <div class="footer__col">
           <h4>Navegação</h4>
           <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="planos.html">Planos</a></li>
-            <li><a href="contato.html">Contato</a></li>
-            <li><a href="trabalhe-conosco.html">Trabalhe conosco</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/aulas">Aulas</a></li>
+            <li><a href="/estudio">Estúdio</a></li>
+            <li><a href="/planos">Planos</a></li>
+            <li><a href="/sobre">Sobre</a></li>
+            <li><a href="/contato">Contato</a></li>
+            <li><a href="/trabalhe-conosco">Trabalhe conosco</a></li>
           </ul>
         </div>
         <div class="footer__col">
@@ -1346,9 +1353,9 @@
       <div class="footer__col">
         <h4>Legal</h4>
         <ul>
-          <li><a href="termos.html">Termos</a></li>
-          <li><a href="privacidade.html">Privacidade</a></li>
-          <li><a href="cookies.html">Cookies</a></li>
+          <li><a href="/termos">Termos</a></li>
+          <li><a href="/privacidade">Privacidade</a></li>
+          <li><a href="/cookies">Cookies</a></li>
         </ul>
       </div>
       <div class="footer__col">
@@ -1390,7 +1397,7 @@
       <p class="disc-modal__summary" id="disc-modal-summary"></p>
       <p class="disc-modal__details" id="disc-modal-details"></p>
       <div class="disc-modal__actions">
-        <a href="contato.html" class="btn btn--yellow">Quero saber mais <span class="arrow"></span></a>
+        <a href="/contato" class="btn btn--yellow">Quero saber mais <span class="arrow"></span></a>
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-/* JSON-LD — SportsActivityLocation + WebSite na home */
+/* JSON-LD — LocalBusiness, WebSite, BreadcrumbList, FAQPage, ContactPage */
 (function () {
   'use strict';
 
@@ -8,6 +8,7 @@
   const b = cfg.business;
   const base = cfg.siteUrl.replace(/\/$/, '');
   const image = base + cfg.defaultImage;
+  const page = document.body.dataset.seoPage || '';
 
   const address = {
     '@type': 'PostalAddress',
@@ -18,9 +19,12 @@
   };
   if (b.postalCode) address.postalCode = b.postalCode;
 
+  const localBusinessId = base + '/#localbusiness';
+
   const localBusiness = {
     '@context': 'https://schema.org',
     '@type': 'SportsActivityLocation',
+    '@id': localBusinessId,
     name: b.name,
     description:
       'Academia de performance em Irecê, Bahia. Treino, musculação, cardio e estrutura premium.',
@@ -64,7 +68,7 @@
   inject(localBusiness);
 
   const isHome =
-    document.body.dataset.seoPage === 'home' ||
+    page === 'home' ||
     location.pathname === '/' ||
     /index\.html$/i.test(location.pathname);
 
@@ -76,6 +80,121 @@
       url: base,
       inLanguage: 'pt-BR',
       publisher: { '@type': 'Organization', name: b.name, url: base },
+    });
+  }
+
+  const breadcrumbLabels = {
+    home: 'Home',
+    planos: 'Planos',
+    contato: 'Contato',
+    aulas: 'Aulas',
+    estudio: 'Estúdio',
+    sobre: 'Sobre',
+    trabalhe: 'Trabalhe conosco',
+    termos: 'Termos de uso',
+    privacidade: 'Privacidade',
+    cookies: 'Cookies',
+  };
+
+  const breadcrumbPaths = {
+    home: '/',
+    planos: '/planos',
+    contato: '/contato',
+    aulas: '/aulas',
+    estudio: '/estudio',
+    sobre: '/sobre',
+    trabalhe: '/trabalhe-conosco',
+    termos: '/termos',
+    privacidade: '/privacidade',
+    cookies: '/cookies',
+  };
+
+  if (page && page !== 'home' && breadcrumbLabels[page]) {
+    inject({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: base + '/',
+        },
+        {
+          '@type': 'ListItem',
+          position: 2,
+          name: breadcrumbLabels[page],
+          item: base + breadcrumbPaths[page],
+        },
+      ],
+    });
+  }
+
+  if (page === 'planos') {
+    inject({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'O que está incluso na mensalidade?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Cada plano inclui acesso a tudo que a ANTONOV tem a oferecer, alterando somente o horário de acesso.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Posso experimentar antes de assinar?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sim. Oferecemos um tour guiado e 1 aula experimental gratuita. Basta agendar pelo link de contato, sem compromisso.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Tem fidelidade ou multa de cancelamento?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Depende do plano. Os planos mensais e diários não têm fidelidade. O plano anual tem desconto de 8% com fidelidade de 12 meses e cobrança recorrente.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Preciso seguir um programa específico?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Não obrigatoriamente. Você pode treinar livre no Hangar. Todo membro tem acesso a uma avaliação inicial e uma rotina sugerida.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Onde fica a Antonov Center em Irecê?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Na Av. 1º de Janeiro, Irecê, Bahia. Agende um tour em /contato para conhecer o hangar de 3.000 m².',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Como agendar tour ou aula experimental em Irecê?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Pelo formulário em /contato, WhatsApp +55 74 99963-1507 ou e-mail antonovacademia@gmail.com.',
+          },
+        },
+      ],
+    });
+  }
+
+  if (page === 'contato') {
+    inject({
+      '@context': 'https://schema.org',
+      '@type': 'ContactPage',
+      name: 'Contato — Antonov Center',
+      url: base + '/contato',
+      about: { '@id': localBusinessId },
+      mainEntity: { '@id': localBusinessId },
     });
   }
 })();
