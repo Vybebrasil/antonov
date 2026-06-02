@@ -12,19 +12,19 @@
 <meta name="apple-mobile-web-app-title" content="Antonov" />
 <link rel="manifest" href="/assets/site.webmanifest" />
 <title>Planos e mensalidades | Academia Antonov — Irecê, BA</title>
-<meta name="description" content="Conheça os planos da Antonov Center em Irecê: Business Class, First Class e diárias. Estrutura completa e horários flexíveis." />
+<meta name="description" content="Conheça os planos da Antonov Center em Irecê: First Class e diárias. Estrutura completa e horários flexíveis." />
 <meta name="robots" content="index, follow" />
 <link rel="canonical" href="https://antonov-one.vercel.app/planos" />
 <meta property="og:type" content="website" />
 <meta property="og:locale" content="pt_BR" />
 <meta property="og:site_name" content="Antonov Center" />
 <meta property="og:title" content="Planos e mensalidades | Academia Antonov — Irecê, BA" />
-<meta property="og:description" content="Conheça os planos da Antonov Center em Irecê: Business Class, First Class e diárias. Estrutura completa e horários flexíveis." />
+<meta property="og:description" content="Conheça os planos da Antonov Center em Irecê: First Class e diárias. Estrutura completa e horários flexíveis." />
 <meta property="og:url" content="https://antonov-one.vercel.app/planos" />
 <meta property="og:image" content="https://antonov-one.vercel.app/assets/foto-hero.png" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="Planos e mensalidades | Academia Antonov — Irecê, BA" />
-<meta name="twitter:description" content="Conheça os planos da Antonov Center em Irecê: Business Class, First Class e diárias. Estrutura completa e horários flexíveis." />
+<meta name="twitter:description" content="Conheça os planos da Antonov Center em Irecê: First Class e diárias. Estrutura completa e horários flexíveis." />
 <meta name="twitter:image" content="https://antonov-one.vercel.app/assets/foto-hero.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -110,9 +110,12 @@
 /* Plans grid */
 .plans {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
+  max-width: 880px;
+  margin-inline: auto;
 }
+.plan--hidden { display: none !important; }
 .plan {
   background: var(--ink); color: #fff;
   border-radius: 16px;
@@ -483,7 +486,7 @@
         Mensalidades flexíveis projetadas em torno da sua rotina.
       </p>
       <div class="page-hero__meta reveal">
-        <div>PLANOS<span class="v">03 ATIVOS</span></div>
+        <div>PLANOS<span class="v">02 ATIVOS</span></div>
         <div>AVALIAÇÃO<span class="v">GRÁTIS</span></div>
         <div>EXPERIMENTAL<span class="v">GRÁTIS</span></div>
       </div>
@@ -502,30 +505,29 @@
     </div>
 
     <div class="plans reveal-up-stagger">
-      
-      <article class="plan">
+
+      <!-- Business Class oculto temporariamente
+      <article class="plan plan--hidden" hidden>
         <div class="plan__no">/ 01</div>
         <h3 class="plan__name">Business<br />Class.</h3>
-     <!--   <div class="plan__sub">A operação completa</div> -->
         <div class="plan__price">
           <span class="plan__currency">R$</span>
           <span class="plan__amount"><span data-price-monthly="134,90" data-price-yearly="124,90">134,90</span></span>
           <span class="plan__period">/mês</span>
         </div>
        <p class="plan__lede">Acesso em horário especial.</p>
-        <ul class="plan__features"> 
+        <ul class="plan__features">
           <li>Acesso completo ao Hangar</li>
           <li>Avaliação física grátis</li>
           <li>Cardio e máquinas ilimitado</li>
           <li>Horário especial (09 às 16h e 22 às 00h)</li>
         </ul>
         <button type="button" class="plan__cta" data-vip-open>Assinar BUSINESS CLASS <span class="arrow"></span></button>
-        
-  </article>
+      </article>
+      -->
 
       <article class="plan plan--featured">
-     <!--   <span class="plan__tag">Mais escolhido</span> -->
-        <div class="plan__no">/ 02</div>
+        <div class="plan__no">/ 01</div>
         <h3 class="plan__name">First<br />Class.</h3>
         <span class="plan__tag">Mais escolhido</span>
      <!--   <div class="plan__sub">Pra começar com solidez</div> -->
@@ -545,7 +547,7 @@
       </article>
 
       <article class="plan">
-        <div class="plan__no">/ 03</div>
+        <div class="plan__no">/ 02</div>
         <h3 class="plan__name">Diária.</h3>
         <div class="plan__price">
           <span class="plan__currency">R$</span>
