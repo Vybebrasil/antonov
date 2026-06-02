@@ -7,6 +7,8 @@ window.ANTONOV_SEO = {
   defaultImage: '/assets/foto-hero.png',
   business: {
     name: 'Antonov Center',
+    legalName: 'Antonov Center LTDA',
+    taxID: '62.421.964/0001-60',
     street: 'Av. 1º de Janeiro',
     city: 'Irecê',
     region: 'BA',

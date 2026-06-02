@@ -20,10 +20,7 @@ const LINK_MAP = {
 
 const NAV_ITEMS = [
   { key: 'home', href: '/', label: 'Home' },
-  { key: 'aulas', href: '/aulas', label: 'Aulas' },
-  { key: 'estudio', href: '/estudio', label: 'Estúdio' },
   { key: 'planos', href: '/planos', label: 'Planos' },
-  { key: 'sobre', href: '/sobre', label: 'Sobre' },
   { key: 'contato', href: '/contato', label: 'Contato' },
 ];
 
@@ -39,10 +36,7 @@ function navHtml(activeKey) {
 
 const FOOTER_NAV = `          <ul>
             <li><a href="/">Home</a></li>
-            <li><a href="/aulas">Aulas</a></li>
-            <li><a href="/estudio">Estúdio</a></li>
             <li><a href="/planos">Planos</a></li>
-            <li><a href="/sobre">Sobre</a></li>
             <li><a href="/contato">Contato</a></li>
             <li><a href="/trabalhe-conosco">Trabalhe conosco</a></li>
           </ul>`;

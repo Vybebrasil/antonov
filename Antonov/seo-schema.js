@@ -26,6 +26,8 @@
     '@type': 'SportsActivityLocation',
     '@id': localBusinessId,
     name: b.name,
+    ...(b.legalName ? { legalName: b.legalName } : {}),
+    ...(b.taxID ? { taxID: b.taxID } : {}),
     description:
       'Academia de performance em Irecê, Bahia. Treino, musculação, cardio e estrutura premium.',
     url: base,

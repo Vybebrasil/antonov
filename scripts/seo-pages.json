@@ -30,21 +30,27 @@
       "path": "/aulas",
       "title": "Aulas e modalidades | Antonov Center — Irecê",
       "description": "Modalidades de treino na Antonov Center, Irecê: hipertrofia, condicionamento, mobilidade e mais. Espaço pensado para performance.",
-      "ogImage": "/assets/disc-01-barbells.png"
+      "ogImage": "/assets/disc-01-barbells.png",
+      "noindex": true,
+      "hidden": true
     },
     "estudio.html": {
       "seoPage": "estudio",
       "path": "/estudio",
       "title": "Estrutura e equipamentos | Antonov Center — Irecê",
       "description": "Conheça o hangar Antonov em Irecê: 3.000 m², equipamentos premium, zonas de força, cardio e recovery. Visite o estúdio.",
-      "ogImage": "/assets/space-hightech.png"
+      "ogImage": "/assets/space-hightech.png",
+      "noindex": true,
+      "hidden": true
     },
     "sobre.html": {
       "seoPage": "sobre",
       "path": "/sobre",
       "title": "Sobre o hangar | Antonov Center — Irecê, Bahia",
       "description": "Manifesto e história da Antonov Center, academia de performance em Irecê, Bahia. Força, tecnologia e cultura de treino.",
-      "ogImage": "/assets/purpose-bg.png"
+      "ogImage": "/assets/purpose-bg.png",
+      "noindex": true,
+      "hidden": true
     },
     "trabalhe-conosco.html": {
       "seoPage": "trabalhe",
