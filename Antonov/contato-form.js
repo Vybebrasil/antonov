@@ -1,4 +1,4 @@
-/* Formulário de tour — contato.html */
+/* Formulário de contato — contato.html */
 (function () {
   'use strict';
 
@@ -38,7 +38,7 @@
       } catch {
         /* resposta não-JSON */
       }
-      if (!res.ok) throw new Error(data.error || 'Não foi possível agendar. Tente novamente.');
+      if (!res.ok) throw new Error(data.error || 'Não foi possível enviar. Tente novamente.');
       return;
     }
     if (c.provider === 'local') return;
@@ -47,7 +47,7 @@
 
   function showSuccess() {
     const label = submitBtn.querySelector('span');
-    if (label) label.textContent = '✓ Tour agendado';
+    if (label) label.textContent = '✓ Mensagem enviada';
     submitBtn.style.background = '#1F8A5B';
     submitBtn.style.color = '#fff';
     submitBtn.disabled = true;

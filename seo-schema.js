@@ -150,7 +150,7 @@
           name: 'Posso experimentar antes de assinar?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sim. Oferecemos um tour guiado e 1 aula experimental gratuita. Basta agendar pelo link de contato, sem compromisso.',
+            text: 'Sim. Oferecemos 1 aula experimental gratuita. Basta falar conosco pelo link de contato, sem compromisso.',
           },
         },
         {
@@ -174,15 +174,15 @@
           name: 'Onde fica a Antonov Center em Irecê?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Na Av. 1º de Janeiro, Irecê, Bahia. Agende um tour em /contato para conhecer o hangar de 3.000 m².',
+            text: 'Na Av. 1º de Janeiro, Irecê, Bahia. Veja o mapa em /contato#mapa.',
           },
         },
         {
           '@type': 'Question',
-          name: 'Como agendar tour ou aula experimental em Irecê?',
+          name: 'Como agendar aula experimental em Irecê?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Pelo formulário em /contato, WhatsApp +55 74 99963-1507 ou e-mail antonovacademia@gmail.com.',
+            text: 'Pelo formulário em /contato, WhatsApp +55 74 99963-1507 ou e-mail antonovacademia@gmail.com. Aula grátis, sem compromisso.',
           },
         },
       ],

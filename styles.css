@@ -447,6 +447,12 @@ body.nav-open { overflow: hidden; }
   font-style: normal;
   line-height: 1.7;
 }
+.footer__address a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.footer__address a:hover { color: var(--yellow); }
 .footer__social { display: flex; gap: 12px; }
 .footer__social a {
   width: 38px; height: 38px;
