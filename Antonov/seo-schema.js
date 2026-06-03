@@ -147,10 +147,10 @@
         },
         {
           '@type': 'Question',
-          name: 'Posso experimentar antes de assinar?',
+          name: 'Posso conhecer a academia antes de assinar?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sim. Oferecemos 1 aula experimental gratuita. Basta falar conosco pelo link de contato, sem compromisso.',
+            text: 'Sim. Fale conosco pelo link de contato para conhecer a estrutura e escolher o plano ideal. Sem compromisso.',
           },
         },
         {
@@ -179,10 +179,10 @@
         },
         {
           '@type': 'Question',
-          name: 'Como agendar aula experimental em Irecê?',
+          name: 'Como falar com a Antonov em Irecê?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Pelo formulário em /contato, WhatsApp +55 74 99963-1507 ou e-mail antonovacademia@gmail.com. Aula grátis, sem compromisso.',
+            text: 'Pelo formulário em /contato, WhatsApp +55 74 99963-1507 ou e-mail antonovacademia@gmail.com. Sem compromisso.',
           },
         },
       ],

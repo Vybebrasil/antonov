@@ -15,6 +15,69 @@
   const errorEl = document.getElementById('cform-error');
   const submitBtn = form.querySelector('.cform__submit');
 
+  const TZ = 'America/Bahia';
+  const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+  function todayInBahia() {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: TZ,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  }
+
+  function addCalendarDays(dateStr, days) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(y, m - 1, d + days);
+    const yy = dt.getFullYear();
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const dd = String(dt.getDate()).padStart(2, '0');
+    return `${yy}-${mm}-${dd}`;
+  }
+
+  function weekdayFromDateStr(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const noonUtc = new Date(Date.UTC(y, m - 1, d, 15, 0, 0));
+    const en = new Intl.DateTimeFormat('en-US', { timeZone: TZ, weekday: 'short' }).format(noonUtc);
+    const map = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+    return WEEKDAYS[map[en] ?? 0];
+  }
+
+  function formatShortDate(dateStr) {
+    const [, month, day] = dateStr.split('-').map(Number);
+    return `${day}/${MONTHS[month - 1]}`;
+  }
+
+  function populateMelhorDiaSelect() {
+    const select = document.getElementById('contato-dia');
+    if (!select) return;
+
+    const today = todayInBahia();
+    const labels = [
+      `Hoje · ${formatShortDate(today)}`,
+      `Amanhã · ${formatShortDate(addCalendarDays(today, 1))}`,
+    ];
+
+    for (let offset = 2; offset <= 3; offset += 1) {
+      const dateStr = addCalendarDays(today, offset);
+      labels.push(`${weekdayFromDateStr(dateStr)} · ${formatShortDate(dateStr)}`);
+    }
+
+    labels.push('Próxima semana');
+
+    select.replaceChildren(
+      ...labels.map((label) => {
+        const opt = document.createElement('option');
+        opt.textContent = label;
+        return opt;
+      })
+    );
+  }
+
+  populateMelhorDiaSelect();
+
   chips.forEach((chip) => {
     chip.addEventListener('click', () => {
       chips.forEach((c) => c.classList.remove('active'));

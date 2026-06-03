@@ -267,8 +267,14 @@
   if (clockEls.length) {
     const fmt = () => {
       const d = new Date();
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mm = String(d.getMinutes()).padStart(2, '0');
+      const parts = new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Bahia',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).formatToParts(d);
+      const hh = parts.find((p) => p.type === 'hour')?.value ?? '00';
+      const mm = parts.find((p) => p.type === 'minute')?.value ?? '00';
       return `${hh}:${mm} BRT`;
     };
     const tick = () => clockEls.forEach((el) => (el.textContent = fmt()));

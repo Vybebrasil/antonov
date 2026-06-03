@@ -7,7 +7,7 @@
       "seoPage": "home",
       "path": "/",
       "title": "Academia em Irecê | Antonov Center — Treino e performance",
-      "description": "Academia premium em Irecê, BA. Musculação, cardio, avaliação física e aula experimental grátis. Antonov Center — projetado para decolar.",
+      "description": "Academia premium em Irecê, BA. Musculação, cardio e avaliação física. Antonov Center — projetado para decolar.",
       "ogImage": "/assets/foto-hero.png",
       "lcpPreload": "/assets/foto-hero.webp"
     },
@@ -22,7 +22,7 @@
       "seoPage": "contato",
       "path": "/contato",
       "title": "Fale conosco | Antonov Center — Irecê",
-      "description": "Fale com a Antonov Center em Irecê. Aula experimental grátis, dúvidas sobre planos, WhatsApp e e-mail.",
+      "description": "Fale com a Antonov Center em Irecê. Dúvidas sobre planos, matrícula, WhatsApp e e-mail.",
       "ogImage": "/assets/fotogeral.png"
     },
     "aulas.html": {
