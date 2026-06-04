@@ -62,9 +62,11 @@
   display: block;
   line-height: 0;
 }
+.hero__wireframe__img,
 .hero__wireframe img {
   width: 100%;
   height: auto;
+  aspect-ratio: 1;
   display: block;
 }
 @keyframes hero-wireframe-float {
@@ -159,6 +161,11 @@
   line-height: 1;
   color: #fff;
   letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+}
+.hero__stat .n [data-count] {
+  display: inline-block;
+  min-width: 4.5ch;
 }
 .hero__stat .n .yel { color: var(--blue); }
 .hero__stat .l {

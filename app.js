@@ -231,26 +231,38 @@
 
   // ---------- counter animation ----------
   const counters = document.querySelectorAll('[data-count]');
-  counters.forEach((el) => {
+  const setCounterText = (el, value) => {
     const target = parseFloat(el.dataset.count);
     const suffix = el.dataset.suffix || '';
-    el.textContent = (Number.isInteger(target) ? target : target.toFixed(1)) + suffix;
-  });
+    const n = Number.isInteger(target) ? Math.round(value) : parseFloat(value);
+    el.textContent = (Number.isInteger(target) ? n : n.toFixed(1)) + suffix;
+  };
+  const setCounterFinal = (el) => {
+    setCounterText(el, parseFloat(el.dataset.count));
+    el.dataset.counted = '1';
+  };
   const animateCount = (el) => {
     if (el.dataset.counted) return;
+    if (el.hasAttribute('data-count-static') || reducedMotion.matches) {
+      setCounterFinal(el);
+      return;
+    }
     el.dataset.counted = '1';
     const target = parseFloat(el.dataset.count);
     const suffix = el.dataset.suffix || '';
+    const finalDigits = (Number.isInteger(target) ? String(target) : target.toFixed(1)) + suffix;
+    el.style.fontVariantNumeric = 'tabular-nums';
+    el.style.minWidth = `${finalDigits.length}ch`;
     const dur = 1600;
     const start = performance.now();
     const tick = (now) => {
       const t = Math.min((now - start) / dur, 1);
       const eased = 1 - Math.pow(1 - t, 3);
       const v = target * eased;
-      el.textContent = (Number.isInteger(target) ? Math.round(v) : v.toFixed(1)) + suffix;
+      setCounterText(el, v);
       if (t < 1) requestAnimationFrame(tick);
     };
-    el.textContent = '0' + suffix;
+    setCounterText(el, 0);
     requestAnimationFrame(tick);
   };
   try {
