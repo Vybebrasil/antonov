@@ -86,6 +86,15 @@ function processHtml(name) {
     (_, slug) => `href="css/pages/${slug}.min.css"`
   );
 
+  html = html.replace(
+    /<script src="seo-config\.min\.js"(?![^>]*\bdefer\b)/g,
+    '<script src="seo-config.min.js" defer'
+  );
+  html = html.replace(
+    /<script src="seo-schema\.min\.js"(?![^>]*\bdefer\b)/g,
+    '<script src="seo-schema.min.js" defer'
+  );
+
   writeFileSync(join(dist, name), html, 'utf8');
   console.log('html', name);
 }

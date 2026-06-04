@@ -4,6 +4,14 @@
 <meta charset="utf-8" />
 <script>try{if(sessionStorage.getItem('antonov-nav')==='1')document.documentElement.classList.add('antonov-loading-pending');}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+:root{--bg:#EEEAE2;--ink:#0E0E10;--carbon:#131316;--yellow:#FAB10F;--blue:#2A8FD6;--f-body:system-ui,sans-serif;--f-display:Impact,sans-serif;--nav-h:76px;--pad-x:clamp(20px,4vw,64px)}
+body{margin:0;font-family:var(--f-body);background:var(--bg);color:var(--ink)}
+html.antonov-loading-pending .page-mask{transform:translateY(0);pointer-events:auto}
+html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
+.page-mask{position:fixed;inset:0;z-index:9999;background:var(--carbon);transform:translateY(-100%);transition:transform var(--mask-cover-duration,.38s) var(--mask-ease,ease)}
+</style>
+
 
 <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
@@ -28,11 +36,16 @@
 <meta name="twitter:image" content="https://www.antonovcenter.com.br/assets/foto-hero.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css" />
-<script src="seo-config.js"></script>
-<script src="seo-schema.js"></script>
-<link rel="stylesheet" href="css/pages/cookies.css" />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" /></noscript>
+<link rel="preload" href="styles.css" as="style" />
+<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="styles.css" /></noscript>
+<script src="seo-config.js" defer></script>
+<script src="seo-schema.js" defer></script>
+<link rel="preload" href="css/pages/cookies.css" as="style" />
+<link rel="stylesheet" href="css/pages/cookies.css" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="css/pages/cookies.css" /></noscript>
 </head>
 <body data-seo-page="cookies">
 
