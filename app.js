@@ -3,7 +3,6 @@
   'use strict';
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const revealFallbackMs = () => (reducedMotion.matches ? 200 : 500);
 
   // ---------- nav scroll state + mobile drawer ----------
   const nav = document.querySelector('.nav');
@@ -67,32 +66,6 @@
     if (window.innerWidth > 880 && nav?.classList.contains('is-open')) closeNav();
   });
 
-  // ---------- reveal on scroll ----------
-  const revealEls = document.querySelectorAll('.reveal, .reveal-up-stagger, .clip-reveal');
-  const triggerReveal = (el) => { if (!el.classList.contains('in')) el.classList.add('in'); };
-  const io = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (e.isIntersecting) {
-          triggerReveal(e.target);
-          io.unobserve(e.target);
-        }
-      });
-    },
-    { threshold: 0, rootMargin: '0px 0px -10% 0px' }
-  );
-  revealEls.forEach((el) => io.observe(el));
-
-  setTimeout(() => {
-    revealEls.forEach((el) => {
-      const r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight && r.bottom > 0) {
-        triggerReveal(el);
-        io.unobserve(el);
-      }
-    });
-  }, revealFallbackMs());
-
   // ---------- page transition (covering -> hovering -> takeoff) ----------
   const mask = document.querySelector('.page-mask');
   const NAV_KEY = 'antonov-nav';
@@ -126,8 +99,11 @@
     const flight = mask?.querySelector('.page-mask__flight');
     if (!flight) return;
     flight.style.animation = 'none';
-    void flight.offsetWidth;
-    flight.style.animation = '';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        flight.style.animation = '';
+      });
+    });
   };
 
   const closeTransitionMask = (onDone) => {
@@ -489,6 +465,13 @@
     const dotsHost = document.querySelector(track.dataset.snap);
     if (!dotsHost) return;
     const cards = track.querySelectorAll(':scope > *');
+    let slideWidth = 0;
+    const measureSlideWidth = () => {
+      slideWidth = track.clientWidth || 1;
+    };
+    measureSlideWidth();
+    window.addEventListener('resize', measureSlideWidth, { passive: true });
+
     cards.forEach((_, i) => {
       const d = document.createElement('button');
       d.className = 'snap-dot' + (i === 0 ? ' active' : '');
@@ -497,9 +480,22 @@
       });
       dotsHost.appendChild(d);
     });
-    track.addEventListener('scroll', () => {
-      const i = Math.round(track.scrollLeft / track.offsetWidth);
-      dotsHost.querySelectorAll('.snap-dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
-    }, { passive: true });
+
+    let snapTicking = false;
+    track.addEventListener(
+      'scroll',
+      () => {
+        if (snapTicking) return;
+        snapTicking = true;
+        requestAnimationFrame(() => {
+          snapTicking = false;
+          const i = Math.round(track.scrollLeft / slideWidth);
+          dotsHost.querySelectorAll('.snap-dot').forEach((d, idx) => {
+            d.classList.toggle('active', idx === i);
+          });
+        });
+      },
+      { passive: true }
+    );
   });
 })();
