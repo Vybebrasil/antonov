@@ -16,7 +16,7 @@ const CRITICAL_CSS = `<style>
 :root{--bg:#EEEAE2;--ink:#0E0E10;--carbon:#131316;--yellow:#FAB10F;--blue:#2A8FD6;--f-body:system-ui,sans-serif;--f-display:Impact,sans-serif;--nav-h:76px;--pad-x:clamp(20px,4vw,64px)}
 body{margin:0;font-family:var(--f-body);background:var(--bg);color:var(--ink)}
 html.antonov-loading-pending .page-mask{transform:translateY(0);pointer-events:auto}
-html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
+html.antonov-loading-pending body>:not(.page-mask){visibility:visible}
 .page-mask{position:fixed;inset:0;z-index:9999;background:var(--carbon);transform:translateY(-100%);transition:transform var(--mask-cover-duration,.38s) var(--mask-ease,ease)}
 </style>
 `;
@@ -80,4 +80,4 @@ for (const name of readdirSync(root).filter((n) => n.endsWith('.html'))) {
     console.log('patched', name);
   }
 }
-
+

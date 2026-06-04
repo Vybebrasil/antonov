@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/optimize-images.mjs && node scripts/inject-critical-home.mjs && node scripts/build.mjs",
+    "build": "node scripts/optimize-images.mjs && node scripts/build.mjs",
     "images:optimize": "node scripts/optimize-images.mjs",
     "extract:page-css": "node scripts/extract-page-styles.mjs",
     "db:init": "node scripts/init-db.mjs",

@@ -76,7 +76,7 @@
   text-transform: uppercase;
   margin: 0;
 }
-.manifesto h2 .yel { color: var(--blue-deep); -webkit-text-stroke: 0; }
+.manifesto h2 .yel { color: #FAB10F; -webkit-text-stroke: 0; }
 
 .manifesto__lede { color: var(--ink-soft); font-size: 17px; line-height: 1.5; max-width: 44ch; }
 .manifesto__lede strong { color: var(--ink); font-weight: 600; }
@@ -202,7 +202,7 @@
   color: rgba(255,255,255,0.6);
   z-index: 3;
 }
-.disc__no .yel { color: var(--blue); }
+.disc__no .yel { color: #FAB10F; }
 .disc__name {
   font-family: var(--f-display);
   font-size: clamp(28px, 2.6vw, 40px);

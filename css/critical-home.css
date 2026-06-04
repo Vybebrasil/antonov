@@ -312,9 +312,7 @@
 .hero__stat .n [data-count-static] {
   min-width: 0;
 }
-.hero__stat .n .yel {
-  color: var(--blue);
-}
+.hero__stat .n .yel { color: #FAB10F; }
 .hero__stat .l {
   font-family: ui-monospace, "Cascadia Mono", monospace;
   font-size: 12px;
@@ -339,9 +337,7 @@
 .hero__meta div {
   white-space: nowrap;
 }
-.hero__meta .yel {
-  color: var(--blue);
-}
+.hero__meta .yel { color: #FAB10F; }
 .hero [data-clock] {
   display: inline-block;
   min-width: 9ch;

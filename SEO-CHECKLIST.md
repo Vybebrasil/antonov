@@ -130,6 +130,25 @@ Auditar e alinhar:
 - [Google Rich Results Test](https://search.google.com/test/rich-results): home (`SportsActivityLocation`), `/planos` (`FAQPage`)
 - PageSpeed Insights (mobile): meta LCP &lt; 2,5s após WebP no servidor
 
+## Checklist LCP (home) por release
+
+1. Rodar `npm run build` e confirmar que o build termina sem mutar `index.html` da raiz.
+2. Validar em `dist/index.html`:
+   - `/* hero CLS */` presente e atualizado.
+   - `styles.min.css` síncrono no head.
+   - `home.min.css` em `media=\"print\"` + `onload`.
+3. Validar assets do hero em `dist/assets`:
+   - `foto-hero.png`
+   - `foto-hero.webp`
+   - `foto-hero-1280.webp`
+   - `foto-hero-960.webp`
+4. Teste manual:
+   - cold load da `/` (sem cache) com hero visível imediatamente.
+   - navegação interna para `/` com máscara sem esconder conteúdo.
+5. PageSpeed/Lighthouse mobile:
+   - elemento LCP deve ser o `h1` do hero na maior parte dos testes.
+   - sem regressão visual em nav, hero e CTA.
+
 ## Conteúdo (médio prazo, opcional)
 
 - Blog ou landing `/guia/academia-irece` só se houver capacidade de atualizar

@@ -18,7 +18,7 @@
   line-height: 0.95; letter-spacing: -0.01em;
   text-transform: uppercase; margin: 0 0 32px;
   }
-.page-hero h1 .yel { color: var(--yellow-ink); }
+.page-hero h1 .yel { color: #FAB10F; }
 .page-hero__row {
   display: grid; grid-template-columns: 1.5fr 1fr;
   gap: 60px; align-items: end;
@@ -134,7 +134,7 @@
   line-height: 1; letter-spacing: -0.01em;
 }
 .plan__period { font-size: 14px; opacity: 0.7; }
-.plan__amount .yel { color: var(--blue); }
+.plan__amount .yel { color: #FAB10F; }
 .plan__lede {
   font-size: 14px; line-height: 1.5;
   margin: 0 0 28px;

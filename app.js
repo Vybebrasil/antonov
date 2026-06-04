@@ -148,11 +148,11 @@
       setTimeout(runTakeoffAndReveal, reducedMotion.matches ? 20 : 140);
     };
 
-    if (document.readyState === 'complete') {
-      setTimeout(done, reducedMotion.matches ? 20 : 120);
+    if (document.readyState === 'interactive' || document.readyState === 'complete') {
+      setTimeout(done, reducedMotion.matches ? 20 : 80);
     } else {
-      window.addEventListener('load', done, { once: true });
-      setTimeout(done, reducedMotion.matches ? 350 : 4500);
+      document.addEventListener('DOMContentLoaded', done, { once: true });
+      setTimeout(done, reducedMotion.matches ? 250 : 1400);
     }
   };
 

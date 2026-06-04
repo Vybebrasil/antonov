@@ -2,12 +2,14 @@
  * Gera variantes WebP/PNG redimensionadas (logo, wireframe) para PageSpeed.
  * Uso: node scripts/optimize-images.mjs
  */
-import { existsSync } from 'fs';
+import { existsSync, cpSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, '..');
 const assetsDir = join(__dirname, '..', 'assets');
+const distAssetsDir = join(root, 'dist', 'assets');
 
 const JOBS = [
   {
@@ -39,6 +41,14 @@ const JOBS = [
       { name: 'wireframe-side-640.png', width: 640, png: { compressionLevel: 9 } },
     ],
   },
+  {
+    src: 'foto-hero.png',
+    variants: [
+      { name: 'foto-hero.webp', width: 1920, webp: { quality: 80, effort: 6 } },
+      { name: 'foto-hero-1280.webp', width: 1280, webp: { quality: 78, effort: 6 } },
+      { name: 'foto-hero-960.webp', width: 960, webp: { quality: 76, effort: 6 } },
+    ],
+  },
 ];
 
 async function main() {
@@ -51,7 +61,15 @@ async function main() {
   }
 
   for (const job of JOBS) {
-    const srcPath = join(assetsDir, job.src);
+    let srcPath = join(assetsDir, job.src);
+    if (
+      !existsSync(srcPath) &&
+      job.src === 'foto-hero.png' &&
+      existsSync(join(distAssetsDir, 'foto-hero.png'))
+    ) {
+      cpSync(join(distAssetsDir, 'foto-hero.png'), srcPath);
+      console.log('recovered foto-hero.png from dist/assets');
+    }
     if (!existsSync(srcPath)) {
       console.warn('skip (ausente)', job.src);
       continue;
@@ -63,12 +81,20 @@ async function main() {
         withoutEnlargement: true,
         fit: 'inside',
       });
-      if (v.webp) {
-        await pipe.webp(v.webp).toFile(dest);
-      } else {
-        await pipe.png(v.png).toFile(dest);
+      try {
+        if (v.webp) {
+          await pipe.webp(v.webp).toFile(dest);
+        } else {
+          await pipe.png(v.png).toFile(dest);
+        }
+        console.log('ok', v.name);
+      } catch (err) {
+        if (existsSync(dest)) {
+          console.warn('keep existing (erro ao regravar)', v.name);
+          continue;
+        }
+        throw err;
       }
-      console.log('ok', v.name);
     }
   }
 }

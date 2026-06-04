@@ -72,7 +72,7 @@ html.antonov-loading-pending .page-mask {
   pointer-events: auto;
 }
 html.antonov-loading-pending body > :not(.page-mask) {
-  visibility: hidden;
+  visibility: visible;
 }
 
 /* paper grain — subtle noise via SVG */
@@ -135,9 +135,7 @@ iframe { display: block; max-width: 100%; border: 0; }
 .accent-light {
   color: #2A8FD6;
 }
-.page-hero h1 .yel {
-  color: var(--yellow-ink);
-}
+.page-hero h1 .yel { color: #FAB10F; }
 .eyebrow .dot {
   display: inline-block; width: 6px; height: 6px;
   background: var(--blue); border-radius: 50%;

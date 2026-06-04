@@ -17,7 +17,7 @@
   line-height: 0.95; letter-spacing: -0.01em;
   text-transform: uppercase; margin: 0 0 32px;
   }
-.page-hero h1 .yel { color: var(--yellow-ink); }
+.page-hero h1 .yel { color: #FAB10F; }
 .page-hero__row {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 60px; align-items: end;
@@ -53,7 +53,7 @@
   text-transform: uppercase;
   color: rgba(255,255,255,0.7);
 }
-.studio-strip__hud .yel { color: var(--blue); }
+.studio-strip__hud .yel { color: #FAB10F; }
 .studio-strip__title {
   font-family: var(--f-display);
   font-size: clamp(44px, 5vw, 80px);
@@ -325,7 +325,7 @@
   font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.2em;
   text-transform: uppercase;
 }
-.floorplan__hud .yel { color: var(--blue); }
+.floorplan__hud .yel { color: #FAB10F; }
 .floorplan__zones {
   position: relative; z-index: 2;
   height: calc(100% - 40px);

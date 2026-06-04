@@ -8,6 +8,7 @@ import {
   readdirSync,
   mkdirSync,
   cpSync,
+  rmSync,
 } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -57,6 +58,7 @@ function minifyCssToDist(srcPath, distPath) {
 }
 
 function prepareDist() {
+  rmSync(dist, { recursive: true, force: true });
   mkdirSync(dist, { recursive: true });
   cpSync(join(root, 'assets'), join(dist, 'assets'), { recursive: true });
   for (const f of COPY_FILES) {
@@ -120,6 +122,27 @@ function processHtml(name) {
   console.log('html', name);
 }
 
+function injectCriticalHomeIntoDist() {
+  const indexPath = join(dist, 'index.html');
+  const heroCss = readFileSync(join(root, 'css', 'critical-home.css'), 'utf8');
+  const minified = new CleanCSS({ level: 1 }).minify(heroCss).styles;
+  const marker = '/* hero CLS */';
+  let html = readFileSync(indexPath, 'utf8');
+  const block = `${marker}\n${minified}`;
+
+  if (html.includes(marker)) {
+    html = html.replace(
+      /\/\* hero CLS \*\/[\s\S]*?(?=<\/style>)/,
+      `${block}\n`
+    );
+  } else {
+    html = html.replace(/<\/style>/, `\n${block}\n</style>`);
+  }
+
+  writeFileSync(indexPath, html, 'utf8');
+  console.log('critical home injected in dist/index.html');
+}
+
 async function main() {
   prepareDist();
 
@@ -143,6 +166,8 @@ async function main() {
   for (const name of htmlFiles) {
     processHtml(name);
   }
+
+  injectCriticalHomeIntoDist();
 
   console.log(`\nBuild concluído → ${dist}`);
 }
