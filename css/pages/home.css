@@ -36,7 +36,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: image-set(url("assets/foto-hero.webp") type("image/webp"), url("assets/foto-hero.png") type("image/png")) center / cover no-repeat;
+  background: image-set(url("/assets/foto-hero.webp") type("image/webp"), url("/assets/foto-hero.png") type("image/png")) center / cover no-repeat;
   filter: grayscale(100%);
 }
 .hero__photo::after {
@@ -431,13 +431,13 @@
 }
 .disc .ph { position: absolute; inset: 0; }
 .disc .ph--disc-01 {
-  background: image-set(url("assets/disc-01-barbells.webp") type("image/webp"), url("assets/disc-01-barbells.png") type("image/png")) center / cover no-repeat;
+  background: image-set(url("/assets/disc-01-barbells.webp") type("image/webp"), url("/assets/disc-01-barbells.png") type("image/png")) center / cover no-repeat;
 }
 .disc .ph--disc-02 {
-  background: image-set(url("assets/disc-02.webp") type("image/webp"), url("assets/disc-02.png") type("image/png")) center / cover no-repeat;
+  background: image-set(url("/assets/disc-02.webp") type("image/webp"), url("/assets/disc-02.png") type("image/png")) center / cover no-repeat;
 }
 .disc .ph--disc-03 {
-  background: image-set(url("assets/disc-03-treadmills.webp") type("image/webp"), url("assets/disc-03-treadmills.png") type("image/png")) center / cover no-repeat;
+  background: image-set(url("/assets/disc-03-treadmills.webp") type("image/webp"), url("/assets/disc-03-treadmills.png") type("image/png")) center / cover no-repeat;
 }
 .disc__content {
   position: absolute; inset: 0;
@@ -535,10 +535,10 @@
 .space-cell--big { grid-row: span 2; }
 .space-cell .ph { position: absolute; inset: 0; }
 .space-cell .ph--space-espaco {
-  background: image-set(url("assets/fotogeral.webp") type("image/webp"), url("assets/fotogeral.png") type("image/png")) center / cover no-repeat;
+  background: image-set(url("/assets/fotogeral.webp") type("image/webp"), url("/assets/fotogeral.png") type("image/png")) center / cover no-repeat;
 }
 .space-cell .ph--space-hightech {
-  background: image-set(url("assets/space-hightech.webp") type("image/webp"), url("assets/space-hightech.png") type("image/png")) center / cover no-repeat;
+  background: image-set(url("/assets/space-hightech.webp") type("image/webp"), url("/assets/space-hightech.png") type("image/png")) center / cover no-repeat;
   filter: brightness(0.82) contrast(1.05) saturate(1.02);
 }
 .space-cell--hightech .ph--space-hightech::before {
@@ -647,7 +647,7 @@
   content: "";
   position: absolute;
   inset: -30px;
-  background: image-set(url("assets/purpose-bg.webp") type("image/webp"), url("assets/purpose-bg.png") type("image/png")) center / cover no-repeat;
+  background: image-set(url("/assets/purpose-bg.webp") type("image/webp"), url("/assets/purpose-bg.png") type("image/png")) center / cover no-repeat;
   filter: grayscale(100%);
 }
 .purpose__bg::after {

@@ -25,7 +25,9 @@ for (const file of readdirSync(root).filter((n) => n.endsWith('.html'))) {
 
   const slug = nameMap[file] || basename(file, '.html');
   const cssPath = join(pagesDir, `${slug}.css`);
-  writeFileSync(cssPath, match[1].trim() + '\n', 'utf8');
+  let css = match[1].trim();
+  css = css.replace(/url\(\s*["']assets\//g, 'url("/assets/');
+  writeFileSync(cssPath, css + '\n', 'utf8');
 
   const link = `<link rel="stylesheet" href="css/pages/${slug}.css" />`;
   html = html.replace(/<style>[\s\S]*?<\/style>/i, link);
