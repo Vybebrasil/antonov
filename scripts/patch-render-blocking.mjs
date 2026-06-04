@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 
 const FONTS_URL =
-  'https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap';
+  'https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=optional';
 
 const CRITICAL_CSS = `<style>
 :root{--bg:#EEEAE2;--ink:#0E0E10;--carbon:#131316;--yellow:#FAB10F;--blue:#2A8FD6;--f-body:system-ui,sans-serif;--f-display:Impact,sans-serif;--nav-h:76px;--pad-x:clamp(20px,4vw,64px)}

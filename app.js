@@ -266,7 +266,9 @@
       return `${hh}:${mm} BRT`;
     };
     const tick = () => clockEls.forEach((el) => (el.textContent = fmt()));
-    tick();
+    const startClock = () => requestAnimationFrame(() => requestAnimationFrame(tick));
+    if (document.readyState === 'complete') startClock();
+    else window.addEventListener('load', startClock, { once: true });
     setInterval(tick, 30000);
   }
 
