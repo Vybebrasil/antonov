@@ -22,5 +22,6 @@ window.ANTONOV_SEO = {
     instagram: 'https://www.instagram.com/antonovcenter',
     mapsUrl: 'https://maps.app.goo.gl/rbhgwPvZnJfMyKkB9',
     areaServed: ['Irecê', 'Bahia', 'Brasil'],
+    priceRange: 'R$ 169,90 a R$ 189,90',
   },
 };

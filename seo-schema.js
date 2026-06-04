@@ -58,6 +58,7 @@
     ],
     areaServed: b.areaServed.map((name) => ({ '@type': 'City', name })),
     sameAs: [b.instagram, b.mapsUrl].filter(Boolean),
+    ...(b.priceRange ? { priceRange: b.priceRange } : {}),
   };
 
   function inject(data) {
