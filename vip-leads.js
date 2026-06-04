@@ -2,6 +2,20 @@
 (function () {
   'use strict';
 
+  if (!window.ANTONOV_LEADS) {
+    window.ANTONOV_LEADS = {
+      provider: 'neon',
+      apiUrls: {
+        preMatricula: '/api/leads/pre-matricula',
+        curriculos: '/api/leads/curriculos',
+        tour: '/api/leads/tour',
+      },
+      apiUrl: '/api/leads',
+      webhookUrl: '',
+    };
+    window.ANTONOV_VIP_LEADS = window.ANTONOV_LEADS;
+  }
+
   const cfg = () => window.ANTONOV_VIP_LEADS || { provider: 'local' };
   const STORAGE_KEY = 'antonov_vip_leads';
   const SEEN_KEY = 'antonov-vip-modal-seen';

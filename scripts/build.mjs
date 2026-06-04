@@ -95,6 +95,19 @@ function processHtml(name) {
     '<script src="seo-schema.min.js" defer'
   );
 
+  for (const base of [
+    'leads-config',
+    'vip-leads',
+    'contato-form',
+    'trabalhe-conosco-form',
+    'app',
+  ]) {
+    html = html.replace(
+      new RegExp(`<script src="${base}\\.min\\.js"(?![^>]*\\bdefer\\b)`, 'g'),
+      `<script src="${base}.min.js" defer`
+    );
+  }
+
   writeFileSync(join(dist, name), html, 'utf8');
   console.log('html', name);
 }
