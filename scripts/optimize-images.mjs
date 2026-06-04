@@ -13,8 +13,8 @@ const JOBS = [
   {
     src: 'logo.png',
     variants: [
-      { name: 'logo.webp', width: 422, webp: { quality: 88 } },
-      { name: 'logo-211.webp', width: 211, webp: { quality: 85 } },
+      { name: 'logo.webp', width: 422, webp: { quality: 76, effort: 6 } },
+      { name: 'logo-211.webp', width: 211, webp: { quality: 74, effort: 6 } },
       { name: 'logo-422.png', width: 422, png: { compressionLevel: 9, palette: true } },
       { name: 'logo-211.png', width: 211, png: { compressionLevel: 9, palette: true } },
     ],
@@ -22,8 +22,8 @@ const JOBS = [
   {
     src: 'logo-preta.png',
     variants: [
-      { name: 'logo-preta.webp', width: 506, webp: { quality: 88 } },
-      { name: 'logo-preta-253.webp', width: 253, webp: { quality: 85 } },
+      { name: 'logo-preta.webp', width: 506, webp: { quality: 76, effort: 6 } },
+      { name: 'logo-preta-253.webp', width: 253, webp: { quality: 74, effort: 6 } },
       { name: 'logo-preta-506.png', width: 506, png: { compressionLevel: 9, palette: true } },
       { name: 'logo-preta-253.png', width: 253, png: { compressionLevel: 9, palette: true } },
     ],
@@ -31,9 +31,9 @@ const JOBS = [
   {
     src: 'wireframe-side.png',
     variants: [
-      { name: 'wireframe-side.webp', width: 1024, webp: { quality: 82 } },
-      { name: 'wireframe-side-640.webp', width: 640, webp: { quality: 80 } },
-      { name: 'wireframe-side-1024.png', width: 1024, png: { compressionLevel: 9 } },
+      { name: 'wireframe-side.webp', width: 937, webp: { quality: 78, effort: 6 } },
+      { name: 'wireframe-side-640.webp', width: 640, webp: { quality: 76, effort: 6 } },
+      { name: 'wireframe-side-937.png', width: 937, png: { compressionLevel: 9 } },
     ],
   },
 ];

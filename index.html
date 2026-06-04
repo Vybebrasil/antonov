@@ -19,7 +19,7 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Antonov" />
 <link rel="manifest" href="/assets/site.webmanifest" />
-<link rel="preload" as="image" href="/assets/wireframe-side.webp" type="image/webp" fetchpriority="high" />
+<link rel="preload" as="image" type="image/webp" fetchpriority="high" imagesrcset="/assets/wireframe-side-640.webp 640w, /assets/wireframe-side.webp 937w" imagesizes="(max-width: 880px) 95vw, 937px" />
 <link rel="preload" as="image" href="/assets/foto-hero.webp" type="image/webp" fetchpriority="high" />
 <title>Academia em Irecê | Antonov Center — Treino e performance</title>
 <meta name="description" content="Academia premium em Irecê, BA. Musculação, cardio e avaliação física. Antonov Center — projetado para decolar." />
@@ -54,7 +54,7 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 <!-- page transition mask -->
 <div class="page-mask" aria-hidden="true" role="presentation">
   <div class="page-mask__loader" aria-live="polite" aria-busy="true">
-    <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="211px"><img class="page-mask__logo" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" src="assets/logo-422.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="211px"></picture>
+    <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="(max-width: 880px) 42vw, 211px"><img class="page-mask__logo" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" src="assets/logo-211.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="(max-width: 880px) 42vw, 211px"></picture>
     <div class="page-mask__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
     <p class="page-mask__status" id="page-mask-status">Preparando hangar…</p>
   </div>
@@ -67,7 +67,7 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 <header class="nav on-dark" data-screen-label="01 Nav">
   <div class="nav__inner">
     <a href="/" class="nav__logo" data-no-transition>
-      <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="211px"><img alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" src="assets/logo-422.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="211px"></picture>
+      <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="(max-width: 880px) 42vw, 211px"><img alt="ANTONOV CENTER — Bahia" width="211" height="61" decoding="async" src="assets/logo-211.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="(max-width: 880px) 42vw, 211px"></picture>
     </a>
                     <nav class="nav__links" aria-label="Principal">
       <a href="/" class="active">Home</a>
@@ -88,8 +88,8 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 <section class="hero" data-screen-label="02 Hero">
   <div class="hero__bg"></div>
   <picture class="hero__wireframe">
-  <source type="image/webp" srcset="assets/wireframe-side-640.webp 640w, assets/wireframe-side.webp 1024w" sizes="(max-width: 880px) 95vw, 937px">
-  <img class="hero__wireframe__img" src="assets/wireframe-side-1024.png" alt="Hangar Antonov Center — estrutura da academia em Irecê" width="937" height="937" fetchpriority="high" decoding="async">
+  <source type="image/webp" srcset="assets/wireframe-side-640.webp 640w, assets/wireframe-side.webp 937w" sizes="(max-width: 880px) 95vw, 937px">
+  <img class="hero__wireframe__img" src="assets/wireframe-side-937.png" alt="Hangar Antonov Center — estrutura da academia em Irecê" width="937" height="937" fetchpriority="high" decoding="async">
 </picture>
   <div class="hero__photo ph">
     <span class="ph__label">HANGAR 1º DE JANEIRO</span>
