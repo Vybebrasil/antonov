@@ -4,7 +4,7 @@
 }
 .page-hero__inner { max-width: var(--container); margin: 0 auto; }
 .page-hero__crumb {
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--ink-mute);
   margin-bottom: 32px;
   display: flex; align-items: center; gap: 12px;
@@ -24,7 +24,7 @@
 }
 .page-hero__lede { font-size: clamp(18px, 1.6vw, 22px); line-height: 1.4; max-width: 50ch; }
 .page-hero__meta {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.18em; text-transform: uppercase;
   display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px;
   color: var(--ink-mute);
@@ -52,7 +52,7 @@
 }
 .careers__pillar-no {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue);
@@ -118,7 +118,7 @@
 .careers__job:hover { border-color: var(--blue); }
 .careers__job-tag {
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -140,7 +140,7 @@
 .careers__job-meta {
   margin-top: 12px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--blue);
@@ -160,7 +160,7 @@
   pointer-events: none;
 }
 .cform__lbl {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--blue);
   margin-bottom: 18px;
@@ -187,7 +187,7 @@
 }
 .cform__field { display: flex; flex-direction: column; gap: 8px; }
 .cform__field label {
-  font-family: var(--f-mono); font-size: 10px;
+  font-family: var(--f-mono); font-size: 11px;
   letter-spacing: 0.22em; text-transform: uppercase;
   color: rgba(255,255,255,0.55);
 }
@@ -234,7 +234,7 @@
   letter-spacing: 0.04em;
 }
 .cform__submit .meta {
-  font-family: var(--f-mono); font-size: 10px;
+  font-family: var(--f-mono); font-size: 11px;
   letter-spacing: 0.22em;
 }
 .cform__submit .arrow {

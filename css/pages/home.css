@@ -29,7 +29,7 @@
   position: absolute;
   top: calc(var(--nav-h) + 22px);
   right: var(--pad-x);
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.35);
 }
 
@@ -106,7 +106,7 @@
 .mstat__num .pl { color: var(--blue-deep); }
 .mstat__lbl {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -115,7 +115,7 @@
 .mstat__id {
   position: absolute; top: 18px; right: 18px;
   font-family: var(--f-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.2em;
   color: var(--ink-mute);
 }
@@ -197,7 +197,7 @@
   position: absolute;
   top: 24px; left: 24px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.18em;
   color: rgba(255,255,255,0.6);
   z-index: 3;
@@ -308,7 +308,7 @@
 }
 .space-cell__tag {
   position: absolute; top: 20px; left: 20px;
-  font-family: var(--f-mono); font-size: 10px;
+  font-family: var(--f-mono); font-size: 11px;
   letter-spacing: 0.2em; color: rgba(255,255,255,0.65);
   background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
   padding: 6px 10px; border-radius: 999px;
@@ -356,7 +356,7 @@
 }
 .space-cell--card .std-label {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
@@ -450,7 +450,7 @@
 }
 .purpose__card .num {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   color: var(--blue);
   display: block;
@@ -505,7 +505,7 @@
   padding: 5px 12px;
   border-radius: 999px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   display: flex; align-items: center; gap: 6px;
   backdrop-filter: blur(8px);
 }
@@ -530,7 +530,7 @@
 .t-card__author {
   margin-top: 24px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
 }
@@ -550,7 +550,7 @@
 .code__inner { max-width: var(--container); margin: 0 auto; }
 .code__head { margin-bottom: 80px; }
 .code__lbl {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--blue);
   margin-bottom: 16px;

@@ -7,7 +7,7 @@
 .page-hero__inner { max-width: var(--container); margin: 0 auto; }
 .page-hero__crumb {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -46,7 +46,7 @@
 }
 .page-hero__meta {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -80,7 +80,7 @@
 }
 .about-strip__caption {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
@@ -101,7 +101,7 @@
 .editorial__grid:last-child { margin-bottom: 0; }
 .editorial__num {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   color: var(--blue);
   margin-bottom: 16px;
@@ -177,7 +177,7 @@
   text-align: left;
 }
 .founder__meta .n { font-size: 16px; }
-.founder__meta .r { font-family: var(--f-mono); font-size: 10px; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+.founder__meta .r { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); text-transform: uppercase; }
 .founder__bg {
   position: absolute; inset: 0;
   background:
@@ -225,7 +225,7 @@
 .pillar:hover { background: var(--paper); }
 .pillar__no {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   color: var(--blue);
   margin-bottom: 32px;
@@ -308,7 +308,7 @@
 }
 .member__role {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue);
@@ -316,7 +316,7 @@
 .member__no {
   position: absolute; top: 16px; left: 16px;
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   color: rgba(255,255,255,0.6);
   z-index: 3;
@@ -347,7 +347,7 @@
 }
 .anatomia__num {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.22em;
   color: var(--blue);
   display: flex; align-items: center; gap: 12px;
@@ -390,7 +390,7 @@
   font-family: var(--f-mono);
 }
 .anatomia__data .lbl {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -447,7 +447,7 @@
 }
 .tlitem__tag {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--yellow);
@@ -461,7 +461,7 @@
 .tlitem__txt strong { color: var(--ink); }
 .tlitem__meta {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   color: var(--ink-mute);
   text-align: right;

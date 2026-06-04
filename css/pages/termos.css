@@ -4,7 +4,7 @@
 }
 .page-hero__inner { max-width: var(--container); margin: 0 auto; }
 .page-hero__crumb {
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--ink-mute);
   margin-bottom: 32px;
   display: flex; align-items: center; gap: 12px;
