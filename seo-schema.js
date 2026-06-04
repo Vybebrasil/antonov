@@ -132,61 +132,79 @@
     });
   }
 
-  if (page === 'planos') {
-    inject({
+  const faqPlanos = [
+    {
+      name: 'O que é a Antonov Center?',
+      text: 'Academia de performance em Irecê, Bahia, com hangar de cerca de 3.000 m², musculação, cardio e avaliação física.',
+    },
+    {
+      name: 'Quais planos a Antonov Center oferece?',
+      text: 'First Class (mensalidade) e Diária (avulso ou pacotes). Preços em /planos.',
+    },
+    {
+      name: 'Quanto custa o plano First Class?',
+      text: 'R$ 189,90/mês no mensal ou R$ 169,90/mês no anual (−8%). Inclui hangar 05:00–00:00 e avaliação física grátis.',
+    },
+    {
+      name: 'Como funciona a diária na Antonov?',
+      text: '1 diária R$ 50; 3 diárias R$ 110; 10 diárias R$ 300 (validade 6 meses).',
+    },
+    {
+      name: 'Qual o horário da Antonov Center em Irecê?',
+      text: 'Segunda a domingo, 05:00 às 00:00 (horário de Brasília).',
+    },
+    {
+      name: 'O que está incluso na mensalidade?',
+      text: 'Cada plano inclui acesso a tudo que a ANTONOV tem a oferecer, alterando somente o horário de acesso.',
+    },
+    {
+      name: 'Posso conhecer a academia antes de assinar?',
+      text: 'Sim. Fale conosco pelo link de contato para conhecer a estrutura e escolher o plano ideal. Sem compromisso.',
+    },
+    {
+      name: 'Tem fidelidade ou multa de cancelamento?',
+      text: 'Planos mensais e diários sem fidelidade. Plano anual: desconto de 8% com fidelidade de 12 meses e cobrança recorrente.',
+    },
+    {
+      name: 'Preciso seguir um programa específico?',
+      text: 'Não obrigatoriamente. Treino livre no Hangar; avaliação inicial e rotina sugerida disponíveis.',
+    },
+    {
+      name: 'Onde fica a Antonov Center em Irecê?',
+      text: 'Av. 1º de Janeiro, Irecê, BA, CEP 44860-201. Mapa em /contato#mapa.',
+    },
+    {
+      name: 'Como falar com a Antonov em Irecê?',
+      text: 'Formulário em /contato, WhatsApp +55 74 99963-1507 ou antonovacademia@gmail.com.',
+    },
+  ];
+
+  function faqSchema(questions) {
+    return {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'O que está incluso na mensalidade?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Cada plano inclui acesso a tudo que a ANTONOV tem a oferecer, alterando somente o horário de acesso.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Posso conhecer a academia antes de assinar?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Sim. Fale conosco pelo link de contato para conhecer a estrutura e escolher o plano ideal. Sem compromisso.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Tem fidelidade ou multa de cancelamento?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Depende do plano. Os planos mensais e diários não têm fidelidade. O plano anual tem desconto de 8% com fidelidade de 12 meses e cobrança recorrente.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Preciso seguir um programa específico?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Não obrigatoriamente. Você pode treinar livre no Hangar. Todo membro tem acesso a uma avaliação inicial e uma rotina sugerida.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Onde fica a Antonov Center em Irecê?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Na Av. 1º de Janeiro, Irecê, Bahia. Veja o mapa em /contato#mapa.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Como falar com a Antonov em Irecê?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Pelo formulário em /contato, WhatsApp +55 74 99963-1507 ou e-mail antonovacademia@gmail.com. Sem compromisso.',
-          },
-        },
-      ],
-    });
+      mainEntity: questions.map((q) => ({
+        '@type': 'Question',
+        name: q.name,
+        acceptedAnswer: { '@type': 'Answer', text: q.text },
+      })),
+    };
+  }
+
+  if (page === 'home' && isHome) {
+    inject(
+      faqSchema([
+        faqPlanos[0],
+        faqPlanos[1],
+        faqPlanos[4],
+        faqPlanos[9],
+        faqPlanos[10],
+      ])
+    );
+  }
+
+  if (page === 'planos') {
+    inject(faqSchema(faqPlanos));
   }
 
   if (page === 'contato') {

@@ -1,4 +1,5 @@
 import { writeFileSync, existsSync, readFileSync } from 'fs';
+import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -58,11 +59,22 @@ ${urls}
 
 writeFileSync(join(root, 'sitemap.xml'), xml, 'utf8');
 
-const robots = `User-agent: *
+const robots = `# Antonov Center — ${siteUrl}
+User-agent: *
 Allow: /
+
+Disallow: /api/
+Disallow: /aulas
+Disallow: /estudio
+Disallow: /sobre
+Disallow: /termos
+Disallow: /privacidade
+Disallow: /cookies
 
 Sitemap: ${siteUrl}/sitemap.xml
 `;
 writeFileSync(join(root, 'robots.txt'), robots, 'utf8');
 
-console.log(`sitemap.xml e robots.txt gerados para ${siteUrl} (${pages.length} URLs)`);
+execSync('node scripts/generate-llms-txt.mjs', { cwd: root, stdio: 'inherit' });
+
+console.log(`sitemap.xml, robots.txt e llms.txt — ${siteUrl} (${pages.length} URLs)`);

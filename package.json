@@ -3,13 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/build.mjs",
     "db:init": "node scripts/init-db.mjs",
     "seo:patch": "node scripts/patch-seo-head.mjs && node scripts/patch-internal-links.mjs && node scripts/patch-image-perf.mjs && node scripts/generate-sitemap.mjs",
     "seo:sitemap": "node scripts/generate-sitemap.mjs",
+    "seo:llms": "node scripts/generate-llms-txt.mjs",
     "seo:webp": "node scripts/generate-webp.mjs",
     "seo:go-live": "node scripts/swap-production-url.mjs"
   },
   "devDependencies": {
+    "clean-css": "^5.3.3",
+    "esbuild": "^0.25.0",
     "sharp": "^0.33.5"
   },
   "dependencies": {

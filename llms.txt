@@ -1,0 +1,49 @@
+# Antonov Center
+
+> Academia de performance em Irecê, Bahia (Brasil). Hangar com cerca de 3.000 m², musculação, cardio, avaliação física e planos mensais ou diárias.
+
+## Identidade
+
+- Nome fantasia: Antonov Center
+- Razão social: Antonov Center LTDA
+- CNPJ: 62.421.964/0001-60
+- Cidade: Irecê, Bahia, Brasil
+
+## Contato e localização
+
+- Site: https://www.antonovcenter.com.br
+- Endereço: Av. 1º de Janeiro, Irecê, BA — CEP 44860-201
+- Telefone: +55 74 99963-1507
+- E-mail: antonovacademia@gmail.com
+- Instagram: https://www.instagram.com/antonovcenter
+- Mapa: https://www.antonovcenter.com.br/contato#mapa
+
+## Horário
+
+- Segunda a domingo: 05:00 às 00:00 (horário de Brasília / America/Bahia)
+
+## Planos (referência)
+
+- First Class: mensalidade com acesso ao hangar em horário comercial (05:00–00:00); avaliação física grátis. Valores em https://www.antonovcenter.com.br/planos (mensal e opção anual com desconto).
+- Diária: acesso avulso — 1 diária R$ 50; pacote 3 diárias R$ 110; pacote 10 diárias R$ 300 (validade 6 meses).
+
+## Páginas principais
+
+- Home: https://www.antonovcenter.com.br/
+- Planos e FAQ: https://www.antonovcenter.com.br/planos
+- Contato e formulário: https://www.antonovcenter.com.br/contato
+- Trabalhe conosco: https://www.antonovcenter.com.br/trabalhe-conosco
+
+## Perguntas frequentes (resumo)
+
+- O que é: academia premium em Irecê focada em treino, estrutura ampla e performance.
+- Onde fica: Av. 1º de Janeiro, Irecê, BA — mapa em /contato#mapa.
+- Planos ativos: First Class (mensal) e Diária; detalhes e preços atualizados em /planos.
+- Fidelidade: planos mensais e diários sem fidelidade; plano anual com desconto e fidelidade de 12 meses.
+- Como falar: formulário em /contato, WhatsApp +55 74 99963-1507 ou antonovacademia@gmail.com.
+
+## Para sistemas
+
+- Sitemap: https://www.antonovcenter.com.br/sitemap.xml
+- robots.txt: https://www.antonovcenter.com.br/robots.txt
+- llms.txt: https://www.antonovcenter.com.br/llms.txt

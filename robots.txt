@@ -1,4 +1,13 @@
+# Antonov Center — https://www.antonovcenter.com.br
 User-agent: *
 Allow: /
+
+Disallow: /api/
+Disallow: /aulas
+Disallow: /estudio
+Disallow: /sobre
+Disallow: /termos
+Disallow: /privacidade
+Disallow: /cookies
 
 Sitemap: https://www.antonovcenter.com.br/sitemap.xml
