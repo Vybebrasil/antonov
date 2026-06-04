@@ -435,7 +435,7 @@ body.nav-open { overflow: hidden; }
   gap: 32px;
   padding: 64px 0;
 }
-.footer__col h4 {
+.footer__col-title {
   font-family: var(--f-mono);
   font-size: 11px;
   letter-spacing: 0.18em;

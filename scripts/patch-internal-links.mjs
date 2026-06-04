@@ -67,8 +67,8 @@ function patchNav(html, activeKey) {
 
 function patchFooterNav(html) {
   return html.replace(
-    /<h4>Navegação<\/h4>\s*<ul>[\s\S]*?<\/ul>/,
-    `<h4>Navegação</h4>\n          ${FOOTER_NAV.trim()}`
+    /<h3 class="footer__col-title">Navegação<\/h3>\s*<ul>[\s\S]*?<\/ul>/,
+    `<h3 class="footer__col-title">Navegação</h3>\n          ${FOOTER_NAV.trim()}`
   );
 }
 
@@ -80,7 +80,7 @@ function patchFile(filePath) {
   let html = readFileSync(filePath, 'utf8');
   html = replaceHtmlLinks(html);
   html = patchNav(html, activeKey);
-  if (html.includes('<h4>Navegação</h4>')) {
+  if (html.includes('<h3 class="footer__col-title">Navegação</h3>')) {
     html = patchFooterNav(html);
   }
   writeFileSync(filePath, html, 'utf8');
