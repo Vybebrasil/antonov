@@ -59,6 +59,13 @@
   mix-blend-mode: screen;
   pointer-events: none;
   animation: hero-wireframe-float 18s ease-in-out infinite;
+  display: block;
+  line-height: 0;
+}
+.hero__wireframe img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 @keyframes hero-wireframe-float {
   0%, 100% { transform: translateY(-50%) rotate(-12deg) translateX(0); }

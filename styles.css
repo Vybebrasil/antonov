@@ -188,10 +188,15 @@ section { position: relative; }
   align-items: center;
   flex-shrink: 0;
 }
-.nav__logo img {
+.nav__logo img,
+.logo-picture img {
   height: 38px;
   width: auto;
   object-fit: contain;
+}
+.logo-picture {
+  display: block;
+  line-height: 0;
 }
 .nav__logo-img--dark { max-width: min(220px, 46vw); }
 .nav__logo-img--light { max-width: min(280px, 52vw); }

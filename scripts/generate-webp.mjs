@@ -15,6 +15,8 @@ const TARGETS = [
   'space-hightech.png',
   'purpose-bg.png',
   'wireframe-side.png',
+  'logo.png',
+  'logo-preta.png',
 ];
 
 async function main() {
