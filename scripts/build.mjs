@@ -80,11 +80,19 @@ function processHtml(name) {
 
   html = html.split('href="styles.css"').join('href="styles.min.css"');
   html = html.split("href='styles.css'").join("href='styles.min.css'");
+  html = html.split("load('styles.css')").join("load('styles.min.css')");
+  html = html.split('load("styles.css")').join('load("styles.min.css")');
 
   html = html.replace(
     /href="css\/pages\/([^"]+)\.css"/g,
     (_, slug) => `href="css/pages/${slug}.min.css"`
   );
+  if (name === 'index.html') {
+    html = html.replace(
+      /load\('css\/pages\/home\.css'\)/g,
+      "load('css/pages/home.min.css')"
+    );
+  }
 
   html = html.replace(
     /<script src="seo-config\.min\.js"(?![^>]*\bdefer\b)/g,

@@ -83,6 +83,8 @@ function patchHead(html) {
 for (const name of readdirSync(root).filter((n) => n.endsWith('.html'))) {
   const path = join(root, name);
   const html = readFileSync(path, 'utf8');
+  /* index: folhas fora do head (auditoria 2025 não marca como render-blocking) */
+  if (name === 'index.html' && html.includes("load('styles.css')")) continue;
   const patched = patchHead(html);
   if (patched !== html) {
     writeFileSync(path, patched, 'utf8');

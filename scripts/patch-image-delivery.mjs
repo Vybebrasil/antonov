@@ -23,21 +23,27 @@ function patch(html, name) {
     `src="assets/logo-211.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="${LOGO_SIZES}"`
   );
 
-  out = out.replace(
-    /srcset="assets\/wireframe-side-640\.webp 640w, assets\/wireframe-side\.webp 1024w"/g,
-    'srcset="assets/wireframe-side-640.webp 640w, assets/wireframe-side.webp 937w"'
-  );
-  out = out.replace(
-    /src="assets\/wireframe-side-1024\.png"/g,
-    'src="assets/wireframe-side-937.png"'
-  );
+  const WIREFRAME_SRCSET =
+    'srcset="assets/wireframe-side-536.webp 536w, assets/wireframe-side-640.webp 640w"';
+  const WIREFRAME_SIZES =
+    'sizes="(max-width: 880px) min(95vw, 640px), min(70vw, 640px)"';
 
-  if (name === 'index.html') {
-    out = out.replace(
-      /<link rel="preload" as="image" href="\/assets\/wireframe-side\.webp"[^>]*>/,
-      '<link rel="preload" as="image" type="image/webp" fetchpriority="high" imagesrcset="/assets/wireframe-side-640.webp 640w, /assets/wireframe-side.webp 937w" imagesizes="(max-width: 880px) 95vw, 937px" />'
-    );
-  }
+  out = out.replace(
+    /srcset="assets\/wireframe-side-640\.webp 640w, assets\/wireframe-side\.webp 937w"/g,
+    WIREFRAME_SRCSET
+  );
+  out = out.replace(
+    /sizes="\(max-width: 880px\) 95vw, 937px"/g,
+    WIREFRAME_SIZES
+  );
+  out = out.replace(
+    /src="assets\/wireframe-side-(?:1024|937)\.png"/g,
+    'src="assets/wireframe-side-536.png"'
+  );
+  out = out.replace(
+    /width="937" height="937"/g,
+    'width="640" height="640"'
+  );
 
   return out;
 }

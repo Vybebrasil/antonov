@@ -76,7 +76,7 @@
   text-transform: uppercase;
   margin: 0;
 }
-.manifesto h2 .yel { color: var(--blue); -webkit-text-stroke: 1px var(--ink); color: transparent; }
+.manifesto h2 .yel { color: var(--blue-deep); -webkit-text-stroke: 0; }
 
 .manifesto__lede { color: var(--ink-soft); font-size: 17px; line-height: 1.5; max-width: 44ch; }
 .manifesto__lede strong { color: var(--ink); font-weight: 600; }
@@ -103,7 +103,7 @@
   letter-spacing: -0.01em;
   color: var(--ink);
 }
-.mstat__num .pl { color: var(--blue); }
+.mstat__num .pl { color: var(--blue-deep); }
 .mstat__lbl {
   font-family: var(--f-mono);
   font-size: 11px;

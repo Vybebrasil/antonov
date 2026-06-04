@@ -29,7 +29,7 @@
 .page-hero h1 > span {
   display: block;
 }
-.page-hero h1 .yel { color: var(--yellow); }
+.page-hero h1 .yel { color: var(--yellow-ink); }
 .page-hero__row {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 60px;
@@ -368,7 +368,7 @@
 .anatomia h2 > span {
   display: block;
 }
-.anatomia h2 .yel { color: var(--yellow); }
+.anatomia h2 .yel { color: var(--yellow-ink); }
 .anatomia__sub {
   font-size: 17px;
   line-height: 1.55;

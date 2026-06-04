@@ -253,7 +253,8 @@
     });
 
     if (!sessionStorage.getItem(SEEN_KEY) && document.querySelector('.hero')) {
-      window.setTimeout(openModal, 4500);
+      const scheduleAutoOpen = () => window.setTimeout(openModal, 600);
+      window.addEventListener('load', () => setTimeout(scheduleAutoOpen, 12000), { once: true });
     }
   }
 

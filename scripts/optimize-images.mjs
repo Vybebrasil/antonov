@@ -31,9 +31,12 @@ const JOBS = [
   {
     src: 'wireframe-side.png',
     variants: [
-      { name: 'wireframe-side.webp', width: 937, webp: { quality: 78, effort: 6 } },
-      { name: 'wireframe-side-640.webp', width: 640, webp: { quality: 76, effort: 6 } },
-      { name: 'wireframe-side-937.png', width: 937, png: { compressionLevel: 9 } },
+      { name: 'wireframe-side-536.webp', width: 536, webp: { quality: 72, effort: 6 } },
+      { name: 'wireframe-side-640.webp', width: 640, webp: { quality: 74, effort: 6 } },
+      /* URL legada — máx. 640px (exibição ~536px no hero) */
+      { name: 'wireframe-side.webp', width: 640, webp: { quality: 74, effort: 6 } },
+      { name: 'wireframe-side-536.png', width: 536, png: { compressionLevel: 9 } },
+      { name: 'wireframe-side-640.png', width: 640, png: { compressionLevel: 9 } },
     ],
   },
 ];
