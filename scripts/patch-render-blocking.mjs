@@ -64,18 +64,7 @@ function patchHead(html) {
     );
   }
 
-  if (!out.includes('href="styles.css" media="print"')) {
-    out = out.replace(
-      /<link rel="stylesheet" href="styles\.css" \/>/,
-      asyncStylesheet('styles.css')
-    );
-  }
-
-  out = out.replace(
-    /<link rel="stylesheet" href="(css\/pages\/[^"]+\.css)" \/>/g,
-    (match, href) =>
-      out.includes(`href="${href}" media="print"`) ? match : asyncStylesheet(href)
-  );
+  /* CSS síncrono no head — async (media=print) quebrava layout em produção */
 
   return out;
 }

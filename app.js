@@ -205,7 +205,7 @@
     else window.location.href = href;
   });
 
-  // ---------- home: LCP = h1 — wireframe/foto só após engajamento ----------
+  // ---------- home: decoração do hero após idle; foto full-bleed no scroll ----------
   if (document.body.dataset.seoPage === 'home') {
     const hero = document.querySelector('.hero');
     const wire = hero?.querySelector('.hero__wireframe__img');
@@ -220,35 +220,20 @@
         'https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=optional';
       document.head.appendChild(link);
     };
-    const scheduleIdle =
-      typeof requestIdleCallback === 'function'
-        ? (fn) => requestIdleCallback(fn, { timeout: 4000 })
-        : (fn) => window.addEventListener('load', fn, { once: true });
-    scheduleIdle(loadFonts);
-
-    let wireStarted = false;
-    const startWireframe = () => {
-      if (!wire || wireStarted) return;
-      wireStarted = true;
-      const picture = wire.closest('picture');
-      const webp = wire.dataset.wireWebp;
-      const sizes = wire.dataset.wireSizes;
-      const fallback = wire.dataset.wireFallback;
-      if (picture && webp && !picture.querySelector('source')) {
-        const source = document.createElement('source');
-        source.type = 'image/webp';
-        source.srcset = webp;
-        if (sizes) source.sizes = sizes;
-        picture.insertBefore(source, wire);
-      }
-      if (fallback) {
-        wire.src = fallback;
-        wire.loading = 'lazy';
-        wire.fetchPriority = 'low';
+    const kick = () => {
+      loadFonts();
+      if (!wire) {
+        enableDecor();
+        return;
       }
       if (wire.complete) enableDecor();
       else wire.addEventListener('load', enableDecor, { once: true });
     };
+    const schedule =
+      typeof requestIdleCallback === 'function'
+        ? (fn) => requestIdleCallback(fn, { timeout: 2500 })
+        : (fn) => window.addEventListener('load', fn, { once: true });
+    schedule(kick);
 
     let bgReady = false;
     const maybeEnableBg = () => {
@@ -256,23 +241,12 @@
       bgReady = true;
       enableBg();
     };
-    const onEngage = () => {
-      if (window.scrollY < 64) return;
-      startWireframe();
+    const onScrollForBg = () => {
+      if (window.scrollY < 48) return;
       maybeEnableBg();
-      window.removeEventListener('scroll', onEngage);
+      window.removeEventListener('scroll', onScrollForBg);
     };
-    window.addEventListener('scroll', onEngage, { passive: true });
-    window.addEventListener(
-      'load',
-      () => {
-        setTimeout(() => {
-          startWireframe();
-          maybeEnableBg();
-        }, 15000);
-      },
-      { once: true }
-    );
+    window.addEventListener('scroll', onScrollForBg, { passive: true });
   }
 
   // ---------- counter animation ----------

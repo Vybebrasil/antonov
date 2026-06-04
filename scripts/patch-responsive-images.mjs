@@ -29,17 +29,8 @@ function wrapLogoLight(fullTag) {
 }
 
 const WIREFRAME_PICTURE = `<picture class="hero__wireframe">
-  <img
-    class="hero__wireframe__img"
-    alt=""
-    width="640"
-    height="640"
-    decoding="async"
-    aria-hidden="true"
-    data-wire-webp="assets/wireframe-side-536.webp 536w, assets/wireframe-side-640.webp 640w"
-    data-wire-sizes="(max-width: 880px) min(95vw, 640px), min(70vw, 640px)"
-    data-wire-fallback="assets/wireframe-side-536.png"
-  />
+  <source type="image/webp" srcset="assets/wireframe-side-536.webp 536w, assets/wireframe-side-640.webp 640w" sizes="(max-width: 880px) min(95vw, 640px), min(70vw, 640px)">
+  <img class="hero__wireframe__img" src="assets/wireframe-side-536.png" alt="" width="640" height="640" loading="lazy" fetchpriority="low" decoding="async" aria-hidden="true">
 </picture>`;
 
 function patchLogo(html) {
