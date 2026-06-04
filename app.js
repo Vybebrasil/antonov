@@ -205,6 +205,38 @@
     else window.location.href = href;
   });
 
+  // ---------- home: decoração do hero após LCP (evita CLS) ----------
+  if (document.body.dataset.seoPage === 'home') {
+    const hero = document.querySelector('.hero');
+    const wire = hero?.querySelector('.hero__wireframe__img');
+    const enableDecor = () => hero?.classList.add('hero--decor-ready');
+    const enableBg = () => hero?.classList.add('hero--bg-ready');
+    const loadFonts = () => {
+      if (document.querySelector('link[data-antonov-fonts]')) return;
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.dataset.antonovFonts = '1';
+      link.href =
+        'https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=optional';
+      document.head.appendChild(link);
+    };
+    const kick = () => {
+      enableBg();
+      loadFonts();
+      if (!wire) {
+        enableDecor();
+        return;
+      }
+      if (wire.complete) enableDecor();
+      else wire.addEventListener('load', enableDecor, { once: true });
+    };
+    const schedule =
+      typeof requestIdleCallback === 'function'
+        ? (fn) => requestIdleCallback(fn, { timeout: 2500 })
+        : (fn) => window.addEventListener('load', fn, { once: true });
+    schedule(kick);
+  }
+
   // ---------- counter animation ----------
   const counters = document.querySelectorAll('[data-count]');
   const setCounterText = (el, value) => {
