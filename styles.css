@@ -131,8 +131,10 @@ iframe { display: block; max-width: 100%; border: 0; }
 }
 .eyebrow.on-dark { color: rgba(255, 255, 255, 0.55); }
 
-/* Destaque amarelo legível em superfícies claras */
-.accent-light,
+/* Destaque azul para textos de acento */
+.accent-light {
+  color: #2A8FD6;
+}
 .page-hero h1 .yel {
   color: var(--yellow-ink);
 }
