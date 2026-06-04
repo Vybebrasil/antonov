@@ -1,7 +1,7 @@
 {
-  "siteUrl": "https://antonov-one.vercel.app",
+  "siteUrl": "https://www.antonovcenter.com.br",
   "productionSiteUrl": "https://www.antonovcenter.com.br",
-  "image": "https://antonov-one.vercel.app/assets/foto-hero.png",
+  "image": "https://www.antonovcenter.com.br/assets/foto-hero.png",
   "pages": {
     "index.html": {
       "seoPage": "home",

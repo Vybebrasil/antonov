@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://antonov-one.vercel.app/sitemap.xml
+Sitemap: https://www.antonovcenter.com.br/sitemap.xml

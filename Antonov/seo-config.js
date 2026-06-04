@@ -1,6 +1,6 @@
 /* SEO global — siteUrl = URL pública atual; productionSiteUrl = domínio final no go-live */
 window.ANTONOV_SEO = {
-  siteUrl: 'https://antonov-one.vercel.app',
+  siteUrl: 'https://www.antonovcenter.com.br',
   productionSiteUrl: 'https://www.antonovcenter.com.br',
   siteName: 'Antonov Center',
   locale: 'pt_BR',
