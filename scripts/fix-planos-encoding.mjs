@@ -7,6 +7,10 @@ let html = readFileSync(path, 'utf8');
 const pairs = [
   ['â€"', '—'],
   ['â€¦', '…'],
+  ['�??', '—'],
+  ['Preparando hangar�?�', 'Preparando hangar…'],
+  ['AVALIA�?�?O', 'AVALIAÇÃO'],
+  ['OPERA�?�?O', 'OPERAÇÃO'],
   ['Ãª', 'ê'],
   ['Ã¡', 'á'],
   ['Ã§', 'ç'],
