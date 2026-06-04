@@ -28,12 +28,9 @@ function wrapLogoLight(fullTag) {
   return `<picture class="logo-picture"><source type="image/webp" srcset="assets/logo-preta-253.webp 253w, assets/logo-preta.webp 506w" sizes="253px"><img ${attrs} src="assets/logo-preta-506.png" srcset="assets/logo-preta-253.png 253w, assets/logo-preta-506.png 506w" sizes="253px"></picture>`;
 }
 
-const WIREFRAME_PRELOAD =
-  '  <link rel="preload" as="image" type="image/webp" fetchpriority="high" imagesrcset="/assets/wireframe-side-640.webp 640w, /assets/wireframe-side.webp 937w" imagesizes="(max-width: 880px) 95vw, 937px" />\n';
-
 const WIREFRAME_PICTURE = `<picture class="hero__wireframe">
   <source type="image/webp" srcset="assets/wireframe-side-640.webp 640w, assets/wireframe-side.webp 937w" sizes="(max-width: 880px) 95vw, 937px">
-  <img class="hero__wireframe__img" src="assets/wireframe-side-937.png" alt="Hangar Antonov Center — estrutura da academia em Irecê" width="937" height="937" fetchpriority="high" decoding="async">
+  <img class="hero__wireframe__img" src="assets/wireframe-side-937.png" alt="" width="937" height="937" loading="lazy" fetchpriority="low" decoding="async" aria-hidden="true">
 </picture>`;
 
 function patchLogo(html) {
@@ -43,14 +40,15 @@ function patchLogo(html) {
 }
 
 function patchIndexPreload(html) {
-  if (html.includes('imagesrcset') && html.includes('wireframe-side')) return html;
-  return html.replace(
-    /(<link rel="preload" as="image" href="\/assets\/foto-hero\.webp"[^>]*>)/,
-    `${WIREFRAME_PRELOAD}$1`
-  ).replace(
-    /<link rel="preload" as="image" href="\/assets\/wireframe-side\.webp"[^>]*>\s*/,
-    WIREFRAME_PRELOAD
-  );
+  return html
+    .replace(
+      /\s*<link rel="preload" as="image"[^>]*wireframe-side[^>]*>\s*/g,
+      '\n'
+    )
+    .replace(
+      /\s*<link rel="preload" as="image" href="\/assets\/foto-hero\.webp"[^>]*>\s*/g,
+      '\n'
+    );
 }
 
 for (const name of readdirSync(root).filter((n) => n.endsWith('.html'))) {
@@ -61,6 +59,12 @@ for (const name of readdirSync(root).filter((n) => n.endsWith('.html'))) {
   if (name === 'index.html') {
     html = html.replace(/<img class="hero__wireframe"[^>]*>/i, WIREFRAME_PICTURE);
     html = patchIndexPreload(html);
+    if (!html.includes('href="styles.css"')) {
+      html = html.replace(
+        /<\/style>\s*/,
+        '</style>\n<link rel="stylesheet" href="styles.css" />\n<link rel="stylesheet" href="css/pages/home.css" />\n'
+      );
+    }
   }
   if (html !== before) {
     writeFileSync(path, html, 'utf8');

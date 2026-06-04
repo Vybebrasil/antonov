@@ -12,19 +12,17 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 .page-mask{position:fixed;inset:0;z-index:9999;background:var(--carbon);transform:translateY(-100%);transition:transform var(--mask-cover-duration,.38s) var(--mask-ease,ease)}
 
 /* hero CLS */
-.nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:50;display:flex;align-items:center;padding-inline:var(--pad-x)}.nav__inner{width:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}.logo-picture img,.nav__logo img{height:38px;width:auto;object-fit:contain}.hero{position:relative;min-height:100vh;min-height:100svh;background:var(--carbon);color:#fff;overflow:hidden;padding-top:var(--nav-h)}.hero__bg,.hero__photo{position:absolute;inset:0}.hero__photo{z-index:0}.hero__wireframe{position:absolute;right:-8%;top:50%;width:70vw;max-width:1400px;transform:translateY(-50%) rotate(-12deg);z-index:1;opacity:.22;pointer-events:none;line-height:0}.hero__wireframe img,.hero__wireframe__img{width:100%;height:auto;aspect-ratio:1;display:block}.hero__inner{position:relative;z-index:2;max-width:var(--container);margin:0 auto;padding-inline:var(--pad-x);min-height:calc(100vh - var(--nav-h));min-height:calc(100svh - var(--nav-h));display:grid;grid-template-rows:1fr auto;align-content:end;gap:60px;padding-top:80px}.hero__eyebrow{font-size:11px;margin-bottom:36px}.hero h1{font-family:var(--f-display);font-size:clamp(64px, 10.5vw, 180px);line-height:.95;margin:0;text-transform:uppercase}.hero__base{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;align-items:end;padding-bottom:48px}.hero__pitch{font-size:16px;line-height:1.55;max-width:38ch;color:rgba(255,255,255,.78);margin:0}.hero__cta{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;min-height:48px}.hero .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid transparent;white-space:nowrap;box-sizing:border-box;cursor:pointer;font-family:var(--f-body)}.hero .btn--yellow{background:var(--yellow);color:var(--ink);border-color:var(--yellow)}.hero .btn--ghost-light{background:0 0;color:#fff;border-color:rgba(255,255,255,.4)}.hero__stat{border-left:1px solid rgba(255,255,255,.18);padding-left:20px}.hero__stat .n{font-family:var(--f-display);font-size:clamp(40px, 5vw, 64px);line-height:1;font-variant-numeric:tabular-nums}.hero__stat .n [data-count]{display:inline-block;min-width:4.5ch;text-align:left}.hero__stat .n .yel{color:var(--blue)}.hero__stat .l{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:8px;line-height:1.4}.hero__meta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);text-align:right;line-height:1.7;border-left:1px solid rgba(255,255,255,.18);padding-left:20px;align-self:end}.hero__meta div{white-space:nowrap}.hero__meta .yel{color:var(--blue)}.hero [data-clock]{display:inline-block;min-width:9ch;font-variant-numeric:tabular-nums}.clip-reveal{display:inline-block;vertical-align:top}.clip-reveal>span{display:inline-block}.hero h1 .accent{color:var(--yellow)}@media (max-width:880px){.hero__inner{min-height:calc(100svh - var(--nav-h));gap:48px;padding-top:56px}.hero__wireframe{width:95vw;right:-28%}.hero__base{grid-template-columns:1fr 1fr;gap:32px 24px;padding-bottom:40px}.hero__meta{text-align:left;border-left:0;padding-left:0;border-top:1px solid rgba(255,255,255,.18);padding-top:20px;grid-column:1/-1}.hero__base>div:first-child{grid-column:1/-1}}@media (max-width:720px){.hero__base{grid-template-columns:1fr;gap:28px}.hero__stat{border-left:none;padding-left:0;padding-top:20px;border-top:1px solid rgba(255,255,255,.14)}.hero__stat:first-of-type{border-top:none;padding-top:0}}@media (max-width:560px){.hero{min-height:auto}.hero__inner{min-height:auto;gap:36px;padding-top:32px;padding-bottom:28px;grid-template-rows:auto auto}.hero h1{font-size:clamp(44px, 13vw, 64px);line-height:1.02}.hero__eyebrow{margin-bottom:20px}.hero__base{gap:24px;padding-bottom:8px}.hero__stat .n{font-size:clamp(36px, 11vw, 48px)}}
+.nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:50;display:flex;align-items:center;padding-inline:var(--pad-x)}.nav__inner{width:100%;display:flex;align-items:center;justify-content:space-between;gap:24px}.logo-picture img,.nav__logo img{height:38px;width:auto;object-fit:contain}.hero{position:relative;min-height:100vh;min-height:100svh;background:var(--carbon);color:#fff;overflow:hidden;padding-top:var(--nav-h)}.hero__bg,.hero__photo{position:absolute;inset:0}.hero__photo{z-index:0}.hero__photo::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0c0c0e 0,#181a1e 100%)}.hero__wireframe{position:absolute;right:-8%;top:50%;width:70vw;max-width:1400px;transform:translateY(-50%) rotate(-12deg);z-index:1;opacity:.22;pointer-events:none;line-height:0}.hero__wireframe img,.hero__wireframe__img{width:100%;height:auto;aspect-ratio:1;display:block}.hero__inner{position:relative;z-index:2;max-width:var(--container);margin:0 auto;padding-inline:var(--pad-x);min-height:calc(100vh - var(--nav-h));min-height:calc(100svh - var(--nav-h));display:grid;grid-template-rows:1fr auto;align-content:end;gap:60px;padding-top:80px}.hero__eyebrow{font-size:11px;margin-bottom:36px}.hero h1{font-family:var(--f-display);font-size:clamp(64px, 10.5vw, 180px);line-height:.95;margin:0;text-transform:uppercase}.hero__base{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;align-items:end;padding-bottom:48px}.hero__pitch{font-size:16px;line-height:1.55;max-width:38ch;color:rgba(255,255,255,.78);margin:0}.hero__cta{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;min-height:48px}.hero .btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid transparent;white-space:nowrap;box-sizing:border-box;cursor:pointer;font-family:var(--f-body)}.hero .btn--yellow{background:var(--yellow);color:var(--ink);border-color:var(--yellow)}.hero .btn--ghost-light{background:0 0;color:#fff;border-color:rgba(255,255,255,.4)}.hero__stat{border-left:1px solid rgba(255,255,255,.18);padding-left:20px}.hero__stat .n{font-family:var(--f-display);font-size:clamp(40px, 5vw, 64px);line-height:1;font-variant-numeric:tabular-nums}.hero__stat .n [data-count]{display:inline-block;min-width:4.5ch;text-align:left}.hero__stat .n .yel{color:var(--blue)}.hero__stat .l{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-top:8px;line-height:1.4}.hero__meta{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);text-align:right;line-height:1.7;border-left:1px solid rgba(255,255,255,.18);padding-left:20px;align-self:end}.hero__meta div{white-space:nowrap}.hero__meta .yel{color:var(--blue)}.hero [data-clock]{display:inline-block;min-width:9ch;font-variant-numeric:tabular-nums}.clip-reveal{display:inline-block;vertical-align:top}.clip-reveal>span{display:inline-block}.hero h1 .accent{color:var(--yellow)}@media (max-width:880px){.hero__inner{min-height:calc(100svh - var(--nav-h));gap:48px;padding-top:56px}.hero__wireframe{width:95vw;right:-28%}.hero__base{grid-template-columns:1fr 1fr;gap:32px 24px;padding-bottom:40px}.hero__meta{text-align:left;border-left:0;padding-left:0;border-top:1px solid rgba(255,255,255,.18);padding-top:20px;grid-column:1/-1}.hero__base>div:first-child{grid-column:1/-1}}@media (max-width:720px){.hero__base{grid-template-columns:1fr;gap:28px}.hero__stat{border-left:none;padding-left:0;padding-top:20px;border-top:1px solid rgba(255,255,255,.14)}.hero__stat:first-of-type{border-top:none;padding-top:0}}@media (max-width:560px){.hero{min-height:auto}.hero__inner{min-height:auto;gap:36px;padding-top:32px;padding-bottom:28px;grid-template-rows:auto auto}.hero h1{font-size:clamp(44px, 13vw, 64px);line-height:1.02}.hero__eyebrow{margin-bottom:20px}.hero__base{gap:24px;padding-bottom:8px}.hero__stat .n{font-size:clamp(36px, 11vw, 48px)}}
 </style>
-
-
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="css/pages/home.css" />
+<title>Academia em Irecê | Antonov Center — Treino e performance</title>
 <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
 <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
 <link rel="shortcut icon" href="/assets/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Antonov" />
 <link rel="manifest" href="/assets/site.webmanifest" />
-<link rel="preload" as="image" type="image/webp" fetchpriority="high" imagesrcset="/assets/wireframe-side-640.webp 640w, /assets/wireframe-side.webp 937w" imagesizes="(max-width: 880px) 95vw, 937px" />
-<link rel="preload" as="image" href="/assets/foto-hero.webp" type="image/webp" fetchpriority="high" />
-<title>Academia em Irecê | Antonov Center — Treino e performance</title>
 <meta name="description" content="Academia premium em Irecê, BA. Musculação, cardio e avaliação física. Antonov Center — projetado para decolar." />
 <meta name="robots" content="index, follow" />
 <link rel="canonical" href="https://www.antonovcenter.com.br/" />
@@ -43,26 +41,8 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=optional" onload="this.onload=null;this.rel='stylesheet'" />
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=optional" /></noscript>
-<link rel="preload" href="styles.css" as="style" />
-<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'" />
-<noscript><link rel="stylesheet" href="styles.css" /></noscript>
-<script src="seo-config.js" defer></script>
-<script src="seo-schema.js" defer></script>
-<link rel="stylesheet" href="css/pages/home.css" />
 </head>
 <body data-seo-page="home">
-
-<!-- page transition mask -->
-<div class="page-mask" aria-hidden="true" role="presentation">
-  <div class="page-mask__loader" aria-live="polite" aria-busy="true">
-    <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="(max-width: 880px) 42vw, 211px"><img class="page-mask__logo" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" src="assets/logo-211.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="(max-width: 880px) 42vw, 211px"></picture>
-    <div class="page-mask__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
-    <p class="page-mask__status" id="page-mask-status">Preparando hangar…</p>
-  </div>
-  <div class="page-mask__flight" aria-hidden="true">
-    <img src="assets/imagotipo.png" alt="Símbolo Antonov Center" width="591" height="591" decoding="async" loading="lazy">
-  </div>
-</div>
 
 <!-- ============= NAV ============= -->
 <header class="nav on-dark" data-screen-label="01 Nav">
@@ -90,7 +70,7 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
   <div class="hero__bg"></div>
   <picture class="hero__wireframe">
   <source type="image/webp" srcset="assets/wireframe-side-640.webp 640w, assets/wireframe-side.webp 937w" sizes="(max-width: 880px) 95vw, 937px">
-  <img class="hero__wireframe__img" src="assets/wireframe-side-937.png" alt="Hangar Antonov Center — estrutura da academia em Irecê" width="937" height="937" fetchpriority="high" decoding="async">
+  <img class="hero__wireframe__img" src="assets/wireframe-side-937.png" alt="" width="937" height="937" loading="lazy" fetchpriority="low" decoding="async" aria-hidden="true">
 </picture>
   <div class="hero__photo ph">
     <span class="ph__label">HANGAR 1º DE JANEIRO</span>
@@ -137,6 +117,18 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
     </div>
   </div>
 </section>
+
+<!-- page transition mask (após hero — prioriza LCP do título) -->
+<div class="page-mask" aria-hidden="true" role="presentation">
+  <div class="page-mask__loader" aria-live="polite" aria-busy="true">
+    <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="(max-width: 880px) 42vw, 211px"><img class="page-mask__logo" alt="Antonov Center — academia em Irecê" width="211" height="61" decoding="async" src="assets/logo-211.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="(max-width: 880px) 42vw, 211px"></picture>
+    <div class="page-mask__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+    <p class="page-mask__status" id="page-mask-status">Preparando hangar…</p>
+  </div>
+  <div class="page-mask__flight" aria-hidden="true">
+    <img src="assets/imagotipo.png" alt="Símbolo Antonov Center" width="591" height="591" decoding="async" loading="lazy">
+  </div>
+</div>
 
 <!-- ============= TICKER ============= -->
 <div class="ticker ticker--hero">
@@ -484,6 +476,8 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
   </div>
 </div>
 
+<script src="seo-config.js" defer></script>
+<script src="seo-schema.js" defer></script>
 <script defer src="vip-leads.js"></script>
 <script defer src="app.js"></script>
 </body>

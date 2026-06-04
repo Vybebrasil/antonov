@@ -40,6 +40,12 @@
 .hero__photo {
   z-index: 0;
 }
+.hero__photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #0c0c0e 0%, #181a1e 100%);
+}
 .hero__wireframe {
   position: absolute;
   right: -8%;
