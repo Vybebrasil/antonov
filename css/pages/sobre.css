@@ -177,7 +177,7 @@
   text-align: left;
 }
 .founder__meta .n { font-size: 16px; }
-.founder__meta .r { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); text-transform: uppercase; }
+.founder__meta .r { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); text-transform: uppercase; }
 .founder__bg {
   position: absolute; inset: 0;
   background:
@@ -225,7 +225,7 @@
 .pillar:hover { background: var(--paper); }
 .pillar__no {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.22em;
   color: var(--blue);
   margin-bottom: 32px;
@@ -308,7 +308,7 @@
 }
 .member__role {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue);
@@ -316,7 +316,7 @@
 .member__no {
   position: absolute; top: 16px; left: 16px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   color: rgba(255,255,255,0.6);
   z-index: 3;
@@ -390,7 +390,7 @@
   font-family: var(--f-mono);
 }
 .anatomia__data .lbl {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -447,7 +447,7 @@
 }
 .tlitem__tag {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--yellow);
@@ -461,7 +461,7 @@
 .tlitem__txt strong { color: var(--ink); }
 .tlitem__meta {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   color: var(--ink-mute);
   text-align: right;

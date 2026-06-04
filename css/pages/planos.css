@@ -69,7 +69,7 @@
 .pricing__toggle .badge {
   background: var(--ink); color: var(--yellow);
   padding: 4px 8px; border-radius: 999px;
-  font-size: 10px; letter-spacing: 0.18em;
+  font-size: 11px; letter-spacing: 0.18em;
 }
 
 /* Plans grid */
@@ -91,7 +91,7 @@
 }
 .plan--featured { background: var(--yellow); color: var(--ink); transform: scale(1.02); }
 .plan__no {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.22em; text-transform: uppercase;
   margin-bottom: 18px;
   display: flex; align-items: center; gap: 10px;
@@ -101,7 +101,7 @@
 .plan__no::before { content: ""; width: 18px; height: 1px; background: currentColor; }
 .plan__tag {
   position: absolute; top: 18px; right: 18px;
-  font-family: var(--f-mono); font-size: 10px;
+  font-family: var(--f-mono); font-size: 11px;
   letter-spacing: 0.22em; text-transform: uppercase;
   background: rgba(255,255,255,0.12); color: #fff;
   padding: 6px 10px; border-radius: 999px;
@@ -319,7 +319,7 @@
 }
 .addon:nth-child(3n) { border-right: 0; }
 .addon__no {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.22em; color: var(--blue);
 }
 .addon__name {

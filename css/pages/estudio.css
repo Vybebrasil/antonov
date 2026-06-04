@@ -151,7 +151,7 @@
 .zone__big .ph { position: absolute; inset: 0; }
 .zone__big-tag {
   position: absolute; bottom: 20px; left: 20px; z-index: 3;
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.2em; color: rgba(255,255,255,0.8);
   background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
   padding: 6px 12px; border-radius: 999px;
@@ -174,7 +174,7 @@
 }
 .spec--yellow { background: var(--blue); color: var(--ink); }
 .spec__lbl {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.2em; text-transform: uppercase;
   opacity: 0.6;
   margin-bottom: 16px;
@@ -245,7 +245,7 @@
 .tcell:hover { background: var(--carbon-2); }
 .tcell:nth-child(4n) { border-right: 0; }
 .tcell__no {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.22em; color: var(--blue);
   margin-bottom: 28px;
 }
@@ -322,7 +322,7 @@
 .floorplan__hud {
   position: relative; z-index: 2;
   display: flex; justify-content: space-between;
-  font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.2em;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 .floorplan__hud .yel { color: var(--blue); }
@@ -347,7 +347,7 @@
 .fpzone:hover { background: rgba(42,143,214,0.08); border-color: var(--blue); }
 .fpzone--big { grid-row: span 2; }
 .fpzone__id {
-  font-family: var(--f-mono); font-size: 10px;
+  font-family: var(--f-mono); font-size: 11px;
   letter-spacing: 0.22em; color: var(--blue);
 }
 .fpzone__name {
@@ -355,7 +355,7 @@
   line-height: 0.95; text-transform: uppercase; margin: 0;
 }
 .fpzone__area {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   color: rgba(255,255,255,0.5);
   letter-spacing: 0.18em;
 }

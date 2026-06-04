@@ -316,6 +316,82 @@
     setInterval(tick, 30000);
   }
 
+  // ---------- live weather in hero (Irecê, BA) ----------
+  const weatherEls = document.querySelectorAll('[data-weather]');
+  if (weatherEls.length) {
+    const WEATHER_CACHE_KEY = 'antonov-weather-irece-v1';
+    const WEATHER_MAX_AGE_MS = 15 * 60 * 1000;
+    const formatWeather = (humidity, temp) =>
+      `UMID. ${Math.round(humidity)}% · ${Math.round(temp)}°C`;
+    const setWeatherText = (text) =>
+      weatherEls.forEach((el) => {
+        el.textContent = text;
+      });
+
+    const readCachedWeather = () => {
+      try {
+        const raw = sessionStorage.getItem(WEATHER_CACHE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== 'object') return null;
+        if (typeof parsed.humidity !== 'number' || typeof parsed.temp !== 'number') return null;
+        if (typeof parsed.at !== 'number') return null;
+        if (Date.now() - parsed.at > WEATHER_MAX_AGE_MS) return null;
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    };
+
+    const saveCachedWeather = (humidity, temp) => {
+      try {
+        sessionStorage.setItem(
+          WEATHER_CACHE_KEY,
+          JSON.stringify({
+            humidity,
+            temp,
+            at: Date.now(),
+          })
+        );
+      } catch (e) {
+        // noop
+      }
+    };
+
+    const cached = readCachedWeather();
+    if (cached) {
+      setWeatherText(formatWeather(cached.humidity, cached.temp));
+    }
+
+    const fetchWeather = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500);
+      try {
+        const res = await fetch(
+          'https://api.open-meteo.com/v1/forecast?latitude=-11.303&longitude=-41.853&current=temperature_2m,relative_humidity_2m&timezone=America%2FBahia',
+          { signal: controller.signal, cache: 'no-store' }
+        );
+        if (!res.ok) return;
+        const data = await res.json();
+        const current = data?.current;
+        const humidity = Number(current?.relative_humidity_2m);
+        const temp = Number(current?.temperature_2m);
+        if (!Number.isFinite(humidity) || !Number.isFinite(temp)) return;
+        setWeatherText(formatWeather(humidity, temp));
+        saveCachedWeather(humidity, temp);
+      } catch (e) {
+        // mantém fallback estático se houver falha
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    if (!cached) {
+      if (document.readyState === 'complete') fetchWeather();
+      else window.addEventListener('load', fetchWeather, { once: true });
+    }
+  }
+
   // ---------- accordion (faq) ----------
   document.querySelectorAll('[data-accordion]').forEach((root) => {
     root.querySelectorAll('.acc__item').forEach((item) => {

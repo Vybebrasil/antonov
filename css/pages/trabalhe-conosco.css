@@ -52,7 +52,7 @@
 }
 .careers__pillar-no {
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--blue);
@@ -118,7 +118,7 @@
 .careers__job:hover { border-color: var(--blue); }
 .careers__job-tag {
   font-family: var(--f-mono);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-mute);
@@ -140,7 +140,7 @@
 .careers__job-meta {
   margin-top: 12px;
   font-family: var(--f-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--blue);
@@ -187,7 +187,7 @@
 }
 .cform__field { display: flex; flex-direction: column; gap: 8px; }
 .cform__field label {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.22em; text-transform: uppercase;
   color: rgba(255,255,255,0.55);
 }
@@ -234,7 +234,7 @@
   letter-spacing: 0.04em;
 }
 .cform__submit .meta {
-  font-family: var(--f-mono); font-size: 11px;
+  font-family: var(--f-mono); font-size: 12px;
   letter-spacing: 0.22em;
 }
 .cform__submit .arrow {

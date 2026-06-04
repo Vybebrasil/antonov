@@ -126,7 +126,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.4);
@@ -309,12 +309,15 @@
   min-width: 4.5ch;
   text-align: left;
 }
+.hero__stat .n [data-count-static] {
+  min-width: 0;
+}
 .hero__stat .n .yel {
   color: var(--blue);
 }
 .hero__stat .l {
   font-family: ui-monospace, "Cascadia Mono", monospace;
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.5);
@@ -435,7 +438,7 @@
     min-height: clamp(5.5rem, 28vw, 7rem);
   }
   .hero__eyebrow {
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.14em;
     flex-wrap: wrap;
     margin-bottom: 20px;
@@ -467,7 +470,7 @@
     font-size: clamp(36px, 11vw, 48px);
   }
   .hero__stat .l {
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.16em;
   }
   .hero.hero--decor-ready .hero__wireframe {
@@ -481,6 +484,6 @@
   }
   .hero__photo .ph__label {
     top: calc(var(--nav-h) + 12px);
-    font-size: 10px;
+    font-size: 11px;
   }
 }
