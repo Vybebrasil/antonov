@@ -1,5 +1,5 @@
 /**
- * Build estático: minifica JS/CSS, HTML com <style> inline → pasta dist/
+ * Build estático: minifica JS/CSS externos → pasta dist/
  * Uso: npm run build
  */
 import {
@@ -17,6 +17,7 @@ import CleanCSS from 'clean-css';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const dist = join(root, 'dist');
+const pagesCssDir = join(root, 'css', 'pages');
 
 const JS_FILES = [
   'seo-config.js',
@@ -49,6 +50,12 @@ async function minifyJsToDist(file) {
   console.log('js', outName);
 }
 
+function minifyCssToDist(srcPath, distPath) {
+  const { styles } = cssMin.minify(readFileSync(srcPath, 'utf8'));
+  mkdirSync(dirname(distPath), { recursive: true });
+  writeFileSync(distPath, styles, 'utf8');
+}
+
 function prepareDist() {
   mkdirSync(dist, { recursive: true });
   cpSync(join(root, 'assets'), join(dist, 'assets'), { recursive: true });
@@ -64,11 +71,6 @@ function prepareDist() {
 function processHtml(name) {
   let html = readFileSync(join(root, name), 'utf8');
 
-  html = html.replace(/<style>([\s\S]*?)<\/style>/gi, (_, block) => {
-    const { styles } = cssMin.minify(block);
-    return `<style>${styles}</style>`;
-  });
-
   for (const file of JS_FILES) {
     const base = file.replace(/\.js$/, '');
     html = html
@@ -79,6 +81,11 @@ function processHtml(name) {
   html = html.split('href="styles.css"').join('href="styles.min.css"');
   html = html.split("href='styles.css'").join("href='styles.min.css'");
 
+  html = html.replace(
+    /href="css\/pages\/([^"]+)\.css"/g,
+    (_, slug) => `href="css/pages/${slug}.min.css"`
+  );
+
   writeFileSync(join(dist, name), html, 'utf8');
   console.log('html', name);
 }
@@ -86,9 +93,17 @@ function processHtml(name) {
 async function main() {
   prepareDist();
 
-  const { styles } = cssMin.minify(readFileSync(join(root, 'styles.css'), 'utf8'));
-  writeFileSync(join(dist, 'styles.min.css'), styles, 'utf8');
+  minifyCssToDist(join(root, 'styles.css'), join(dist, 'styles.min.css'));
   console.log('css styles.min.css');
+
+  if (readdirSync(join(root, 'css')).includes('pages')) {
+    mkdirSync(join(dist, 'css', 'pages'), { recursive: true });
+    for (const file of readdirSync(pagesCssDir).filter((n) => n.endsWith('.css'))) {
+      const slug = file.replace(/\.css$/, '');
+      minifyCssToDist(join(pagesCssDir, file), join(dist, 'css', 'pages', `${slug}.min.css`));
+      console.log('css pages', `${slug}.min.css`);
+    }
+  }
 
   for (const file of JS_FILES) {
     await minifyJsToDist(file);
