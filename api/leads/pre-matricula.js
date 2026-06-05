@@ -13,6 +13,11 @@ function parsePreMatricula(raw) {
   const row = { ...base, interesse, mensagem, page };
 
   return {
+    notify: {
+      subject: 'Novo pré-cadastro — Antonov Center',
+      formType: 'Pré-matrícula / inauguração',
+      fields: row,
+    },
     insert: (sql) => sql`
       INSERT INTO leads_pre_matricula (nome, email, telefone, interesse, mensagem, page)
       VALUES (

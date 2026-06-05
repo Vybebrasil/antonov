@@ -21,6 +21,11 @@ function parseCurriculo(raw) {
   const row = { ...base, area, disponibilidade, mensagem, page };
 
   return {
+    notify: {
+      subject: 'Nova candidatura — Trabalhe conosco',
+      formType: 'Trabalhe conosco',
+      fields: row,
+    },
     insert: (sql) => sql`
       INSERT INTO leads_curriculos (nome, email, telefone, area, disponibilidade, mensagem, page)
       VALUES (

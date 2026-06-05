@@ -19,6 +19,7 @@
     "sharp": "^0.33.5"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^0.10.4"
+    "@neondatabase/serverless": "^0.10.4",
+    "resend": "^6.12.4"
   }
 }

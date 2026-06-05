@@ -1,4 +1,5 @@
 import { neon } from '@neondatabase/serverless';
+import { isResendConfigured, sendLeadNotification } from './resend.js';
 
 export function getSql() {
   const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
@@ -51,8 +52,11 @@ export async function handleLeadPost(req, res, insertFn) {
     return json(res, 405, { error: 'Método não permitido.' });
   }
 
-  if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL) {
-    return json(res, 500, { error: 'Banco de dados não configurado no servidor.' });
+  const hasDb = Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL);
+  const hasResend = isResendConfigured();
+
+  if (!hasDb && !hasResend) {
+    return json(res, 500, { error: 'Servidor não configurado (banco ou e-mail).' });
   }
 
   const body = parseBody(req);
@@ -61,11 +65,30 @@ export async function handleLeadPost(req, res, insertFn) {
   const parsed = insertFn(body);
   if (parsed.error) return json(res, 400, { error: parsed.error });
 
-  try {
-    const rows = await parsed.insert(getSql());
-    return json(res, 201, { ok: true, id: rows[0]?.id, created_at: rows[0]?.created_at });
-  } catch (err) {
-    console.error('lead insert error', err);
-    return json(res, 500, { error: 'Não foi possível salvar o cadastro.' });
+  let id;
+  let created_at;
+
+  if (hasDb && parsed.insert) {
+    try {
+      const rows = await parsed.insert(getSql());
+      id = rows[0]?.id;
+      created_at = rows[0]?.created_at;
+    } catch (err) {
+      console.error('lead insert error', err);
+      return json(res, 500, { error: 'Não foi possível salvar o cadastro.' });
+    }
   }
+
+  if (hasResend && parsed.notify) {
+    try {
+      await sendLeadNotification(parsed.notify);
+    } catch (err) {
+      console.error('resend error', err);
+      if (!hasDb || id == null) {
+        return json(res, 500, { error: 'Não foi possível enviar a mensagem.' });
+      }
+    }
+  }
+
+  return json(res, 201, { ok: true, id, created_at });
 }

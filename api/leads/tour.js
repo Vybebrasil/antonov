@@ -15,6 +15,11 @@ function parseTour(raw) {
   const row = { ...base, interesse, mensagem, melhor_dia, melhor_turno, page };
 
   return {
+    notify: {
+      subject: 'Nova mensagem — Contato',
+      formType: 'Formulário de contato',
+      fields: row,
+    },
     insert: (sql) => sql`
       INSERT INTO leads_tour (nome, email, telefone, interesse, melhor_dia, melhor_turno, mensagem, page)
       VALUES (
