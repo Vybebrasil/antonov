@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const DEFAULT_TO = 'antonovacademia@gmail.com';
+const DEFAULT_TO = 'contato@antonovcenter.com';
 
 const FIELD_LABELS = {
   nome: 'Nome',
@@ -67,7 +67,7 @@ export async function sendLeadNotification({ subject, formType, fields }) {
   if (!isResendConfigured()) return null;
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const from = process.env.RESEND_FROM || 'Antonov Center <noreply@antonovcenter.com>';
+  const from = process.env.RESEND_FROM || 'Antonov Center <contato@antonovcenter.com>';
   const to = process.env.RESEND_TO || DEFAULT_TO;
   const replyTo = fields.email ? String(fields.email).trim() : undefined;
 
