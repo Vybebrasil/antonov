@@ -17,6 +17,7 @@
   }
 
   const cfg = () => window.ANTONOV_VIP_LEADS || { provider: 'local' };
+  const PRE_MATRICULA_ENABLED = false;
   const STORAGE_KEY = 'antonov_vip_leads';
   const SEEN_KEY = 'antonov-vip-modal-seen';
 
@@ -185,6 +186,7 @@
   }
 
   function mount() {
+    if (!PRE_MATRICULA_ENABLED) return;
     const wrap = document.createElement('div');
     wrap.innerHTML = modalHtml;
     document.body.appendChild(wrap.firstElementChild);

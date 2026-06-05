@@ -155,7 +155,15 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
           <li>Cardio e máquinas ilimitado</li>
           <li>Horário comercial (05:00h às 23:00h)</li>
         </ul>
-        <button type="button" class="plan__cta" data-vip-open>Assinar FIRST CLASS <span class="arrow"></span></button>
+        <a
+          href="https://evo-totem.w12app.com.br/antonov/1/site/landing-page/checkout/12/0"
+          class="plan__cta"
+          id="first-class-cta"
+          data-checkout-monthly="https://evo-totem.w12app.com.br/antonov/1/site/landing-page/checkout/12/0"
+          data-checkout-yearly="https://evo-totem.w12app.com.br/antonov/1/site/landing-page/checkout/13/0"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Assinar FIRST CLASS <span class="arrow"></span></a>
       </article>
 
       <article class="plan">
@@ -177,7 +185,7 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
             </span>
           </li>
         </ul>
-        <button type="button" class="plan__cta" data-vip-open>Comprar diária <span class="arrow"></span></button>
+        <a href="https://wa.me/5574999631507?text=Ol%C3%A1!%20Quero%20comprar%20di%C3%A1ria(s)." class="plan__cta" target="_blank" rel="noopener noreferrer">Comprar diária <span class="arrow"></span></a>
       </article>
     </div>
   </div>
@@ -451,7 +459,6 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
   <div class="footer__wordmark" aria-hidden="true">ANTONOV</div>
 </footer>
 
-<script defer src="vip-leads.js"></script>
 <script defer src="app.js"></script>
 <script>
 // pricing toggle
@@ -460,6 +467,7 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
   const lblM = document.getElementById('lbl-mes');
   const lblY = document.getElementById('lbl-ano');
   const prices = document.querySelectorAll('[data-price-monthly]');
+  const firstClassCta = document.getElementById('first-class-cta');
   let yearly = false;
   btn.addEventListener('click', () => {
     yearly = !yearly;
@@ -469,6 +477,11 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
     prices.forEach(p => {
       p.textContent = yearly ? p.dataset.priceYearly : p.dataset.priceMonthly;
     });
+    if (firstClassCta) {
+      firstClassCta.href = yearly
+        ? firstClassCta.dataset.checkoutYearly
+        : firstClassCta.dataset.checkoutMonthly;
+    }
   });
   lblM.classList.add('active');
 })();

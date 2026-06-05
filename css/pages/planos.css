@@ -220,6 +220,8 @@
   border: 0;
   cursor: pointer;
   transition: transform 200ms;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 .plan--featured .plan__cta { background: var(--ink); color: var(--yellow); }
 .plan__cta:hover { transform: translateY(-1px); }
