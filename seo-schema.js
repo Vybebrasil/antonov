@@ -53,7 +53,7 @@
           'Sunday',
         ],
         opens: '05:00',
-        closes: '24:00',
+        closes: '23:00',
       },
     ],
     areaServed: b.areaServed.map((name) => ({ '@type': 'City', name })),
@@ -144,7 +144,7 @@
     },
     {
       name: 'Quanto custa o plano First Class?',
-      text: 'R$ 189,90/mês no mensal ou R$ 169,90/mês no anual (−8%). Inclui hangar 05:00–00:00 e avaliação física grátis.',
+      text: 'R$ 189,90/mês no mensal ou R$ 169,90/mês no anual (−8%). Inclui hangar 05:00–23:00 e avaliação física grátis.',
     },
     {
       name: 'Como funciona a diária na Antonov?',
@@ -152,7 +152,7 @@
     },
     {
       name: 'Qual o horário da Antonov Center em Irecê?',
-      text: 'Segunda a domingo, 05:00 às 00:00 (horário de Brasília).',
+      text: 'Segunda a domingo, 05:00 às 23:00 (horário de Brasília).',
     },
     {
       name: 'O que está incluso na mensalidade?',

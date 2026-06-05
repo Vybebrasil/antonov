@@ -33,11 +33,11 @@ const llms = `# Antonov Center
 
 ## Horário
 
-- Segunda a domingo: 05:00 às 00:00 (horário de Brasília / America/Bahia)
+- Segunda a domingo: 05:00 às 23:00 (horário de Brasília / America/Bahia)
 
 ## Planos (referência)
 
-- First Class: mensalidade com acesso ao hangar em horário comercial (05:00–00:00); avaliação física grátis. Valores em ${siteUrl}/planos (mensal e opção anual com desconto).
+- First Class: mensalidade com acesso ao hangar em horário comercial (05:00–23:00); avaliação física grátis. Valores em ${siteUrl}/planos (mensal e opção anual com desconto).
 - Diária: acesso avulso — 1 diária R$ 50; pacote 3 diárias R$ 110; pacote 10 diárias R$ 300 (validade 6 meses).
 
 ## Páginas principais
