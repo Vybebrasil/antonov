@@ -25,6 +25,7 @@ const JS_FILES = [
   'seo-schema.js',
   'leads-config.js',
   'vip-leads.js',
+  'google-review-prompt.js',
   'app.js',
   'contato-form.js',
   'trabalhe-conosco-form.js',
