@@ -24,6 +24,7 @@ function parseCurriculo(raw) {
     notify: {
       subject: 'Nova candidatura — Trabalhe conosco',
       formType: 'Trabalhe conosco',
+      confirmationType: 'curriculos',
       fields: row,
     },
     insert: (sql) => sql`

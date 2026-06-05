@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { isResendConfigured, sendLeadNotification } from './resend.js';
+import { isResendConfigured, sendLeadEmails } from './resend.js';
 
 export function getSql() {
   const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
@@ -81,7 +81,7 @@ export async function handleLeadPost(req, res, insertFn) {
 
   if (hasResend && parsed.notify) {
     try {
-      await sendLeadNotification(parsed.notify);
+      await sendLeadEmails(parsed.notify);
     } catch (err) {
       console.error('resend error', err);
       if (!hasDb || id == null) {

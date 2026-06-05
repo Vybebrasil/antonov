@@ -18,6 +18,7 @@ function parseTour(raw) {
     notify: {
       subject: 'Nova mensagem — Contato',
       formType: 'Formulário de contato',
+      confirmationType: 'contato',
       fields: row,
     },
     insert: (sql) => sql`
