@@ -13,18 +13,8 @@
 </script>
 <script>try{if(sessionStorage.getItem('antonov-nav')==='1')document.documentElement.classList.add('antonov-loading-pending');}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-:root{--bg:#EEEAE2;--ink:#0E0E10;--carbon:#131316;--yellow:#FAB10F;--blue:#2A8FD6;--f-body:system-ui,sans-serif;--f-display:Impact,sans-serif;--nav-h:76px;--pad-x:clamp(20px,4vw,64px)}
-body{margin:0;font-family:var(--f-body);background:var(--bg);color:var(--ink)}
-html.antonov-loading-pending .page-mask{transform:translateY(0);pointer-events:auto}
-html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
-.page-mask{position:fixed;inset:0;z-index:9999;background:var(--carbon);transform:translateY(-100%);transition:transform var(--mask-cover-duration,.38s) var(--mask-ease,ease)}
-</style>
-
-
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
 <link rel="icon" type="image/png" href="/assets/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
-<link rel="shortcut icon" href="/assets/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="Antonov" />
 <link rel="manifest" href="/assets/site.webmanifest" />
@@ -43,6 +33,16 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 <meta name="twitter:title" content="Política de cookies | Antonov Center" />
 <meta name="twitter:description" content="Política de cookies do ANTONOV CENTER — tipos, finalidades e como gerenciar preferências no site." />
 <meta name="twitter:image" content="https://www.antonovcenter.com.br/assets/foto-hero.png" />
+<style>
+:root{--bg:#EEEAE2;--ink:#0E0E10;--carbon:#131316;--yellow:#FAB10F;--blue:#2A8FD6;--f-body:system-ui,sans-serif;--f-display:Impact,sans-serif;--nav-h:76px;--pad-x:clamp(20px,4vw,64px)}
+body{margin:0;font-family:var(--f-body);background:var(--bg);color:var(--ink)}
+html.antonov-loading-pending .page-mask{transform:translateY(0);pointer-events:auto}
+html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
+.page-mask{position:fixed;inset:0;z-index:9999;background:var(--carbon);transform:translateY(-100%);transition:transform var(--mask-cover-duration,.38s) var(--mask-ease,ease)}
+</style>
+
+
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />

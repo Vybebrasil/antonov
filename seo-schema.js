@@ -29,7 +29,7 @@
     ...(b.legalName ? { legalName: b.legalName } : {}),
     ...(b.taxID ? { taxID: b.taxID } : {}),
     description:
-      'Academia de performance em Irecê, Bahia. Treino, musculação, cardio e estrutura premium.',
+      'Procurando a melhor academia em Irecê, BA? Musculação, cardio e avaliação física com estrutura moderna. Antonov Center — projetado para decolar.',
     url: base,
     image,
     telephone: b.phone,

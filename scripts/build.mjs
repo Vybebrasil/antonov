@@ -61,6 +61,7 @@ function prepareDist() {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(dist, { recursive: true });
   cpSync(join(root, 'assets'), join(dist, 'assets'), { recursive: true });
+  cpSync(join(root, 'assets', 'favicon.ico'), join(dist, 'favicon.ico'));
   for (const f of COPY_FILES) {
     try {
       cpSync(join(root, f), join(dist, f));
