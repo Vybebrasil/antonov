@@ -22,7 +22,7 @@ function parseCurriculo(raw) {
 
   return {
     notify: {
-      subject: 'Nova candidatura — Trabalhe conosco',
+      subject: 'Nova candidatura | Trabalhe conosco',
       formType: 'Trabalhe conosco',
       confirmationType: 'curriculos',
       fields: row,

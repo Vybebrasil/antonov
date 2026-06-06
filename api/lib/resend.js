@@ -62,7 +62,7 @@ const CONFIRMATIONS = {
     subject: (nome) => `${firstName(nome)}, você está na lista VIP ✈`,
     title: (nome) => `Prioridade confirmada, ${firstName(nome)}.`,
     lead: (fields) =>
-      `Seu pré-cadastro de inauguração foi confirmado. Você entrou na lista com foco em **${fields.interesse || 'performance'}** — avisaremos em primeira mão.`,
+      `Seu pré-cadastro de inauguração foi confirmado. Você entrou na lista com foco em **${fields.interesse || 'performance'}** e avisaremos em primeira mão.`,
     nextSteps: [
       'Fique de olho no e-mail e WhatsApp para novidades da abertura.',
       'Vagas de inauguração são limitadas.',
@@ -177,7 +177,7 @@ function wrapEmail({
   summaryHtml = '',
   stepsHtml = '',
   ctaHtml = '',
-  footerNote = 'Antonov Center · Av. 1º de Janeiro, Irecê — BA',
+  footerNote = 'Antonov Center · Av. 1º de Janeiro, Irecê, BA',
 }) {
   return `<!doctype html>
 <html lang="pt-BR">
@@ -265,7 +265,7 @@ function buildNotificationHtml({ formType, fields }) {
     buildCtaButton({ label: 'Abrir WhatsApp', href: waHref }, true);
 
   return wrapEmail({
-    preheader: `Novo lead: ${nome} — ${formType}`,
+    preheader: `Novo lead: ${nome} | ${formType}`,
     eyebrow: '/ NOVO LEAD',
     title: formType.toUpperCase(),
     bodyHtml,
@@ -280,7 +280,7 @@ function buildNotificationText({ formType, fields }) {
     .filter(([, value]) => value != null && String(value).trim() !== '')
     .map(([key, value]) => `${FIELD_LABELS[key] || key}: ${value}`);
 
-  return [`Antonov Center — ${formType}`, '', ...lines].join('\n');
+  return [`Antonov Center | ${formType}`, '', ...lines].join('\n');
 }
 
 function buildConfirmationHtml({ nome, fields, confirmationType }) {
@@ -346,7 +346,7 @@ export async function sendLeadNotification({ subject, formType, fields }) {
   const to = process.env.RESEND_TO || DEFAULT_TO;
   const replyTo = fields.email ? String(fields.email).trim() : undefined;
   const nome = fields.nome ? String(fields.nome).trim() : '';
-  const personalizedSubject = nome ? `${subject.replace(' —', '')} · ${nome}` : subject;
+  const personalizedSubject = nome ? `${subject.replace(' |', '')} · ${nome}` : subject;
 
   const payload = {
     from: getFrom(),

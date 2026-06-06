@@ -1,4 +1,4 @@
-/* JSON-LD — LocalBusiness, WebSite, BreadcrumbList, FAQPage, ContactPage */
+/* JSON-LD, LocalBusiness, WebSite, BreadcrumbList, FAQPage, ContactPage */
 (function () {
   'use strict';
 
@@ -29,7 +29,7 @@
     ...(b.legalName ? { legalName: b.legalName } : {}),
     ...(b.taxID ? { taxID: b.taxID } : {}),
     description:
-      'Procurando a melhor academia em Irecê, BA? Musculação, cardio e avaliação física com estrutura moderna. Antonov Center — projetado para decolar.',
+      'Procurando a melhor academia em Irecê, BA? Musculação, cardio e avaliação física com estrutura moderna. Antonov Center, projetado para decolar.',
     url: base,
     image,
     telephone: b.phone,
@@ -212,7 +212,7 @@
     inject({
       '@context': 'https://schema.org',
       '@type': 'ContactPage',
-      name: 'Contato — Antonov Center',
+      name: 'Contato | Antonov Center',
       url: base + '/contato',
       about: { '@id': localBusinessId },
       mainEntity: { '@id': localBusinessId },

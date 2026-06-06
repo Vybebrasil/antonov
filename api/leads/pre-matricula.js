@@ -14,7 +14,7 @@ function parsePreMatricula(raw) {
 
   return {
     notify: {
-      subject: 'Novo pré-cadastro — Antonov Center',
+      subject: 'Novo pré-cadastro | Antonov Center',
       formType: 'Pré-matrícula / inauguração',
       confirmationType: 'preMatricula',
       fields: row,

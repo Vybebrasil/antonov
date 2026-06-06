@@ -1,4 +1,4 @@
-/* ANTONOV CENTER — shared interactions */
+/* ANTONOV CENTER, shared interactions */
 (function () {
   'use strict';
 
@@ -523,7 +523,7 @@
       }
       modalTrack.innerHTML = list.map((src, i) => `
         <figure class="disc-modal__slide">
-          <img src="${src}" alt="${title} — imagem ${i + 1}" width="720" height="450" loading="lazy" decoding="async" />
+          <img src="${src}" alt="${title}, imagem ${i + 1}" width="720" height="450" loading="lazy" decoding="async" />
         </figure>`).join('');
       modalDots.innerHTML = list.map((_, i) =>
         `<button type="button" class="disc-modal__dot${i === 0 ? ' is-active' : ''}" data-disc-dot="${i}" role="tab" aria-label="Imagem ${i + 1}" aria-selected="${i === 0 ? 'true' : 'false'}"></button>`

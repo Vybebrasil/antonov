@@ -1,4 +1,4 @@
-/* Popup de avaliação no Google — após 12s no site */
+/* Popup de avaliação no Google, após 12s no site */
 (function () {
   'use strict';
 

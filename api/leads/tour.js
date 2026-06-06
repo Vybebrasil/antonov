@@ -16,7 +16,7 @@ function parseTour(raw) {
 
   return {
     notify: {
-      subject: 'Nova mensagem — Contato',
+      subject: 'Nova mensagem | Contato',
       formType: 'Formulário de contato',
       confirmationType: 'contato',
       fields: row,
