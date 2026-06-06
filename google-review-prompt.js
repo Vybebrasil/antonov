@@ -21,7 +21,7 @@
       <span class="review-prompt__star"></span>
       <span class="review-prompt__star"></span>
     </div>
-    <h2 id="review-prompt-title" class="review-prompt__title">Ajude a Antonov a <span class="yel">decolar.</span></h2>
+    <h2 id="review-prompt-title" class="review-prompt__title">Ajude a Antonov Center a <span class="yel">decolar.</span></h2>
     <p class="review-prompt__sub">Sua avaliação no Google leva menos de um minuto e ajuda mais pessoas em Irecê a conhecer a melhor experiência de treino da região.</p>
     <div class="review-prompt__actions">
       <a class="btn btn--yellow review-prompt__cta" href="${REVIEW_URL}" target="_blank" rel="noopener noreferrer" data-review-go>
