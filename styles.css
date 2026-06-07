@@ -178,6 +178,7 @@ section { position: relative; }
   align-items: center;
   justify-content: space-between;
   gap: 24px;
+  min-width: 0;
 }
 .nav.scrolled {
   background: rgba(238, 234, 226, 0.85);
@@ -390,8 +391,16 @@ section { position: relative; }
 body.nav-open { overflow: hidden; }
 
 @media (max-width: 880px) {
+  .nav__inner {
+    gap: 10px;
+  }
+  .nav__logo img,
+  .logo-picture img {
+    max-width: min(168px, 44vw);
+    height: 32px;
+  }
   .nav__links { display: none; }
-  .nav__cta { display: none; }
+  .nav__cta { display: none !important; }
   .nav__burger {
     display: flex;
     flex-direction: column;
