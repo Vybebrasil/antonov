@@ -250,6 +250,87 @@
   .plan--featured { transform: none; }
 }
 
+/* Corporate benefits */
+.corp-benefits {
+  padding: 0 var(--pad-x) 100px;
+  background: var(--bg);
+}
+.corp-benefits__inner {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 40px 36px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.corp-benefits__label {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.corp-benefits__label::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: var(--blue);
+}
+.corp-benefits h2 {
+  font-family: var(--f-display);
+  font-size: clamp(36px, 5vw, 56px);
+  line-height: 1;
+  text-transform: uppercase;
+  margin: 0 0 16px;
+}
+.corp-benefits__lede {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 58ch;
+}
+.corp-benefits__list {
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+.corp-benefits__list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 16px 18px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.corp-benefits__list li strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.corp-benefits__note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-mute);
+}
+.corp-benefits__note a {
+  color: var(--blue-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* Comparison table */
 .compare {
   padding: 140px var(--pad-x);
