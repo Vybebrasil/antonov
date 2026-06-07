@@ -338,6 +338,7 @@
   white-space: nowrap;
 }
 .hero__meta .yel { color: #FAB10F; }
+.hero__meta .dim { color: rgba(255, 255, 255, 0.32); }
 .hero [data-clock] {
   display: inline-block;
   min-width: 9ch;

@@ -19,6 +19,12 @@ window.ANTONOV_SEO = {
     lat: -11.3089689,
     lng: -41.853495,
     hours: ['Mo-Fr 05:00-23:00', 'Sa 06:00-15:00', 'Su 08:00-14:00'],
+    operatingHours: {
+      timezone: 'America/Bahia',
+      weekday: { open: [5, 0], close: [23, 0] },
+      saturday: { open: [6, 0], close: [15, 0] },
+      sundayAndHoliday: { open: [8, 0], close: [14, 0] },
+    },
     instagram: 'https://www.instagram.com/antonovcenter',
     mapsUrl: 'https://maps.app.goo.gl/rbhgwPvZnJfMyKkB9',
     areaServed: ['Irecê', 'Bahia', 'Brasil'],

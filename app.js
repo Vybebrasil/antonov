@@ -294,13 +294,124 @@
     counters.forEach((el) => countIO.observe(el));
   } catch (e) { /* noop */ }
 
+  // ---------- operating status (hero) ----------
+  const statusEls = document.querySelectorAll('[data-operating-status]');
+  const operatingCfg =
+    window.ANTONOV_SEO?.business?.operatingHours ?? {
+      timezone: 'America/Bahia',
+      weekday: { open: [5, 0], close: [23, 0] },
+      saturday: { open: [6, 0], close: [15, 0] },
+      sundayAndHoliday: { open: [8, 0], close: [14, 0] },
+    };
+
+  const getEasterDate = (year) => {
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const month = Math.floor((h + l - 7 * m + 114) / 31);
+    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    return new Date(Date.UTC(year, month - 1, day));
+  };
+
+  const toDateKey = (date) => {
+    const y = date.getUTCFullYear();
+    const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(date.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  const addDaysUtc = (date, days) => {
+    const next = new Date(date.getTime());
+    next.setUTCDate(next.getUTCDate() + days);
+    return next;
+  };
+
+  const getBrazilianNationalHolidays = (year) => {
+    const fixed = [
+      `${year}-01-01`,
+      `${year}-04-21`,
+      `${year}-05-01`,
+      `${year}-09-07`,
+      `${year}-10-12`,
+      `${year}-11-02`,
+      `${year}-11-15`,
+      `${year}-11-20`,
+      `${year}-12-25`,
+    ];
+    const easter = getEasterDate(year);
+    const movable = [addDaysUtc(easter, -2), addDaysUtc(easter, 60)].map(toDateKey);
+    return new Set([...fixed, ...movable]);
+  };
+
+  const holidayCache = new Map();
+  const isBrazilianNationalHoliday = (dateKey) => {
+    const year = parseInt(dateKey.slice(0, 4), 10);
+    if (!holidayCache.has(year)) holidayCache.set(year, getBrazilianNationalHolidays(year));
+    return holidayCache.get(year).has(dateKey);
+  };
+
+  const getScheduleForDate = (weekday, dateKey) => {
+    if (weekday === 'Sun' || isBrazilianNationalHoliday(dateKey)) {
+      return operatingCfg.sundayAndHoliday;
+    }
+    if (weekday === 'Sat') return operatingCfg.saturday;
+    return operatingCfg.weekday;
+  };
+
+  const isWithinSchedule = (hour, minute, schedule) => {
+    const nowMins = hour * 60 + minute;
+    const openMins = schedule.open[0] * 60 + schedule.open[1];
+    const closeMins = schedule.close[0] * 60 + schedule.close[1];
+    return nowMins >= openMins && nowMins < closeMins;
+  };
+
+  const isAntonovOpen = (now = new Date()) => {
+    const tz = operatingCfg.timezone || 'America/Bahia';
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      weekday: 'short',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+    }).formatToParts(now);
+    const weekday = parts.find((p) => p.type === 'weekday')?.value ?? 'Mon';
+    const hour = parseInt(parts.find((p) => p.type === 'hour')?.value ?? '0', 10);
+    const minute = parseInt(parts.find((p) => p.type === 'minute')?.value ?? '0', 10);
+    const dateKey = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(now);
+    return isWithinSchedule(hour, minute, getScheduleForDate(weekday, dateKey));
+  };
+
+  const updateOperatingStatus = () => {
+    if (!statusEls.length) return;
+    const open = isAntonovOpen();
+    statusEls.forEach((el) => {
+      if (open) {
+        el.innerHTML = '<span class="yel">●</span> OPERANDO AGORA';
+        el.setAttribute('aria-label', 'Academia aberta agora');
+      } else {
+        el.innerHTML = '<span class="dim">●</span> FECHADO AGORA';
+        el.setAttribute('aria-label', 'Academia fechada no momento');
+      }
+    });
+  };
+
   // ---------- live clock in nav for vibes ----------
   const clockEls = document.querySelectorAll('[data-clock]');
-  if (clockEls.length) {
+  if (clockEls.length || statusEls.length) {
+    const tz = operatingCfg.timezone || 'America/Bahia';
     const fmt = () => {
       const d = new Date();
       const parts = new Intl.DateTimeFormat('pt-BR', {
-        timeZone: 'America/Bahia',
+        timeZone: tz,
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
@@ -309,7 +420,10 @@
       const mm = parts.find((p) => p.type === 'minute')?.value ?? '00';
       return `${hh}:${mm} BRT`;
     };
-    const tick = () => clockEls.forEach((el) => (el.textContent = fmt()));
+    const tick = () => {
+      clockEls.forEach((el) => (el.textContent = fmt()));
+      updateOperatingStatus();
+    };
     const startClock = () => requestAnimationFrame(() => requestAnimationFrame(tick));
     if (document.readyState === 'complete') startClock();
     else window.addEventListener('load', startClock, { once: true });
