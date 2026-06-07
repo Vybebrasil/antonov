@@ -140,7 +140,7 @@
   const faqPlanos = [
     {
       name: 'O que é a Antonov Center?',
-      text: 'Academia de performance em Irecê, Bahia, com hangar de cerca de 3.000 m², musculação, cardio e avaliação física.',
+      text: 'É um espaço vivo, construído sobre propósito, relações genuínas e resultados concretos. Excelência na prática de musculação e exercícios resistidos. Hangar com cerca de 3.000 m², em Irecê-BA.',
     },
     {
       name: 'Quais planos a Antonov Center oferece?',
