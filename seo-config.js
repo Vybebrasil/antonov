@@ -18,7 +18,7 @@ window.ANTONOV_SEO = {
     email: 'antonovacademia@gmail.com',
     lat: -11.3089689,
     lng: -41.853495,
-    hours: ['Mo-Su 05:00-23:00'],
+    hours: ['Mo-Fr 05:00-23:00', 'Sa 06:00-15:00', 'Su 08:00-14:00'],
     instagram: 'https://www.instagram.com/antonovcenter',
     mapsUrl: 'https://maps.app.goo.gl/rbhgwPvZnJfMyKkB9',
     areaServed: ['Irecê', 'Bahia', 'Brasil'],

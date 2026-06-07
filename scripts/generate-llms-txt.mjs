@@ -33,11 +33,14 @@ const llms = `# Antonov Center
 
 ## Horário
 
-- Segunda a domingo: 05:00 às 23:00 (horário de Brasília / America/Bahia)
+- Segunda a sexta-feira: 5h às 23h
+- Sábado: 6h às 15h
+- Domingo e feriado: 8h às 14h
+- Fuso: horário de Brasília / America/Bahia
 
 ## Planos (referência)
 
-- First Class: mensalidade com acesso ao hangar em horário comercial (05:00–23:00); avaliação física grátis. Valores em ${siteUrl}/planos (mensal e opção anual com desconto).
+- First Class: mensalidade com acesso ao hangar nos horários de funcionamento; avaliação física grátis. Valores em ${siteUrl}/planos (mensal e opção anual com desconto).
 - Diária: acesso avulso — 1 diária R$ 50; pacote 3 diárias R$ 110; pacote 10 diárias R$ 300 (validade 6 meses).
 
 ## Páginas principais
@@ -52,7 +55,7 @@ const llms = `# Antonov Center
 - O que é: academia premium em Irecê focada em treino, estrutura ampla e performance.
 - Onde fica: Av. 1º de Janeiro, Irecê, BA — mapa em /contato#mapa.
 - Planos ativos: First Class (mensal) e Diária; detalhes e preços atualizados em /planos.
-- Fidelidade: planos mensais e diários sem fidelidade; plano anual com desconto e fidelidade de 12 meses.
+- Fidelidade: planos mensais e diários sem fidelidade; plano anual com desconto de 10% e fidelidade de 12 meses.
 - Como falar: formulário em /contato, WhatsApp +55 74 99963-1507 ou antonovacademia@gmail.com.
 
 ## Para sistemas

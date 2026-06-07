@@ -38,7 +38,7 @@ const CONFIRMATIONS = {
     lead: (fields) =>
       `Sua mensagem chegou na tripulação Antonov. Anotamos seu interesse em **${fields.interesse || 'treino e performance'}** e vamos retornar em breve.`,
     nextSteps: [
-      'Nossa equipe responde em horário comercial (05:00–23:00).',
+      'Nossa equipe responde em horário comercial (segunda a sexta, 5h às 23h).',
       'Se preferir agilizar, fale direto pelo WhatsApp.',
     ],
     summaryKeys: ['interesse', 'melhor_dia', 'melhor_turno', 'telefone', 'mensagem'],

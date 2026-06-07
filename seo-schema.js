@@ -43,17 +43,21 @@
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',
-        dayOfWeek: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday',
-          'Saturday',
-          'Sunday',
-        ],
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         opens: '05:00',
         closes: '23:00',
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: 'Saturday',
+        opens: '06:00',
+        closes: '15:00',
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: 'Sunday',
+        opens: '08:00',
+        closes: '14:00',
       },
     ],
     areaServed: b.areaServed.map((name) => ({ '@type': 'City', name })),
@@ -144,7 +148,7 @@
     },
     {
       name: 'Quanto custa o plano First Class?',
-      text: 'R$ 189,90/mês no mensal ou R$ 169,90/mês no anual (−8%). Inclui hangar 05:00–23:00 e avaliação física grátis.',
+      text: 'R$ 189,90/mês no mensal ou R$ 169,90/mês no anual (−10%). Inclui hangar nos horários de funcionamento e avaliação física grátis.',
     },
     {
       name: 'Como funciona a diária na Antonov?',
@@ -152,7 +156,7 @@
     },
     {
       name: 'Qual o horário da Antonov Center em Irecê?',
-      text: 'Segunda a domingo, 05:00 às 23:00 (horário de Brasília).',
+      text: 'Segunda a sexta-feira, 5h às 23h; sábado, 6h às 15h; domingo e feriado, 8h às 14h (horário de Brasília).',
     },
     {
       name: 'O que está incluso na mensalidade?',
@@ -164,7 +168,7 @@
     },
     {
       name: 'Tem fidelidade ou multa de cancelamento?',
-      text: 'Planos mensais e diários sem fidelidade. Plano anual: desconto de 8% com fidelidade de 12 meses e cobrança recorrente.',
+      text: 'Planos mensais e diários sem fidelidade. Plano anual: desconto de 10% com fidelidade de 12 meses e cobrança recorrente.',
     },
     {
       name: 'Preciso seguir um programa específico?',
