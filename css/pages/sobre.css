@@ -63,30 +63,43 @@
 
 /* ----- Hero image strip ----- */
 .about-strip {
-  height: 60vh; min-height: 480px;
-  margin: 0 var(--pad-x);
+  width: min(100% - 2 * var(--pad-x), 1024px);
+  height: 52vh;
+  min-height: 400px;
+  margin-inline: auto;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
   background: var(--carbon);
 }
 .about-strip .ph { position: absolute; inset: 0; }
+.about-strip__parallax {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+}
 .about-strip__media {
   position: absolute;
   inset: 0;
   display: block;
+  width: 100%;
+  height: 100%;
 }
 .about-strip__img {
   width: 100%;
-  height: 100%;
+  height: 120%;
   object-fit: cover;
-  object-position: center 44%;
+  object-position: center 32%;
+  filter: contrast(1.06);
+  will-change: transform;
+  transform: translate3d(0, calc(-10% + var(--parallax-y, 0px)), 0);
 }
 .about-strip__overlay {
   position: absolute; inset: 0; z-index: 2;
   padding: 32px;
   display: flex; justify-content: space-between; align-items: flex-end;
-  background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.7) 100%);
+  background: linear-gradient(180deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.55) 72%, rgba(0,0,0,0.82) 100%);
   color: #fff;
 }
 .about-strip__caption {
@@ -96,6 +109,14 @@
   text-transform: uppercase;
 }
 .about-strip__caption::before { content: "● "; color: var(--blue); }
+
+@media (prefers-reduced-motion: reduce) {
+  .about-strip__img {
+    height: 100%;
+    transform: none;
+    will-change: auto;
+  }
+}
 
 /* ----- Editorial section ----- */
 .editorial {

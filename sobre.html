@@ -107,11 +107,13 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
 </section>
 
 <!-- ============= STRIP ============= -->
-<div class="about-strip reveal">
-  <picture class="about-strip__media">
-    <source type="image/webp" srcset="assets/tripulacao-sobre-960.webp 960w, assets/tripulacao-sobre-1280.webp 1280w" sizes="(max-width: 880px) 100vw, 92vw" />
-    <img class="about-strip__img" src="assets/tripulacao-sobre.png" alt="Tripulação Antonov Center 2026 reunida no hangar em Irecê" width="1024" height="575" decoding="async" loading="lazy" />
-  </picture>
+<div class="about-strip reveal" data-parallax-strip>
+  <div class="about-strip__parallax">
+    <picture class="about-strip__media">
+      <source type="image/webp" srcset="assets/tripulacao-sobre-960.webp 960w, assets/tripulacao-sobre-1024.webp 1024w" sizes="(max-width: 880px) 100vw, min(92vw, 1024px)" />
+      <img class="about-strip__img" src="assets/tripulacao-sobre.png" alt="Tripulação Antonov Center 2026 reunida no hangar em Irecê" width="1024" height="575" decoding="async" loading="lazy" />
+    </picture>
+  </div>
   <div class="about-strip__overlay">
     <div class="about-strip__caption">/ TRIPULAÇÃO · CULTURA · 2026</div>
     <div class="about-strip__caption">11°18'32"S · 41°51'13"W</div>

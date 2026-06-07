@@ -734,4 +734,48 @@
       { passive: true }
     );
   });
+
+  // ---------- about strip parallax (sobre) ----------
+  const parallaxStrips = document.querySelectorAll('[data-parallax-strip]');
+  if (parallaxStrips.length) {
+    const parallaxMax = 52;
+
+    const updateParallax = () => {
+      parallaxStrips.forEach((strip) => {
+        const img = strip.querySelector('.about-strip__img');
+        if (!img) return;
+
+        if (reducedMotion.matches) {
+          img.style.removeProperty('--parallax-y');
+          return;
+        }
+
+        const rect = strip.getBoundingClientRect();
+        const vh = window.innerHeight;
+        if (rect.bottom < 0 || rect.top > vh) {
+          img.style.setProperty('--parallax-y', '0px');
+          return;
+        }
+
+        const centerDelta = rect.top + rect.height * 0.5 - vh * 0.5;
+        const shift = Math.max(-parallaxMax, Math.min(parallaxMax, centerDelta * -0.24));
+        img.style.setProperty('--parallax-y', `${shift.toFixed(2)}px`);
+      });
+    };
+
+    let parallaxTick = false;
+    const onParallaxScroll = () => {
+      if (parallaxTick) return;
+      parallaxTick = true;
+      requestAnimationFrame(() => {
+        parallaxTick = false;
+        updateParallax();
+      });
+    };
+
+    window.addEventListener('scroll', onParallaxScroll, { passive: true });
+    window.addEventListener('resize', onParallaxScroll, { passive: true });
+    reducedMotion.addEventListener('change', updateParallax);
+    updateParallax();
+  }
 })();
