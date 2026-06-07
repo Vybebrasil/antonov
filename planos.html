@@ -160,6 +160,8 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
           href="https://evo-totem.w12app.com.br/antonov/1/site/landing-page/checkout/12/0"
           class="plan__cta"
           id="first-class-cta"
+          data-track="first-class-checkout"
+          data-billing-period="mensal"
           data-checkout-monthly="https://evo-totem.w12app.com.br/antonov/1/site/landing-page/checkout/12/0"
           data-checkout-yearly="https://evo-totem.w12app.com.br/antonov/1/site/landing-page/checkout/13/0"
           target="_blank"
@@ -498,6 +500,33 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
   const prices = document.querySelectorAll('[data-price-monthly]');
   const firstClassCta = document.getElementById('first-class-cta');
   let yearly = false;
+
+  function trackFirstClassCheckout(isYearly) {
+    const billingPeriod = isYearly ? 'anual' : 'mensal';
+    const eventName = isYearly ? 'assinar_first_class_anual' : 'assinar_first_class_mensal';
+    const payload = {
+      event_category: 'checkout',
+      plan: 'first_class',
+      billing_period: billingPeriod,
+      link_url: firstClassCta?.href || '',
+    };
+
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, payload);
+    }
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: eventName, ...payload });
+  }
+
+  function syncFirstClassCta() {
+    if (!firstClassCta) return;
+    firstClassCta.href = yearly
+      ? firstClassCta.dataset.checkoutYearly
+      : firstClassCta.dataset.checkoutMonthly;
+    firstClassCta.dataset.billingPeriod = yearly ? 'anual' : 'mensal';
+  }
+
   btn.addEventListener('click', () => {
     yearly = !yearly;
     btn.classList.toggle('active-year', yearly);
@@ -506,12 +535,16 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
     prices.forEach(p => {
       p.textContent = yearly ? p.dataset.priceYearly : p.dataset.priceMonthly;
     });
-    if (firstClassCta) {
-      firstClassCta.href = yearly
-        ? firstClassCta.dataset.checkoutYearly
-        : firstClassCta.dataset.checkoutMonthly;
-    }
+    syncFirstClassCta();
   });
+
+  if (firstClassCta) {
+    firstClassCta.addEventListener('click', () => {
+      trackFirstClassCheckout(yearly);
+    });
+    syncFirstClassCta();
+  }
+
   lblM.classList.add('active');
 })();
 </script>
