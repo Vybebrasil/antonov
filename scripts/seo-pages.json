@@ -46,11 +46,9 @@
     "sobre.html": {
       "seoPage": "sobre",
       "path": "/sobre",
-      "title": "Sobre o hangar | Antonov Center — Irecê, Bahia",
-      "description": "Manifesto e história da Antonov Center, academia de performance em Irecê, Bahia. Força, tecnologia e cultura de treino.",
-      "ogImage": "/assets/purpose-bg.png",
-      "noindex": true,
-      "hidden": true
+      "title": "Sobre a cultura | Antonov Center — Irecê, Bahia",
+      "description": "Cultura, visão, missão e valores da Antonov Center em Irecê. Excelência em musculação, aluno no centro e tripulação comprometida com resultados reais.",
+      "ogImage": "/assets/purpose-bg.png"
     },
     "trabalhe-conosco.html": {
       "seoPage": "trabalhe",

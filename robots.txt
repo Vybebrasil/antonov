@@ -5,7 +5,6 @@ Allow: /
 Disallow: /api/
 Disallow: /aulas
 Disallow: /estudio
-Disallow: /sobre
 Disallow: /termos
 Disallow: /privacidade
 Disallow: /cookies

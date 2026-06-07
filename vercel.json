@@ -20,11 +20,6 @@
       "permanent": false
     },
     {
-      "source": "/sobre",
-      "destination": "/planos",
-      "permanent": false
-    },
-    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "antonovcenter.com.br" }],
       "destination": "https://www.antonovcenter.com.br/:path*",

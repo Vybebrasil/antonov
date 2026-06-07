@@ -30,6 +30,7 @@ const priorityMap = {
   '/': { priority: '1.0', changefreq: 'weekly' },
   '/planos': { priority: '0.9', changefreq: 'weekly' },
   '/contato': { priority: '0.9', changefreq: 'monthly' },
+  '/sobre': { priority: '0.8', changefreq: 'monthly' },
   '/trabalhe-conosco': { priority: '0.6', changefreq: 'monthly' },
 };
 
@@ -66,7 +67,6 @@ Allow: /
 Disallow: /api/
 Disallow: /aulas
 Disallow: /estudio
-Disallow: /sobre
 Disallow: /termos
 Disallow: /privacidade
 Disallow: /cookies
