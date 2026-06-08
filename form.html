@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<title>Formulário | Antonov Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/styles.css" />
+<link rel="stylesheet" href="/css/pages/form.css" />
+</head>
+<body>
+<header class="form-topbar">
+  <div class="form-topbar__inner">
+    <a href="/" class="form-topbar__logo" aria-label="Antonov Center — início">
+      <img src="/assets/logo-preta-253.png" alt="" width="160" height="38" />
+    </a>
+  </div>
+</header>
+<main class="form-page">
+  <div class="form-page__bg" aria-hidden="true"></div>
+  <div class="form-page__inner">
+    <div id="form-loading" class="form-state form-state--loading" role="status" aria-live="polite">
+      <span class="form-state__spinner" aria-hidden="true"></span>
+      Carregando formulário…
+    </div>
+
+    <div id="form-error" class="form-state form-state--error" hidden role="alert"></div>
+
+    <article id="form-wrap" class="form-card" hidden>
+      <div class="form-card__bg" aria-hidden="true"></div>
+      <header class="form-card__head">
+        <p class="form-card__crumb">Formulário</p>
+        <h1 id="form-title"></h1>
+        <div id="form-desc" class="form-card__sub" hidden></div>
+      </header>
+
+      <form id="dynamic-form" class="dynamic-form" novalidate></form>
+
+      <div id="form-success" class="form-success" hidden>
+        <div class="form-success__icon" aria-hidden="true">✓</div>
+        <h2 class="form-success__title">Resposta enviada</h2>
+        <p class="form-success__text">Obrigado! Sua resposta foi registrada com sucesso.</p>
+        <a href="/" class="btn btn--yellow">Voltar ao site <span class="arrow" aria-hidden="true"></span></a>
+      </div>
+    </article>
+  </div>
+</main>
+<script src="/form-render.js" defer></script>
+</body>
+</html>

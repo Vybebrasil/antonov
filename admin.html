@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<title>Admin | Antonov Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/pages/admin.css" />
+</head>
+<body>
+<div id="app">
+  <div id="login-view" class="login-view">
+    <div class="login-card">
+      <img src="/assets/logo-211.png" alt="Antonov Center" width="211" height="32" class="login-logo" />
+      <h1>Painel Admin</h1>
+      <p class="login-sub">Acesso restrito</p>
+      <form id="login-form">
+        <label>
+          <span>E-mail</span>
+          <input type="email" name="email" required autocomplete="username" />
+        </label>
+        <label>
+          <span>Senha</span>
+          <input type="password" name="password" required autocomplete="current-password" />
+        </label>
+        <p id="login-error" class="form-error" hidden></p>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="panel-view" class="panel-view" hidden>
+    <header class="panel-header">
+      <div class="panel-brand">
+        <img src="/assets/logo-211.png" alt="" width="211" height="32" />
+        <span>Admin</span>
+      </div>
+      <nav class="panel-tabs" role="tablist">
+        <button type="button" class="tab active" data-tab="dashboard">Dashboard</button>
+        <button type="button" class="tab" data-tab="reports">Relatórios</button>
+        <button type="button" class="tab" data-tab="forms">Formulários</button>
+      </nav>
+      <div class="panel-user">
+        <span id="user-email"></span>
+        <button type="button" id="logout-btn" class="btn btn-ghost">Sair</button>
+      </div>
+    </header>
+
+    <main class="panel-main">
+      <section id="tab-dashboard" class="tab-panel active">
+        <header class="dash-head">
+          <div class="dash-head__main">
+            <p class="dash-kicker">Visão geral</p>
+            <h2>Dashboard</h2>
+            <p class="dash-sub" id="dash-period-label">Leads e respostas dos formulários</p>
+          </div>
+          <div class="dash-period" id="dash-period" role="group" aria-label="Período">
+            <button type="button" class="dash-period__btn" data-days="7">7 dias</button>
+            <button type="button" class="dash-period__btn active" data-days="30">30 dias</button>
+            <button type="button" class="dash-period__btn" data-days="90">90 dias</button>
+          </div>
+        </header>
+
+        <div id="dash-loading" class="dash-loading" hidden>
+          <div class="dash-skeleton stats-grid">
+            <div class="dash-skeleton__block"></div>
+            <div class="dash-skeleton__block"></div>
+            <div class="dash-skeleton__block"></div>
+          </div>
+          <div class="dash-skeleton dash-skeleton__chart"></div>
+        </div>
+
+        <p id="dash-error" class="dash-error" hidden></p>
+
+        <div id="dash-content" class="dash-content" hidden>
+          <div class="stats-grid" id="stats-grid"></div>
+          <div class="dash-row">
+            <article class="card dash-card dash-card--chart">
+              <header class="dash-card__head">
+                <div>
+                  <h3>Leads por dia</h3>
+                  <p class="dash-card__meta" id="chart-period-meta">Últimos 30 dias</p>
+                </div>
+                <span class="dash-card__badge" id="chart-total"></span>
+              </header>
+              <div class="chart-panel" id="chart-panel">
+                <div class="chart-stage">
+                  <div class="chart-y-axis" id="chart-y-axis" aria-hidden="true"></div>
+                  <div class="chart-scroll">
+                    <div id="chart-bars" class="chart-bars" aria-label="Leads por dia"></div>
+                  </div>
+                  <div class="chart-tooltip" id="chart-tooltip" role="status" hidden></div>
+                </div>
+                <div class="chart-summary" id="chart-summary"></div>
+              </div>
+            </article>
+            <article class="card dash-card dash-card--rank">
+              <header class="dash-card__head">
+                <div>
+                  <h3>Top formulários</h3>
+                  <p class="dash-card__meta">Por volume no período</p>
+                </div>
+              </header>
+              <ul id="top-forms" class="top-list"></ul>
+            </article>
+          </div>
+          <article class="card dash-card dash-card--recent">
+            <header class="dash-card__head">
+              <div>
+                <h3>Respostas recentes</h3>
+                <p class="dash-card__meta">Últimas entradas no período</p>
+              </div>
+              <button type="button" id="dash-view-reports" class="btn btn-secondary btn-sm">Ver relatórios</button>
+            </header>
+            <ul id="recent-list" class="recent-list"></ul>
+          </article>
+          <article class="card dash-card dash-card--ga ga-block">
+            <header class="dash-card__head">
+              <div>
+                <h3>Google Analytics</h3>
+                <p id="ga-period-meta" class="dash-card__meta">Tráfego e conversões no site</p>
+              </div>
+              <a id="ga-link" href="https://analytics.google.com/" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Abrir GA4</a>
+            </header>
+            <div id="ga-panel"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="tab-reports" class="tab-panel">
+        <h2>Relatórios</h2>
+        <div class="filters card">
+          <label>
+            <span>Formulário</span>
+            <select id="report-form"></select>
+          </label>
+          <label>
+            <span>De</span>
+            <input type="date" id="report-from" />
+          </label>
+          <label>
+            <span>Até</span>
+            <input type="date" id="report-to" />
+          </label>
+          <label>
+            <span>Busca (nome/e-mail)</span>
+            <input type="search" id="report-search" placeholder="Opcional" />
+          </label>
+          <button type="button" id="report-filter-btn" class="btn btn-primary">Filtrar</button>
+          <div class="export-btns">
+            <button type="button" id="export-xlsx" class="btn btn-secondary">Exportar XLSX</button>
+            <button type="button" id="export-pdf" class="btn btn-secondary">Exportar PDF</button>
+          </div>
+        </div>
+        <div class="card table-wrap">
+          <table class="data-table" id="report-table">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+          <div class="pagination" id="report-pagination"></div>
+        </div>
+      </section>
+
+      <section id="tab-forms" class="tab-panel">
+        <div class="forms-header">
+          <h2>Formulários</h2>
+          <button type="button" id="new-form-btn" class="btn btn-primary">+ Novo formulário</button>
+        </div>
+        <div id="forms-list" class="forms-list"></div>
+        <div id="form-editor" class="form-editor card" hidden>
+          <div class="editor-header">
+            <h3 id="editor-title">Editor</h3>
+            <div class="editor-actions">
+              <button type="button" id="preview-form-btn" class="btn btn-secondary">Visualizar</button>
+              <button type="button" id="editor-close" class="btn btn-ghost">Fechar</button>
+            </div>
+          </div>
+          <form id="form-meta-form" class="form-meta-form">
+            <div class="field-row">
+              <label><span>Nome do formulário</span><input name="name" required /></label>
+              <label><span>Descrição</span><textarea name="description" rows="2" placeholder="Opcional"></textarea></label>
+            </div>
+            <p class="form-meta-info">
+              <strong>Slug:</strong> <span id="editor-slug"></span>
+              · <strong>Link público:</strong> <a id="editor-public-link" href="#" target="_blank" rel="noopener"></a>
+            </p>
+            <p id="form-meta-error" class="form-error" hidden></p>
+            <p id="form-meta-notice" class="field-save-notice" hidden></p>
+            <button type="submit" class="btn btn-sm btn-secondary">Salvar informações</button>
+          </form>
+          <div id="fields-list" class="fields-list"></div>
+          <p id="field-save-notice" class="field-save-notice" hidden></p>
+          <form id="add-field-form" class="add-field-form">
+            <h4 id="add-field-title">Adicionar campo</h4>
+            <input type="hidden" name="field_id" value="" />
+            <div class="field-row">
+              <label><span>Rótulo</span><input name="label" required /></label>
+              <label><span>Chave</span><input name="field_key" pattern="[a-z0-9_]+" placeholder="auto" /></label>
+              <label><span>Tipo</span>
+                <select name="field_type">
+                  <option value="text">Texto</option>
+                  <option value="email">E-mail</option>
+                  <option value="tel">Telefone</option>
+                  <option value="date">Data</option>
+                  <option value="number">Número</option>
+                  <option value="textarea">Área de texto</option>
+                  <option value="select">Seleção</option>
+                  <option value="checkbox">Checkbox</option>
+                </select>
+              </label>
+              <label class="check-label"><input type="checkbox" name="required" /> Obrigatório</label>
+            </div>
+            <label><span>Descrição (texto de ajuda abaixo do rótulo)</span><textarea name="description" rows="2" placeholder="Opcional"></textarea></label>
+            <label id="placeholder-wrap"><span>Placeholder (sugestão dentro do campo)</span><input name="placeholder" placeholder="Opcional" /></label>
+            <label id="options-wrap" hidden>
+              <span>Opções (uma por linha — no checkbox, múltipla escolha)</span>
+              <textarea name="options" rows="3"></textarea>
+            </label>
+            <fieldset class="conditional-fieldset">
+              <legend>Exibir somente quando (condicional)</legend>
+              <div class="field-row">
+                <label><span>Campo</span>
+                  <select name="cond_field">
+                    <option value="">Sempre visível</option>
+                  </select>
+                </label>
+                <label id="cond-op-wrap" hidden><span>Condição</span>
+                  <select name="cond_operator">
+                    <option value="equals">É igual a</option>
+                    <option value="not_equals">É diferente de</option>
+                    <option value="contains">Contém</option>
+                    <option value="checked">Está marcado</option>
+                    <option value="not_checked">Não está marcado</option>
+                  </select>
+                </label>
+                <label id="cond-val-wrap" hidden><span>Valor</span><input name="cond_value" placeholder="Ex.: Sim" /></label>
+              </div>
+            </fieldset>
+            <div class="add-field-actions">
+              <button type="button" id="cancel-field-edit" class="btn btn-ghost" hidden>Cancelar edição</button>
+              <button type="submit" id="add-field-submit" class="btn btn-secondary">Adicionar campo</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="form-preview" class="form-preview" hidden>
+  <div class="form-preview-backdrop"></div>
+  <div class="form-preview-panel card">
+    <header class="form-preview-header">
+      <div>
+        <h3 id="preview-title">Visualizar formulário</h3>
+        <p class="preview-hint">Arraste pelo ícone ⋮⋮ para reordenar · escolha o tamanho de cada campo</p>
+      </div>
+      <div class="form-preview-actions">
+        <a id="preview-open-public" href="#" target="_blank" rel="noopener" class="btn btn-ghost">Abrir público</a>
+        <button type="button" id="preview-save" class="btn btn-primary">Salvar layout</button>
+        <button type="button" id="preview-close" class="btn btn-ghost">Fechar</button>
+      </div>
+    </header>
+    <div id="preview-canvas" class="preview-canvas"></div>
+  </div>
+</div>
+
+<div id="modal" class="modal" hidden>
+  <div class="modal-backdrop"></div>
+  <div class="modal-box card">
+    <h3 id="modal-title">Novo formulário</h3>
+    <form id="modal-form">
+      <label><span>Nome</span><input name="name" required /></label>
+      <label><span>Slug</span><input name="slug" pattern="[a-z0-9-]+" placeholder="gerado automaticamente" /></label>
+      <label><span>Descrição</span><textarea name="description" rows="2"></textarea></label>
+      <p id="modal-error" class="form-error" hidden></p>
+      <div class="modal-actions">
+        <button type="button" id="modal-cancel" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/admin.js" defer></script>
+</body>
+</html>

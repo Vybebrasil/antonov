@@ -7,6 +7,7 @@
     "images:optimize": "node scripts/optimize-images.mjs",
     "extract:page-css": "node scripts/extract-page-styles.mjs",
     "db:init": "node scripts/init-db.mjs",
+    "admin:create": "node scripts/create-admin.mjs",
     "seo:patch": "node scripts/patch-seo-head.mjs && node scripts/patch-internal-links.mjs && node scripts/patch-image-perf.mjs && node scripts/generate-sitemap.mjs",
     "seo:sitemap": "node scripts/generate-sitemap.mjs",
     "seo:llms": "node scripts/generate-llms-txt.mjs",
@@ -20,6 +21,10 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
-    "resend": "^6.12.4"
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.3",
+    "pdfkit": "^0.19.0",
+    "resend": "^6.12.4",
+    "xlsx": "^0.18.5"
   }
 }

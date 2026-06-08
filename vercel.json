@@ -3,6 +3,12 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/form/:slug",
+      "destination": "/form.html?slug=:slug"
+    }
+  ],
   "redirects": [
     {
       "source": "/favicon.ico",

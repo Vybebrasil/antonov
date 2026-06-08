@@ -9,6 +9,7 @@ import {
   mkdirSync,
   cpSync,
   rmSync,
+  statSync,
 } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -29,6 +30,8 @@ const JS_FILES = [
   'app.js',
   'contato-form.js',
   'trabalhe-conosco-form.js',
+  'admin.js',
+  'form-render.js',
 ];
 
 const COPY_FILES = [
@@ -58,10 +61,27 @@ function minifyCssToDist(srcPath, distPath) {
   writeFileSync(distPath, styles, 'utf8');
 }
 
+function cpDirResilient(src, dest) {
+  mkdirSync(dest, { recursive: true });
+  for (const name of readdirSync(src)) {
+    const from = join(src, name);
+    const to = join(dest, name);
+    try {
+      if (statSync(from).isDirectory()) {
+        cpDirResilient(from, to);
+      } else {
+        cpSync(from, to);
+      }
+    } catch (err) {
+      console.warn('skip', from, err.message);
+    }
+  }
+}
+
 function prepareDist() {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(dist, { recursive: true });
-  cpSync(join(root, 'assets'), join(dist, 'assets'), { recursive: true });
+  cpDirResilient(join(root, 'assets'), join(dist, 'assets'));
   cpSync(join(root, 'assets', 'favicon.ico'), join(dist, 'favicon.ico'));
   for (const f of COPY_FILES) {
     try {
@@ -78,18 +98,26 @@ function processHtml(name) {
   for (const file of JS_FILES) {
     const base = file.replace(/\.js$/, '');
     html = html
-      .split(`src="${file}"`).join(`src="${base}.min.js"`)
-      .split(`src='${file}'`).join(`src='${base}.min.js'`);
+      .split(`src="${file}"`).join(`src="/${base}.min.js"`)
+      .split(`src='${file}'`).join(`src='/${base}.min.js'`)
+      .split(`src="/${file}"`).join(`src="/${base}.min.js"`)
+      .split(`src='/${file}'`).join(`src='/${base}.min.js'`);
   }
 
-  html = html.split('href="styles.css"').join('href="styles.min.css"');
-  html = html.split("href='styles.css'").join("href='styles.min.css'");
-  html = html.split("load('styles.css')").join("load('styles.min.css')");
-  html = html.split('load("styles.css")').join('load("styles.min.css")');
+  html = html.split('href="styles.css"').join('href="/styles.min.css"');
+  html = html.split("href='styles.css'").join("href='/styles.min.css'");
+  html = html.split('href="/styles.css"').join('href="/styles.min.css"');
+  html = html.split("href='/styles.css'").join("href='/styles.min.css'");
+  html = html.split("load('styles.css')").join("load('/styles.min.css')");
+  html = html.split('load("styles.css")').join('load("/styles.min.css")');
 
   html = html.replace(
-    /href="css\/pages\/([^"]+)\.css"/g,
-    (_, slug) => `href="css/pages/${slug}.min.css"`
+    /href="(?:\/)?css\/pages\/([^"]+)\.css"/g,
+    (_, slug) => `href="/css/pages/${slug}.min.css"`
+  );
+  html = html.replace(
+    /href='(?:\/)?css\/pages\/([^']+)\.css'/g,
+    (_, slug) => `href='/css/pages/${slug}.min.css'`
   );
   if (name === 'index.html') {
     html = html.replace(

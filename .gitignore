@@ -1,8 +1,11 @@
 .vercel
 dist/
+dist_bak*/
+dist_old*/
 node_modules/
 .DS_Store
 Thumbs.db
 *.log
 .env
 .env.*
+.env*
