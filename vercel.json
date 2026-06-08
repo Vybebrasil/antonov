@@ -10,7 +10,7 @@
     },
     {
       "source": "/form/:slug",
-      "destination": "/form.html?slug=:slug"
+      "destination": "/form?slug=:slug"
     },
     {
       "source": "/api/forms/:slug/submit",
