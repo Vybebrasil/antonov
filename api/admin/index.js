@@ -1,8 +1,11 @@
 function segments(req) {
   const raw = req.query?.path;
-  if (raw) {
-    return Array.isArray(raw) ? raw : [raw];
+  if (typeof raw === 'string') {
+    return raw.split('/').filter(Boolean);
   }
+  if (Array.isArray(raw)) return raw.filter(Boolean);
+  if (raw) return [String(raw)];
+
   const pathname = String(req.url || '').split('?')[0];
   const prefix = '/api/admin/';
   if (pathname.startsWith(prefix)) {
@@ -12,7 +15,8 @@ function segments(req) {
 }
 
 function withId(req, id) {
-  req.query = { ...req.query, id: String(id) };
+  if (!req.query) req.query = {};
+  req.query.id = String(id);
 }
 
 export default async function handler(req, res) {

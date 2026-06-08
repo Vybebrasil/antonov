@@ -5,6 +5,10 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/api/admin/:path*",
+      "destination": "/api/admin/index?path=:path*"
+    },
+    {
       "source": "/form/:slug",
       "destination": "/form.html?slug=:slug"
     },
