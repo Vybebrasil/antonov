@@ -1,7 +1,14 @@
 function segments(req) {
   const raw = req.query?.path;
-  if (!raw) return [];
-  return Array.isArray(raw) ? raw : [raw];
+  if (raw) {
+    return Array.isArray(raw) ? raw : [raw];
+  }
+  const pathname = String(req.url || '').split('?')[0];
+  const prefix = '/api/admin/';
+  if (pathname.startsWith(prefix)) {
+    return pathname.slice(prefix.length).split('/').filter(Boolean);
+  }
+  return [];
 }
 
 function withId(req, id) {
