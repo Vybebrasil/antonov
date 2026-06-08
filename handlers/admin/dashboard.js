@@ -1,12 +1,12 @@
-import { json, adminCors } from '../lib/admin-http.js';
-import { requireAdmin } from '../lib/admin-auth.js';
+import { json, adminCors } from '../../api/lib/admin-http.js';
+import { requireAdmin } from '../../api/lib/admin-auth.js';
 import {
   countAllInRange,
   getSubmissionStats,
   getDailyCountsBetween,
   getRecentSubmissions,
-} from '../lib/forms.js';
-import { fetchGa4Metrics } from '../lib/ga4.js';
+} from '../../api/lib/forms.js';
+import { fetchGa4Metrics } from '../../api/lib/ga4.js';
 
 const PERIOD_DAYS = [7, 30, 90];
 

@@ -1,7 +1,7 @@
-import { json, adminCors } from '../../../lib/admin-http.js';
-import { requireAdmin } from '../../../lib/admin-auth.js';
-import { getFormById, getFormFields } from '../../../lib/forms.js';
-import { getAllSubmissionsForExport, toXlsxBuffer, toPdfBuffer } from '../../../lib/export.js';
+import { json, adminCors } from '../../api/lib/admin-http.js';
+import { requireAdmin } from '../../api/lib/admin-auth.js';
+import { getFormById, getFormFields } from '../../api/lib/forms.js';
+import { getAllSubmissionsForExport, toXlsxBuffer, toPdfBuffer } from '../../api/lib/export.js';
 
 function defaultRange() {
   const to = new Date();

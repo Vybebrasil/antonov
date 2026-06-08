@@ -1,5 +1,5 @@
-import { json } from '../../lib/admin-http.js';
-import { getFormBySlug, getFormFields } from '../../lib/forms.js';
+import { json } from '../../api/lib/admin-http.js';
+import { getFormBySlug, getFormFields } from '../../api/lib/forms.js';
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {

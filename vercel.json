@@ -7,6 +7,10 @@
     {
       "source": "/form/:slug",
       "destination": "/form.html?slug=:slug"
+    },
+    {
+      "source": "/api/forms/:slug/submit",
+      "destination": "/api/forms/:slug"
     }
   ],
   "redirects": [

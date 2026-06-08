@@ -1,7 +1,7 @@
-import { json, adminCors, parseBody } from '../../lib/admin-http.js';
-import { requireAdmin } from '../../lib/admin-auth.js';
-import { getFormById, getFormFields, normalizeOptionalText } from '../../lib/forms.js';
-import { getSql } from '../../lib/db.js';
+import { json, adminCors, parseBody } from '../../api/lib/admin-http.js';
+import { requireAdmin } from '../../api/lib/admin-auth.js';
+import { getFormById, getFormFields, normalizeOptionalText } from '../../api/lib/forms.js';
+import { getSql } from '../../api/lib/db.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);

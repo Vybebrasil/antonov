@@ -1,5 +1,5 @@
-import { json, adminCors } from '../../../lib/admin-http.js';
-import { requireAdmin } from '../../../lib/admin-auth.js';
+import { json, adminCors } from '../../api/lib/admin-http.js';
+import { requireAdmin } from '../../api/lib/admin-auth.js';
 import {
   getFormById,
   getFormFields,
@@ -10,7 +10,7 @@ import {
   normalizeLegacyRow,
   normalizeSubmissionPayload,
   LEGACY_TABLES,
-} from '../../../lib/forms.js';
+} from '../../api/lib/forms.js';
 
 function defaultRange() {
   const to = new Date();

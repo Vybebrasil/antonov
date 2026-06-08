@@ -289,7 +289,7 @@ async function init() {
       body.page = window.location.pathname;
 
       try {
-        const r = await fetch(`/api/forms/${slug}/submit`, {
+        const r = await fetch(`/api/forms/${slug}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),

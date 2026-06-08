@@ -1,7 +1,7 @@
 import crypto from 'crypto';
-import { json, parseBody } from '../../lib/admin-http.js';
-import { getFormBySlug, getFormFields, validateDynamicPayload } from '../../lib/forms.js';
-import { getSql } from '../../lib/db.js';
+import { json, parseBody } from '../../api/lib/admin-http.js';
+import { getFormBySlug, getFormFields, validateDynamicPayload } from '../../api/lib/forms.js';
+import { getSql } from '../../api/lib/db.js';
 
 function hashIp(ip) {
   const salt = process.env.RATE_LIMIT_SALT || 'antonov';

@@ -1,5 +1,5 @@
-import { json, adminCors, parseBody } from '../lib/admin-http.js';
-import { loginUser, signToken, setAuthCookie } from '../lib/admin-auth.js';
+import { json, adminCors, parseBody } from '../../api/lib/admin-http.js';
+import { loginUser, signToken, setAuthCookie } from '../../api/lib/admin-auth.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);
