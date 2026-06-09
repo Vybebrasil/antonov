@@ -48,7 +48,10 @@ export default async function handler(req, res) {
     const date = new Date().toISOString().slice(0, 10);
 
     if (format === 'pdf') {
-      const buf = await toPdfBuffer(`${form.name} — Respostas`, exportRows, columns, labels);
+      const buf = await toPdfBuffer(`${form.name} — Respostas`, exportRows, columns, labels, {
+        from,
+        to,
+      });
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${safeName}-${date}.pdf"`);
