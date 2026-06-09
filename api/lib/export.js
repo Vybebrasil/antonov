@@ -46,15 +46,67 @@ export function toXlsxBuffer(rows, sheetName = 'Respostas') {
   return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }
 
-function fieldEntries(row, columns, labels) {
-  const entries = columns.map((col) => ({
-    label: labels[col] || col,
-    value: String(row[labels[col] || col] ?? '').trim(),
-  }));
-  if (row.Página) {
-    entries.push({ label: 'Página', value: String(row.Página) });
+function buildPdfHeaders(columns, labels, rows) {
+  const headers = ['ID', 'Data', ...columns.map((c) => labels[c] || c)];
+  if (rows.some((r) => r.Página != null && r.Página !== '')) {
+    headers.push('Página');
   }
-  return entries;
+  return headers;
+}
+
+function pdfRowCells(row, columns, labels, headers) {
+  const cells = [
+    String(row.ID ?? ''),
+    String(row.Data ?? ''),
+    ...columns.map((c) => String(row[labels[c] || c] ?? '').trim()),
+  ];
+  if (headers.includes('Página')) {
+    cells.push(String(row.Página ?? '').trim());
+  }
+  return cells.map((v) => v || '—');
+}
+
+function computeColumnWidths(doc, headers, rows, columns, labels, contentWidth) {
+  const cellPad = 5;
+  const sample = rows.slice(0, 25);
+  const weights = headers.map((header, index) => {
+    if (header === 'ID') return 0.55;
+    if (header === 'Data') return 1.15;
+    if (header === 'Página') return 0.9;
+
+    let maxChars = header.length;
+    for (const row of sample) {
+      const cells = pdfRowCells(row, columns, labels, headers);
+      maxChars = Math.max(maxChars, Math.min(String(cells[index] ?? '').length, 80));
+    }
+    return Math.min(2.8, Math.max(1, maxChars / 14));
+  });
+
+  const minWidth = 42;
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+  let widths = weights.map((w) => Math.max(minWidth, (w / totalWeight) * contentWidth));
+
+  const sum = widths.reduce((a, b) => a + b, 0);
+  if (sum > contentWidth) {
+    const scale = contentWidth / sum;
+    widths = widths.map((w) => w * scale);
+  } else if (sum < contentWidth) {
+    const extra = (contentWidth - sum) / widths.length;
+    widths = widths.map((w) => w + extra);
+  }
+
+  return { widths, cellPad };
+}
+
+function measureRowHeight(doc, cells, widths, cellPad, font, fontSize) {
+  doc.font(font).fontSize(fontSize);
+  const heights = cells.map((cell, i) =>
+    doc.heightOfString(String(cell ?? ''), {
+      width: Math.max(12, widths[i] - cellPad * 2),
+      lineGap: 1,
+    }),
+  );
+  return Math.max(16, ...heights.map((h) => h + cellPad * 2));
 }
 
 export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
@@ -62,7 +114,7 @@ export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
     const doc = new PDFDocument({
       margin: PDF_MARGIN,
       size: 'A4',
-      layout: 'portrait',
+      layout: 'landscape',
       bufferPages: true,
     });
     const chunks = [];
@@ -70,109 +122,90 @@ export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
     doc.on('end', () => resolve(Buffer.concat(chunks)));
     doc.on('error', reject);
 
+    const tableLeft = PDF_MARGIN;
     const contentWidth = doc.page.width - PDF_MARGIN * 2;
-    const innerX = PDF_MARGIN + 12;
-    const innerWidth = contentWidth - 12;
-    const footerY = doc.page.height - PDF_MARGIN + 8;
+    const footerY = doc.page.height - PDF_MARGIN + 10;
+    const bottomLimit = () => doc.page.height - PDF_MARGIN - 22;
 
-    function drawDocumentHeader() {
-      doc.font('Helvetica-Bold').fontSize(15).fillColor('#111111')
-        .text(title, PDF_MARGIN, PDF_MARGIN, { width: contentWidth, lineBreak: true });
+    const headers = buildPdfHeaders(columns, labels, rows);
+    const { widths, cellPad } = computeColumnWidths(doc, headers, rows, columns, labels, contentWidth);
+
+    function drawTitleBlock() {
+      doc.font('Helvetica-Bold').fontSize(14).fillColor('#111111')
+        .text(title, tableLeft, PDF_MARGIN, { width: contentWidth, lineBreak: true });
 
       const period = formatPeriodLabel(meta.from, meta.to);
-      doc.font('Helvetica').fontSize(9).fillColor('#555555');
-      if (period) {
-        doc.text(period, { width: contentWidth, lineBreak: true });
-      }
+      doc.font('Helvetica').fontSize(8.5).fillColor('#555555');
+      if (period) doc.text(period, { width: contentWidth, lineBreak: true });
       doc.text(`Gerado em ${formatDate(new Date())} · ${rows.length} registro(s)`, {
         width: contentWidth,
         lineBreak: true,
       });
-      doc.moveDown(0.6);
-      doc.strokeColor('#dddddd').lineWidth(1)
-        .moveTo(PDF_MARGIN, doc.y)
-        .lineTo(doc.page.width - PDF_MARGIN, doc.y)
-        .stroke();
-      doc.moveDown(0.8);
+      doc.moveDown(0.5);
+      return doc.y + 4;
     }
 
-    function bottomLimit() {
-      return doc.page.height - PDF_MARGIN - 28;
-    }
+    function drawTableHeader(y) {
+      const rowHeight = measureRowHeight(doc, headers, widths, cellPad, 'Helvetica-Bold', 8);
+      let x = tableLeft;
 
-    function ensureSpace(minHeight) {
-      if (doc.y + minHeight > bottomLimit()) {
-        doc.addPage();
-        drawDocumentHeader();
-      }
-    }
-
-    function drawField(label, value) {
-      const safeValue = value || '—';
-      const labelHeight = doc.heightOfString(label.toUpperCase(), {
-        width: innerWidth,
-        lineGap: 1,
-      });
-      const valueHeight = doc.heightOfString(safeValue, {
-        width: innerWidth,
-        lineGap: 2,
-      });
-      ensureSpace(labelHeight + valueHeight + 14);
-
-      doc.font('Helvetica-Bold').fontSize(8).fillColor('#777777')
-        .text(label.toUpperCase(), innerX, doc.y, { width: innerWidth, lineGap: 1 });
-      doc.font('Helvetica').fontSize(10).fillColor('#111111')
-        .text(safeValue, innerX, doc.y, { width: innerWidth, lineGap: 2 });
-      doc.moveDown(0.35);
-    }
-
-    function drawRecord(row) {
-      const entries = fieldEntries(row, columns, labels);
-
-      const previewHeight = entries.reduce((sum, entry) => {
-        doc.font('Helvetica-Bold').fontSize(8);
-        const lh = doc.heightOfString(entry.label.toUpperCase(), { width: innerWidth });
-        doc.font('Helvetica').fontSize(10);
-        const vh = doc.heightOfString(entry.value || '—', { width: innerWidth, lineGap: 2 });
-        return sum + lh + vh + 14;
-      }, 48);
-
-      ensureSpace(Math.min(previewHeight, bottomLimit() - doc.y));
-
-      const blockTop = doc.y;
       doc.save();
-      doc.rect(PDF_MARGIN, blockTop, 3, 24).fill('#fab10f');
+      for (let i = 0; i < headers.length; i++) {
+        doc.rect(x, y, widths[i], rowHeight).fill('#ececec');
+        x += widths[i];
+      }
       doc.restore();
 
-      doc.y = blockTop;
-      doc.font('Helvetica-Bold').fontSize(10.5).fillColor('#111111')
-        .text(`Registro #${row.ID}`, innerX, doc.y, { width: innerWidth, lineBreak: true });
-      doc.font('Helvetica').fontSize(9).fillColor('#666666')
-        .text(String(row.Data || ''), innerX, doc.y, { width: innerWidth, lineBreak: true });
-      doc.moveDown(0.35);
-      doc.strokeColor('#eeeeee').lineWidth(1)
-        .moveTo(PDF_MARGIN + 12, doc.y)
-        .lineTo(doc.page.width - PDF_MARGIN, doc.y)
-        .stroke();
-      doc.moveDown(0.45);
-
-      for (const entry of entries) {
-        drawField(entry.label, entry.value);
+      x = tableLeft;
+      for (let i = 0; i < headers.length; i++) {
+        doc.font('Helvetica-Bold').fontSize(8).fillColor('#222222')
+          .text(String(headers[i]), x + cellPad, y + cellPad, {
+            width: widths[i] - cellPad * 2,
+            lineGap: 1,
+          });
+        x += widths[i];
       }
 
-      doc.moveDown(0.15);
-      doc.strokeColor('#dddddd').lineWidth(1)
-        .moveTo(PDF_MARGIN, doc.y)
-        .lineTo(doc.page.width - PDF_MARGIN, doc.y)
+      doc.strokeColor('#bbbbbb').lineWidth(0.75)
+        .moveTo(tableLeft, y + rowHeight)
+        .lineTo(tableLeft + contentWidth, y + rowHeight)
         .stroke();
-      doc.moveDown(0.85);
+
+      return y + rowHeight;
     }
 
-    drawDocumentHeader();
+    function drawTableRow(cells, y, stripe) {
+      const rowHeight = measureRowHeight(doc, cells, widths, cellPad, 'Helvetica', 7.5);
+      let x = tableLeft;
+
+      if (stripe) {
+        doc.save();
+        doc.rect(tableLeft, y, contentWidth, rowHeight).fill('#f8f8f8');
+        doc.restore();
+      }
+
+      for (let i = 0; i < cells.length; i++) {
+        doc.font('Helvetica').fontSize(7.5).fillColor('#111111')
+          .text(String(cells[i] ?? ''), x + cellPad, y + cellPad, {
+            width: widths[i] - cellPad * 2,
+            lineGap: 1,
+          });
+        x += widths[i];
+      }
+
+      doc.strokeColor('#dddddd').lineWidth(0.5)
+        .moveTo(tableLeft, y + rowHeight)
+        .lineTo(tableLeft + contentWidth, y + rowHeight)
+        .stroke();
+
+      return y + rowHeight;
+    }
+
+    let y = drawTitleBlock();
 
     if (!rows.length) {
-      doc.font('Helvetica').fontSize(11).fillColor('#444444')
-        .text('Nenhum registro no período selecionado.', PDF_MARGIN, doc.y, {
+      doc.font('Helvetica').fontSize(10).fillColor('#444444')
+        .text('Nenhum registro no período selecionado.', tableLeft, y, {
           width: contentWidth,
           lineBreak: true,
         });
@@ -180,17 +213,33 @@ export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
       return;
     }
 
+    const headerHeight = measureRowHeight(doc, headers, widths, cellPad, 'Helvetica-Bold', 8);
+    if (y + headerHeight > bottomLimit()) {
+      doc.addPage();
+      y = drawTitleBlock();
+    }
+    y = drawTableHeader(y);
+
     const slice = rows.slice(0, PDF_MAX_ROWS);
-    for (const row of slice) {
-      drawRecord(row);
+    for (let i = 0; i < slice.length; i++) {
+      const cells = pdfRowCells(slice[i], columns, labels, headers);
+      const rowHeight = measureRowHeight(doc, cells, widths, cellPad, 'Helvetica', 7.5);
+
+      if (y + rowHeight > bottomLimit()) {
+        doc.addPage();
+        y = drawTitleBlock();
+        y = drawTableHeader(y);
+      }
+
+      y = drawTableRow(cells, y, i % 2 === 1);
     }
 
     if (rows.length > PDF_MAX_ROWS) {
-      ensureSpace(24);
-      doc.font('Helvetica-Oblique').fontSize(9).fillColor('#666666')
+      doc.moveDown(0.5);
+      doc.font('Helvetica-Oblique').fontSize(8).fillColor('#666666')
         .text(
           `… e mais ${rows.length - PDF_MAX_ROWS} registros. Use a exportação XLSX para o arquivo completo.`,
-          PDF_MARGIN,
+          tableLeft,
           doc.y,
           { width: contentWidth, lineBreak: true },
         );
@@ -202,7 +251,7 @@ export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
       doc.font('Helvetica').fontSize(8).fillColor('#999999')
         .text(
           `Página ${i - range.start + 1} de ${range.count}`,
-          PDF_MARGIN,
+          tableLeft,
           footerY,
           { width: contentWidth, align: 'center', lineBreak: false },
         );
