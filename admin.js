@@ -179,17 +179,7 @@ function initAdmin() {
 
   bind('#dash-view-reports', 'click', () => switchTab('reports'));
 
-  bind('#report-filter-btn', 'click', () => {
-    loadReport(1);
-    closeReportFilters();
-  });
-  bind('#report-filters-toggle', 'click', () => {
-    const filters = $('#report-filters');
-    const toggle = $('#report-filters-toggle');
-    if (!filters || !toggle) return;
-    const open = filters.classList.toggle('is-open');
-    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
+  bind('#report-filter-btn', 'click', () => loadReport(1));
   bind('#export-xlsx', 'click', () => exportReport('xlsx'));
   bind('#export-pdf', 'click', () => exportReport('pdf'));
   bind('#editor-close', 'click', () => {
@@ -1015,14 +1005,6 @@ function readOptionsFromForm(form, fieldType) {
   if (!raw) return null;
   const list = String(raw).split('\n').map((s) => s.trim()).filter(Boolean);
   return list.length ? list : null;
-}
-
-function closeReportFilters() {
-  const filters = $('#report-filters');
-  const toggle = $('#report-filters-toggle');
-  if (!filters || !toggle) return;
-  filters.classList.remove('is-open');
-  toggle.setAttribute('aria-expanded', 'false');
 }
 
 function renderReportCards(data) {
