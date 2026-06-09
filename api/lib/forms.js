@@ -74,7 +74,7 @@ function mapFormFieldRow(field) {
 
 export const LEGACY_TABLES = {
   leads_tour: {
-    columns: ['nome', 'email', 'telefone', 'interesse', 'melhor_dia', 'melhor_turno', 'mensagem', 'page'],
+    columns: ['nome', 'email', 'telefone', 'interesse', 'melhor_dia', 'melhor_turno', 'mensagem'],
     labels: {
       nome: 'Nome',
       email: 'E-mail',
@@ -83,11 +83,10 @@ export const LEGACY_TABLES = {
       melhor_dia: 'Melhor dia',
       melhor_turno: 'Melhor turno',
       mensagem: 'Mensagem',
-      page: 'Página',
     },
   },
   leads_curriculos: {
-    columns: ['nome', 'email', 'telefone', 'area', 'disponibilidade', 'mensagem', 'page'],
+    columns: ['nome', 'email', 'telefone', 'area', 'disponibilidade', 'mensagem'],
     labels: {
       nome: 'Nome',
       email: 'E-mail',
@@ -95,18 +94,16 @@ export const LEGACY_TABLES = {
       area: 'Área',
       disponibilidade: 'Disponibilidade',
       mensagem: 'Mensagem',
-      page: 'Página',
     },
   },
   leads_pre_matricula: {
-    columns: ['nome', 'email', 'telefone', 'interesse', 'mensagem', 'page'],
+    columns: ['nome', 'email', 'telefone', 'interesse', 'mensagem'],
     labels: {
       nome: 'Nome',
       email: 'E-mail',
       telefone: 'Telefone',
       interesse: 'Interesse',
       mensagem: 'Mensagem',
-      page: 'Página',
     },
   },
 };

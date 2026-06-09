@@ -5,8 +5,8 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/api/admin/:path*",
-      "destination": "/api/admin/index?path=:path*"
+      "source": "/api/admin/(.*)",
+      "destination": "/api/admin/index?path=$1"
     },
     {
       "source": "/form/:slug",
@@ -34,9 +34,9 @@
       "permanent": false
     },
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "antonovcenter.com.br" }],
-      "destination": "https://www.antonovcenter.com.br/:path*",
+      "destination": "https://www.antonovcenter.com.br/$1",
       "permanent": true
     }
   ],

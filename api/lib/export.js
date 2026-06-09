@@ -19,7 +19,6 @@ export function buildExportRows(submissions, columns, labels) {
     for (const col of columns) {
       row[labels[col] || col] = formatSubmissionValue(s.payload[col]);
     }
-    if (s.page) row.Página = s.page;
     return row;
   });
 }
@@ -46,24 +45,16 @@ export function toXlsxBuffer(rows, sheetName = 'Respostas') {
   return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }
 
-function buildPdfHeaders(columns, labels, rows) {
-  const headers = ['ID', 'Data', ...columns.map((c) => labels[c] || c)];
-  if (rows.some((r) => r.Página != null && r.Página !== '')) {
-    headers.push('Página');
-  }
-  return headers;
+function buildPdfHeaders(columns, labels) {
+  return ['ID', 'Data', ...columns.map((c) => labels[c] || c)];
 }
 
-function pdfRowCells(row, columns, labels, headers) {
-  const cells = [
+function pdfRowCells(row, columns, labels) {
+  return [
     String(row.ID ?? ''),
     String(row.Data ?? ''),
     ...columns.map((c) => String(row[labels[c] || c] ?? '').trim()),
-  ];
-  if (headers.includes('Página')) {
-    cells.push(String(row.Página ?? '').trim());
-  }
-  return cells.map((v) => v || '—');
+  ].map((v) => v || '—');
 }
 
 function computeColumnWidths(doc, headers, rows, columns, labels, contentWidth) {
@@ -72,11 +63,10 @@ function computeColumnWidths(doc, headers, rows, columns, labels, contentWidth) 
   const weights = headers.map((header, index) => {
     if (header === 'ID') return 0.55;
     if (header === 'Data') return 1.15;
-    if (header === 'Página') return 0.9;
 
     let maxChars = header.length;
     for (const row of sample) {
-      const cells = pdfRowCells(row, columns, labels, headers);
+      const cells = pdfRowCells(row, columns, labels);
       maxChars = Math.max(maxChars, Math.min(String(cells[index] ?? '').length, 80));
     }
     return Math.min(2.8, Math.max(1, maxChars / 14));
@@ -127,7 +117,7 @@ export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
     const footerY = doc.page.height - PDF_MARGIN + 10;
     const bottomLimit = () => doc.page.height - PDF_MARGIN - 22;
 
-    const headers = buildPdfHeaders(columns, labels, rows);
+    const headers = buildPdfHeaders(columns, labels);
     const { widths, cellPad } = computeColumnWidths(doc, headers, rows, columns, labels, contentWidth);
 
     function drawTitleBlock() {
@@ -222,7 +212,7 @@ export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
 
     const slice = rows.slice(0, PDF_MAX_ROWS);
     for (let i = 0; i < slice.length; i++) {
-      const cells = pdfRowCells(slice[i], columns, labels, headers);
+      const cells = pdfRowCells(slice[i], columns, labels);
       const rowHeight = measureRowHeight(doc, cells, widths, cellPad, 'Helvetica', 7.5);
 
       if (y + rowHeight > bottomLimit()) {
