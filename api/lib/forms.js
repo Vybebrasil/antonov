@@ -69,6 +69,7 @@ function mapFormFieldRow(field) {
     ...field,
     description: normalizeOptionalText(field.description),
     placeholder: normalizeOptionalText(field.placeholder),
+    default_value: normalizeOptionalText(field.default_value),
   };
 }
 
@@ -208,78 +209,59 @@ export async function countLegacySubmissions(table, from, to, search) {
   return 0;
 }
 
-export async function fetchLegacySubmissions(table, { from, to, search, limit, offset }) {
-  if (!LEGACY_TABLES[table]) return [];
+const LEGACY_TABLE_SELECT = {
+  leads_tour:
+    'id, nome, email, telefone, interesse, melhor_dia, melhor_turno, mensagem, page, created_at',
+  leads_curriculos:
+    'id, nome, email, telefone, area, disponibilidade, mensagem, page, created_at',
+  leads_pre_matricula: 'id, nome, email, telefone, interesse, mensagem, page, created_at',
+};
+
+function buildLegacyOrderBy(table, sort, order) {
+  const meta = LEGACY_TABLES[table];
+  if (!meta) return 'created_at DESC';
+  const allowed = new Set(['id', 'created_at', 'page', ...meta.columns]);
+  const col = allowed.has(sort) ? sort : 'created_at';
+  const dir = order === 'asc' ? 'ASC' : 'DESC';
+  return `${col} ${dir} NULLS LAST`;
+}
+
+function buildDynamicOrderBy(sort, order, columns) {
+  const dir = order === 'asc' ? 'ASC' : 'DESC';
+  if (sort === 'id') return `id ${dir}`;
+  if (sort === 'created_at') return `created_at ${dir}`;
+  if (columns.includes(sort) && /^[a-z0-9_]+$/i.test(sort)) {
+    return `(payload->>'${sort}') ${dir} NULLS LAST`;
+  }
+  return 'created_at DESC';
+}
+
+export async function fetchLegacySubmissions(
+  table,
+  { from, to, search, limit, offset, sort = 'created_at', order = 'desc' },
+) {
+  if (!LEGACY_TABLES[table] || !LEGACY_TABLE_SELECT[table]) return [];
   const sql = getSql();
-  const s = search ? `%${search.toLowerCase()}%` : null;
+  const cols = LEGACY_TABLE_SELECT[table];
+  const orderBy = buildLegacyOrderBy(table, sort, order);
 
-  if (table === 'leads_tour') {
-    if (s) {
-      return sql`
-        SELECT id, nome, email, telefone, interesse, melhor_dia, melhor_turno, mensagem, page, created_at
-        FROM leads_tour
-        WHERE created_at >= ${from} AND created_at <= ${to}
-        AND (
-          LOWER(nome) LIKE ${s} OR LOWER(email) LIKE ${s} OR LOWER(telefone) LIKE ${s}
-        )
-        ORDER BY created_at DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    }
-    return sql`
-      SELECT id, nome, email, telefone, interesse, melhor_dia, melhor_turno, mensagem, page, created_at
-      FROM leads_tour
-      WHERE created_at >= ${from} AND created_at <= ${to}
-      ORDER BY created_at DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `;
+  if (search) {
+    const s = `%${search.toLowerCase()}%`;
+    return sql(
+      `SELECT ${cols} FROM ${table}
+       WHERE created_at >= $1 AND created_at <= $2
+       AND (LOWER(nome) LIKE $3 OR LOWER(email) LIKE $3 OR LOWER(telefone) LIKE $3)
+       ORDER BY ${orderBy} LIMIT $4 OFFSET $5`,
+      [from, to, s, limit, offset],
+    );
   }
 
-  if (table === 'leads_curriculos') {
-    if (s) {
-      return sql`
-        SELECT id, nome, email, telefone, area, disponibilidade, mensagem, page, created_at
-        FROM leads_curriculos
-        WHERE created_at >= ${from} AND created_at <= ${to}
-        AND (
-          LOWER(nome) LIKE ${s} OR LOWER(email) LIKE ${s} OR LOWER(telefone) LIKE ${s}
-        )
-        ORDER BY created_at DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    }
-    return sql`
-      SELECT id, nome, email, telefone, area, disponibilidade, mensagem, page, created_at
-      FROM leads_curriculos
-      WHERE created_at >= ${from} AND created_at <= ${to}
-      ORDER BY created_at DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `;
-  }
-
-  if (table === 'leads_pre_matricula') {
-    if (s) {
-      return sql`
-        SELECT id, nome, email, telefone, interesse, mensagem, page, created_at
-        FROM leads_pre_matricula
-        WHERE created_at >= ${from} AND created_at <= ${to}
-        AND (
-          LOWER(nome) LIKE ${s} OR LOWER(email) LIKE ${s} OR LOWER(telefone) LIKE ${s}
-        )
-        ORDER BY created_at DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-    }
-    return sql`
-      SELECT id, nome, email, telefone, interesse, mensagem, page, created_at
-      FROM leads_pre_matricula
-      WHERE created_at >= ${from} AND created_at <= ${to}
-      ORDER BY created_at DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `;
-  }
-
-  return [];
+  return sql(
+    `SELECT ${cols} FROM ${table}
+     WHERE created_at >= $1 AND created_at <= $2
+     ORDER BY ${orderBy} LIMIT $3 OFFSET $4`,
+    [from, to, limit, offset],
+  );
 }
 
 export function normalizeLegacyRow(row, table) {
@@ -315,28 +297,63 @@ export async function countDynamicSubmissions(formId, from, to, search) {
   return rows[0]?.n || 0;
 }
 
-export async function fetchDynamicSubmissions(formId, { from, to, search, limit, offset }) {
+export async function fetchDynamicSubmissions(
+  formId,
+  { from, to, search, limit, offset, sort = 'created_at', order = 'desc', columns = [] },
+) {
   const sql = getSql();
+  const orderBy = buildDynamicOrderBy(sort, order, columns);
+
   if (search) {
     const s = `%${search.toLowerCase()}%`;
-    return sql`
-      SELECT id, payload, page, created_at
-      FROM form_submissions
-      WHERE form_id = ${formId}
-      AND created_at >= ${from} AND created_at <= ${to}
-      AND payload::text ILIKE ${s}
-      ORDER BY created_at DESC
-      LIMIT ${limit} OFFSET ${offset}
-    `;
+    return sql(
+      `SELECT id, payload, page, created_at
+       FROM form_submissions
+       WHERE form_id = $1 AND created_at >= $2 AND created_at <= $3
+       AND payload::text ILIKE $4
+       ORDER BY ${orderBy} LIMIT $5 OFFSET $6`,
+      [formId, from, to, s, limit, offset],
+    );
   }
-  return sql`
-    SELECT id, payload, page, created_at
-    FROM form_submissions
-    WHERE form_id = ${formId}
-    AND created_at >= ${from} AND created_at <= ${to}
-    ORDER BY created_at DESC
-    LIMIT ${limit} OFFSET ${offset}
+
+  return sql(
+    `SELECT id, payload, page, created_at
+     FROM form_submissions
+     WHERE form_id = $1 AND created_at >= $2 AND created_at <= $3
+     ORDER BY ${orderBy} LIMIT $4 OFFSET $5`,
+    [formId, from, to, limit, offset],
+  );
+}
+
+export async function deleteDynamicSubmission(formId, submissionId) {
+  const sql = getSql();
+  const rows = await sql`
+    DELETE FROM form_submissions
+    WHERE id = ${submissionId} AND form_id = ${formId}
+    RETURNING id
   `;
+  return rows.length > 0;
+}
+
+export async function deleteLegacySubmission(table, submissionId) {
+  if (!LEGACY_TABLES[table]) return false;
+  const sql = getSql();
+  const id = Number(submissionId);
+  if (!id) return false;
+
+  if (table === 'leads_tour') {
+    const rows = await sql`DELETE FROM leads_tour WHERE id = ${id} RETURNING id`;
+    return rows.length > 0;
+  }
+  if (table === 'leads_curriculos') {
+    const rows = await sql`DELETE FROM leads_curriculos WHERE id = ${id} RETURNING id`;
+    return rows.length > 0;
+  }
+  if (table === 'leads_pre_matricula') {
+    const rows = await sql`DELETE FROM leads_pre_matricula WHERE id = ${id} RETURNING id`;
+    return rows.length > 0;
+  }
+  return false;
 }
 
 export async function getSubmissionStats(fromIso, toIso = null) {
@@ -390,6 +407,96 @@ export async function countAllInRange(fromIso, toIso) {
     sql`SELECT COUNT(*)::int AS n FROM form_submissions WHERE created_at >= ${fromIso} AND created_at < ${toIso}`,
   ]);
   return (t[0]?.n || 0) + (c[0]?.n || 0) + (p[0]?.n || 0) + (d[0]?.n || 0);
+}
+
+export async function countFormInRange(formId, fromIso, toIso) {
+  const form = await getFormById(formId);
+  if (!form) return 0;
+  const sql = getSql();
+
+  if (form.source_type === 'legacy' && LEGACY_TABLES[form.legacy_table]) {
+    const table = form.legacy_table;
+    if (table === 'leads_tour') {
+      const r = await sql`SELECT COUNT(*)::int AS n FROM leads_tour WHERE created_at >= ${fromIso} AND created_at < ${toIso}`;
+      return r[0]?.n || 0;
+    }
+    if (table === 'leads_curriculos') {
+      const r = await sql`SELECT COUNT(*)::int AS n FROM leads_curriculos WHERE created_at >= ${fromIso} AND created_at < ${toIso}`;
+      return r[0]?.n || 0;
+    }
+    if (table === 'leads_pre_matricula') {
+      const r = await sql`SELECT COUNT(*)::int AS n FROM leads_pre_matricula WHERE created_at >= ${fromIso} AND created_at < ${toIso}`;
+      return r[0]?.n || 0;
+    }
+    return 0;
+  }
+
+  const r = await sql`
+    SELECT COUNT(*)::int AS n FROM form_submissions
+    WHERE form_id = ${formId} AND created_at >= ${fromIso} AND created_at < ${toIso}
+  `;
+  return r[0]?.n || 0;
+}
+
+async function dailyCountsFromRows(rows, fromIso, toIso) {
+  const start = startOfUtcDay(fromIso);
+  const endExclusive = parseEndExclusive(toIso);
+  const map = new Map();
+  for (const r of rows) {
+    const key = dayKey(r.day);
+    map.set(key, (map.get(key) || 0) + r.n);
+  }
+  const out = [];
+  const cursor = new Date(start);
+  while (cursor < endExclusive) {
+    const key = cursor.toISOString().slice(0, 10);
+    out.push({ day: key, count: map.get(key) || 0 });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return out;
+}
+
+export async function getDailyCountsForForm(formId, fromIso, toIso) {
+  const form = await getFormById(formId);
+  if (!form) return [];
+  const sql = getSql();
+  const start = startOfUtcDay(fromIso);
+  const endExclusive = parseEndExclusive(toIso);
+  const from = start.toISOString();
+  const to = endExclusive.toISOString();
+
+  if (form.source_type === 'legacy' && form.legacy_table === 'leads_tour') {
+    const rows = await sql`
+      SELECT TO_CHAR(DATE(created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*)::int AS n
+      FROM leads_tour WHERE created_at >= ${from} AND created_at < ${to}
+      GROUP BY 1 ORDER BY 1
+    `;
+    return dailyCountsFromRows(rows, fromIso, toIso);
+  }
+  if (form.source_type === 'legacy' && form.legacy_table === 'leads_curriculos') {
+    const rows = await sql`
+      SELECT TO_CHAR(DATE(created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*)::int AS n
+      FROM leads_curriculos WHERE created_at >= ${from} AND created_at < ${to}
+      GROUP BY 1 ORDER BY 1
+    `;
+    return dailyCountsFromRows(rows, fromIso, toIso);
+  }
+  if (form.source_type === 'legacy' && form.legacy_table === 'leads_pre_matricula') {
+    const rows = await sql`
+      SELECT TO_CHAR(DATE(created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*)::int AS n
+      FROM leads_pre_matricula WHERE created_at >= ${from} AND created_at < ${to}
+      GROUP BY 1 ORDER BY 1
+    `;
+    return dailyCountsFromRows(rows, fromIso, toIso);
+  }
+
+  const rows = await sql`
+    SELECT TO_CHAR(DATE(created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD') AS day, COUNT(*)::int AS n
+    FROM form_submissions
+    WHERE form_id = ${formId} AND created_at >= ${from} AND created_at < ${to}
+    GROUP BY 1 ORDER BY 1
+  `;
+  return dailyCountsFromRows(rows, fromIso, toIso);
 }
 
 function startOfUtcDay(date = new Date()) {
@@ -466,7 +573,7 @@ function previewFromPayload(payload) {
   return 'Nova resposta';
 }
 
-export async function getRecentSubmissions(limit = 8, fromIso = null, toIso = null) {
+export async function getRecentSubmissions(limit = 8, fromIso = null, toIso = null, formId = null) {
   const sql = getSql();
   const forms = await listForms(true);
   const legacyForm = {};
@@ -557,7 +664,8 @@ export async function getRecentSubmissions(limit = 8, fromIso = null, toIso = nu
   }
 
   items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  return items.slice(0, limit);
+  const filtered = formId ? items.filter((item) => item.form_id === formId) : items;
+  return filtered.slice(0, limit);
 }
 
 export async function getDailyCounts(days = 30) {
@@ -722,7 +830,7 @@ export async function validateDynamicPayload(fields, body) {
     if (val && f.field_type === 'number' && Number.isNaN(Number(val))) {
       return { error: `Número inválido: ${f.label}` };
     }
-    if (val && f.field_type === 'select' && f.options?.length) {
+    if (val && (f.field_type === 'select' || f.field_type === 'radio') && f.options?.length) {
       const opts = f.options.map(String);
       if (!opts.includes(val)) return { error: `Opção inválida: ${f.label}` };
     }

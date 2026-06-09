@@ -3,7 +3,7 @@ import { requireAdmin } from '../../api/lib/admin-auth.js';
 import { getFormById, getFormFields, parseShowWhen, normalizeOptionalText } from '../../api/lib/forms.js';
 import { getSql } from '../../api/lib/db.js';
 
-const FIELD_TYPES = new Set(['text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'date', 'number']);
+const FIELD_TYPES = new Set(['text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number']);
 const FIELD_WIDTHS = new Set(['full', 'half', 'third']);
 
 function normalizeOptions(raw) {
@@ -20,11 +20,12 @@ function normalizeWidth(raw) {
 function fieldMeta(body, fieldKey, allFields, excludeFieldId) {
   const description = body?.description != null ? normalizeOptionalText(body.description) : null;
   const placeholder = body?.placeholder != null ? normalizeOptionalText(body.placeholder) : null;
+  const default_value = body?.default_value != null ? normalizeOptionalText(body.default_value) : null;
   const pool = excludeFieldId ? allFields.filter((f) => Number(f.id) !== excludeFieldId) : allFields;
   const showWhen = body?.show_when != null
     ? parseShowWhen(body.show_when, fieldKey, pool)
     : null;
-  return { description, placeholder, show_when: showWhen };
+  return { description, placeholder, default_value, show_when: showWhen };
 }
 
 export default async function handler(req, res) {
@@ -71,7 +72,7 @@ export default async function handler(req, res) {
       const rows = await sql`
         INSERT INTO form_fields (
           form_id, field_key, label, field_type, required, options,
-          description, placeholder, show_when, field_width, sort_order
+          description, placeholder, default_value, show_when, field_width, sort_order
         )
         VALUES (
           ${formId},
@@ -82,6 +83,7 @@ export default async function handler(req, res) {
           ${options ? JSON.stringify(options) : null},
           ${meta.description},
           ${meta.placeholder},
+          ${meta.default_value},
           ${meta.show_when ? JSON.stringify(meta.show_when) : null},
           ${normalizeWidth(body?.field_width)},
           ${Number(body?.sort_order) || 0}
@@ -140,6 +142,9 @@ export default async function handler(req, res) {
     const placeholder = body?.placeholder !== undefined
       ? normalizeOptionalText(body.placeholder)
       : normalizeOptionalText(current.placeholder);
+    const default_value = body?.default_value !== undefined
+      ? normalizeOptionalText(body.default_value)
+      : normalizeOptionalText(current.default_value);
     const fieldWidth = body?.field_width !== undefined ? normalizeWidth(body.field_width) : normalizeWidth(current.field_width);
 
     let showWhenParam = current.show_when;
@@ -163,6 +168,7 @@ export default async function handler(req, res) {
           options = ${options?.length ? JSON.stringify(options) : null},
           description = ${description},
           placeholder = ${placeholder},
+          default_value = ${default_value},
           show_when = ${showWhenParam ? JSON.stringify(showWhenParam) : null},
           field_width = ${fieldWidth}
         WHERE id = ${fieldId} AND form_id = ${formId}

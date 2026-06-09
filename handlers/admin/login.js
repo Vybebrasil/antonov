@@ -1,5 +1,6 @@
 import { json, adminCors, parseBody } from '../../api/lib/admin-http.js';
 import { loginUser, signToken, setAuthCookie } from '../../api/lib/admin-auth.js';
+import { checkRateLimit, clientIp } from '../../api/lib/rate-limit.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);
@@ -17,6 +18,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    const allowed = await checkRateLimit('admin:login', clientIp(req));
+    if (!allowed) {
+      return json(res, 429, { error: 'Muitas tentativas. Tente novamente em uma hora.' });
+    }
+
     const user = await loginUser(body.email, body.password);
     if (!user) return json(res, 401, { error: 'Credenciais inválidas.' });
 

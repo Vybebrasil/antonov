@@ -1,55 +1,8 @@
-import crypto from 'crypto';
 import { json, parseBody } from '../../api/lib/admin-http.js';
 import { getFormBySlug, getFormFields, validateDynamicPayload } from '../../api/lib/forms.js';
 import { getSql } from '../../api/lib/db.js';
-
-function hashIp(ip) {
-  const salt = process.env.RATE_LIMIT_SALT || 'antonov';
-  return crypto.createHash('sha256').update(`${ip}:${salt}`).digest('hex').slice(0, 32);
-}
-
-function clientIp(req) {
-  const fwd = req.headers['x-forwarded-for'];
-  if (fwd) return String(fwd).split(',')[0].trim();
-  return req.socket?.remoteAddress || 'unknown';
-}
-
-async function checkRateLimit(slug, ip) {
-  const sql = getSql();
-  const ipHash = hashIp(ip);
-  const rows = await sql`
-    SELECT submit_count, window_start FROM form_rate_limits
-    WHERE ip_hash = ${ipHash} AND slug = ${slug}
-  `;
-
-  const hourAgo = Date.now() - 3600000;
-
-  if (rows[0]) {
-    const windowStart = new Date(rows[0].window_start).getTime();
-    if (windowStart < hourAgo) {
-      await sql`
-        UPDATE form_rate_limits
-        SET submit_count = 1, window_start = NOW()
-        WHERE ip_hash = ${ipHash} AND slug = ${slug}
-      `;
-      return true;
-    }
-    if (rows[0].submit_count >= 5) return false;
-    await sql`
-      UPDATE form_rate_limits
-      SET submit_count = submit_count + 1
-      WHERE ip_hash = ${ipHash} AND slug = ${slug}
-    `;
-    return true;
-  }
-
-  await sql`
-    INSERT INTO form_rate_limits (ip_hash, slug, submit_count, window_start)
-    VALUES (${ipHash}, ${slug}, 1, NOW())
-    ON CONFLICT (ip_hash, slug) DO UPDATE SET submit_count = 1, window_start = NOW()
-  `;
-  return true;
-}
+import { checkRateLimit, clientIp, hashIp } from '../../api/lib/rate-limit.js';
+import { isResendConfigured, sendDynamicFormEmails } from '../../api/lib/resend.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -99,6 +52,18 @@ export default async function handler(req, res) {
       VALUES (${form.id}, ${JSON.stringify(validated.payload)}, ${page}, ${ipHash})
       RETURNING id, created_at
     `;
+
+    if (isResendConfigured()) {
+      try {
+        await sendDynamicFormEmails({
+          formName: form.name,
+          fieldDefs: fields,
+          payload: validated.payload,
+        });
+      } catch (err) {
+        console.error('dynamic form email', err);
+      }
+    }
 
     return json(res, 201, { ok: true, id: rows[0]?.id, created_at: rows[0]?.created_at });
   } catch (err) {

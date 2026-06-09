@@ -2,17 +2,15 @@ import { json, adminCors } from '../../api/lib/admin-http.js';
 import { requireAdmin } from '../../api/lib/admin-auth.js';
 import {
   countAllInRange,
+  countFormInRange,
   getSubmissionStats,
   getDailyCountsBetween,
+  getDailyCountsForForm,
   getRecentSubmissions,
 } from '../../api/lib/forms.js';
 import { fetchGa4Metrics } from '../../api/lib/ga4.js';
 
 const PERIOD_DAYS = [7, 30, 90];
-
-async function countAllSince(since) {
-  return countAllInRange(since, periodBounds(0).toExclusiveIso);
-}
 
 function startOfUtcDay(date = new Date()) {
   const d = new Date(date);
@@ -69,9 +67,17 @@ export default async function handler(req, res) {
 
   try {
     const days = parsePeriodDays(req.query?.days);
+    const formId = req.query?.formId ? Number(req.query.formId) : null;
     const { fromIso, toIso, toExclusiveIso } = periodBounds(days);
     const prevFromIso = daysAgoStartOfDay(days * 2);
     const prevToIso = fromIso;
+
+    const countRange = formId
+      ? (from, to) => countFormInRange(formId, from, to)
+      : (from, to) => countAllInRange(from, to);
+    const dailyRange = formId
+      ? (from, to) => getDailyCountsForForm(formId, from, to)
+      : (from, to) => getDailyCountsBetween(from, to);
 
     const [
       total,
@@ -79,15 +85,17 @@ export default async function handler(req, res) {
       today,
       topForms,
       daily,
+      dailyPrevious,
       recent,
       ga4,
     ] = await Promise.all([
-      countAllInRange(fromIso, toExclusiveIso),
-      countAllInRange(prevFromIso, prevToIso),
-      countAllSince(startOfUtcDay().toISOString()),
+      countRange(fromIso, toExclusiveIso),
+      countRange(prevFromIso, prevToIso),
+      countRange(startOfUtcDay().toISOString(), periodBounds(0).toExclusiveIso),
       getSubmissionStats(fromIso, toExclusiveIso),
-      getDailyCountsBetween(fromIso, toExclusiveIso),
-      getRecentSubmissions(8, fromIso, toExclusiveIso),
+      dailyRange(fromIso, toExclusiveIso),
+      dailyRange(prevFromIso, prevToIso),
+      getRecentSubmissions(8, fromIso, toExclusiveIso, formId || null),
       fetchGa4Metrics(days),
     ]);
 
@@ -108,6 +116,7 @@ export default async function handler(req, res) {
         to: toIso,
         label: periodLabels[days] || `Últimos ${days} dias`,
       },
+      formId: formId || null,
       counts: {
         total,
         today,
@@ -116,6 +125,7 @@ export default async function handler(req, res) {
       comparison,
       topForms: top,
       daily,
+      dailyPrevious,
       recent,
       ga4,
     });

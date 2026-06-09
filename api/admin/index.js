@@ -49,6 +49,12 @@ export default async function handler(req, res) {
       withId(req, parts[1]);
       return (await import('../../handlers/admin/forms-submissions.js')).default(req, res);
     }
+    if (parts.length === 4 && parts[0] === 'forms' && /^\d+$/.test(parts[1]) && parts[2] === 'submissions' && /^\d+$/.test(parts[3])) {
+      withId(req, parts[1]);
+      if (!req.query) req.query = {};
+      req.query.submissionId = parts[3];
+      return (await import('../../handlers/admin/forms-submission-id.js')).default(req, res);
+    }
     if (parts.length === 3 && parts[0] === 'forms' && /^\d+$/.test(parts[1]) && parts[2] === 'export') {
       withId(req, parts[1]);
       return (await import('../../handlers/admin/forms-export.js')).default(req, res);

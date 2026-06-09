@@ -393,3 +393,181 @@ export async function sendLeadEmails(notify) {
     });
   }
 }
+
+function formatDynamicValue(value) {
+  if (Array.isArray(value)) return value.filter((v) => v != null && String(v).trim()).join(', ');
+  if (value === true) return 'Sim';
+  if (value === false) return 'Não';
+  return value != null ? String(value).trim() : '';
+}
+
+function buildSummaryHtmlLabeled(entries) {
+  const rows = entries
+    .filter(({ value }) => value)
+    .map(
+      ({ label, value }) => `
+      <tr>
+        <td style="padding:12px 0;border-bottom:1px solid #E8E4DC;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:${BRAND.mute};width:38%;vertical-align:top;">
+          ${escapeHtml(label)}
+        </td>
+        <td style="padding:12px 0 12px 16px;border-bottom:1px solid #E8E4DC;font-size:15px;line-height:1.5;color:${BRAND.ink};vertical-align:top;">
+          ${escapeHtml(value).replace(/\n/g, '<br />')}
+        </td>
+      </tr>`
+    )
+    .join('');
+
+  if (!rows) return '';
+
+  return `
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0 0;border-collapse:collapse;">
+      <tr>
+        <td style="padding:16px 18px;background:${BRAND.bg};border-radius:12px;border:1px solid rgba(0,0,0,0.06);">
+          <p style="margin:0 0 12px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:${BRAND.mute};">Resumo do envio</p>
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">${rows}</table>
+        </td>
+      </tr>
+    </table>`;
+}
+
+function findDynamicLeadName(fieldDefs, payload) {
+  const nomeField = fieldDefs.find(
+    (f) => f.field_key === 'nome' || /nome/i.test(f.label)
+  );
+  if (nomeField) {
+    const v = formatDynamicValue(payload[nomeField.field_key]);
+    if (v) return v;
+  }
+  const textField = fieldDefs.find((f) => f.field_type === 'text' || f.field_type === 'textarea');
+  if (textField) {
+    const v = formatDynamicValue(payload[textField.field_key]);
+    if (v) return v;
+  }
+  return 'Novo lead';
+}
+
+function findDynamicEmail(fieldDefs, payload) {
+  const emailField = fieldDefs.find(
+    (f) => f.field_key === 'email' || f.field_type === 'email' || /e-?mail/i.test(f.label)
+  );
+  return emailField ? String(payload[emailField.field_key] || '').trim().toLowerCase() : '';
+}
+
+function findDynamicPhone(fieldDefs, payload) {
+  const telField = fieldDefs.find(
+    (f) =>
+      f.field_key === 'telefone' ||
+      f.field_type === 'tel' ||
+      /telefone|whatsapp|celular/i.test(f.label)
+  );
+  return telField ? formatDynamicValue(payload[telField.field_key]) : '';
+}
+
+function buildDynamicNotificationHtml({ formName, leadName, entries, email, telefone }) {
+  const summaryHtml = buildSummaryHtmlLabeled(entries);
+  const telDigits = String(telefone || '').replace(/\D/g, '');
+  const waHref = telDigits ? `https://wa.me/55${telDigits.replace(/^55/, '')}` : WHATSAPP_URL;
+  const mailHref = email ? `mailto:${email}` : 'mailto:contato@antonovcenter.com';
+
+  const bodyHtml = `<p style="margin:0 0 4px;font-size:15px;line-height:1.6;">
+    Novo envio pelo site em <strong style="color:${BRAND.ink};">${escapeHtml(formName)}</strong>.
+  </p>
+  <p style="margin:0;font-size:14px;color:${BRAND.mute};">
+    Lead: <strong style="color:${BRAND.ink};">${escapeHtml(leadName)}</strong>
+  </p>`;
+
+  const ctaHtml =
+    buildCtaButton({ label: 'Responder por e-mail', href: mailHref }) +
+    buildCtaButton({ label: 'Abrir WhatsApp', href: waHref }, true);
+
+  return wrapEmail({
+    preheader: `Novo lead: ${leadName} | ${formName}`,
+    eyebrow: '/ NOVO LEAD',
+    title: formName.toUpperCase(),
+    bodyHtml,
+    summaryHtml,
+    ctaHtml,
+    footerNote: 'Notificação interna · Formulário do site Antonov Center',
+  });
+}
+
+function buildDynamicNotificationText({ formName, leadName, entries }) {
+  const lines = entries.filter(({ value }) => value).map(({ label, value }) => `${label}: ${value}`);
+  return [`Antonov Center | ${formName}`, '', `Lead: ${leadName}`, '', ...lines].join('\n');
+}
+
+function buildDynamicConfirmationHtml({ formName, nome, entries }) {
+  const summaryHtml = buildSummaryHtmlLabeled(entries);
+  const bodyHtml = `<p style="margin:0 0 12px;font-size:15px;line-height:1.6;">
+    Obrigado, <strong style="color:${BRAND.ink};">${escapeHtml(nome)}</strong>!
+  </p>
+  <p style="margin:0;font-size:15px;line-height:1.6;color:${BRAND.soft};">
+    Recebemos seu envio pelo formulário <strong style="color:${BRAND.ink};">${escapeHtml(formName)}</strong>.
+    Nossa equipe retorna em breve.
+  </p>`;
+
+  return wrapEmail({
+    preheader: `Recebemos sua mensagem, ${nome}`,
+    eyebrow: '/ CONFIRMAÇÃO',
+    title: 'MENSAGEM ENVIADA',
+    bodyHtml,
+    summaryHtml,
+    ctaHtml: buildCtaButton({ label: 'Conhecer a Antonov', href: SITE_URL }),
+    footerNote: 'Academia premium em Irecê · Projetado para decolar.',
+  });
+}
+
+function buildDynamicConfirmationText({ formName, nome, entries }) {
+  const summary = entries
+    .filter(({ value }) => value)
+    .map(({ label, value }) => `${label}: ${value}`)
+    .join('\n');
+
+  return [
+    `Olá, ${nome}!`,
+    '',
+    `Recebemos seu envio pelo formulário ${formName}. Nossa equipe retorna em breve.`,
+    '',
+    summary ? `Resumo:\n${summary}` : '',
+    '',
+    SITE_URL,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+export async function sendDynamicFormEmails({ formName, fieldDefs, payload }) {
+  if (!isResendConfigured()) return;
+
+  const entries = fieldDefs.map((f) => ({
+    label: f.label,
+    value: formatDynamicValue(payload[f.field_key]),
+  }));
+
+  const leadName = findDynamicLeadName(fieldDefs, payload);
+  const email = findDynamicEmail(fieldDefs, payload);
+  const telefone = findDynamicPhone(fieldDefs, payload);
+  const to = process.env.RESEND_TO || DEFAULT_TO;
+  const subject = leadName ? `${formName} · ${leadName}` : formName;
+
+  const notifyPayload = {
+    from: getFrom(),
+    to: [to],
+    subject,
+    html: buildDynamicNotificationHtml({ formName, leadName, entries, email, telefone }),
+    text: buildDynamicNotificationText({ formName, leadName, entries }),
+  };
+  if (email) notifyPayload.replyTo = email;
+
+  await sendEmail(notifyPayload);
+
+  if (email) {
+    await sendEmail({
+      from: getFrom(),
+      to: [email],
+      subject: `Recebemos sua mensagem · Antonov Center`,
+      html: buildDynamicConfirmationHtml({ formName, nome: leadName, entries }),
+      text: buildDynamicConfirmationText({ formName, nome: leadName, entries }),
+    });
+  }
+}

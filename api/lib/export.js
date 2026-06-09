@@ -45,6 +45,24 @@ export function toXlsxBuffer(rows, sheetName = 'Respostas') {
   return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }
 
+function csvEscape(value) {
+  const s = String(value ?? '');
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+export function toCsvBuffer(rows) {
+  if (!rows.length) {
+    return Buffer.from('\uFEFFInfo\r\nSem registros\r\n', 'utf8');
+  }
+  const headers = Object.keys(rows[0]);
+  const lines = [
+    headers.map(csvEscape).join(','),
+    ...rows.map((row) => headers.map((h) => csvEscape(row[h])).join(',')),
+  ];
+  return Buffer.from(`\uFEFF${lines.join('\r\n')}\r\n`, 'utf8');
+}
+
 function buildPdfHeaders(columns, labels) {
   return ['ID', 'Data', ...columns.map((c) => labels[c] || c)];
 }

@@ -1,7 +1,7 @@
 import { json, adminCors } from '../../api/lib/admin-http.js';
 import { requireAdmin } from '../../api/lib/admin-auth.js';
 import { getFormById, getFormFields } from '../../api/lib/forms.js';
-import { getAllSubmissionsForExport, toXlsxBuffer, toPdfBuffer } from '../../api/lib/export.js';
+import { getAllSubmissionsForExport, toXlsxBuffer, toPdfBuffer, toCsvBuffer } from '../../api/lib/export.js';
 
 function defaultRange() {
   const to = new Date();
@@ -30,7 +30,7 @@ export default async function handler(req, res) {
   if (!form) return json(res, 404, { error: 'Formulário não encontrado.' });
 
   const q = req.query || {};
-  const format = q.format === 'pdf' ? 'pdf' : 'xlsx';
+  const format = q.format === 'pdf' ? 'pdf' : q.format === 'csv' ? 'csv' : 'xlsx';
   const defaults = defaultRange();
   const from = q.from || defaults.from;
   const to = q.to || defaults.to;
@@ -55,6 +55,15 @@ export default async function handler(req, res) {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${safeName}-${date}.pdf"`);
+      res.setHeader('Cache-Control', 'no-store');
+      return res.end(buf);
+    }
+
+    if (format === 'csv') {
+      const buf = toCsvBuffer(exportRows);
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="${safeName}-${date}.csv"`);
       res.setHeader('Cache-Control', 'no-store');
       return res.end(buf);
     }

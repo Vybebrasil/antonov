@@ -92,7 +92,10 @@ function getFormValues(form, fields) {
   const values = {};
   for (const f of fields) {
     if (f.field_type === 'checkbox') values[f.field_key] = getCheckboxFieldValue(form, f);
-    else values[f.field_key] = form.elements[f.field_key]?.value ?? '';
+    else if (f.field_type === 'radio') {
+      const checked = form.querySelector(`input[type="radio"][name="${CSS.escape(f.field_key)}"]:checked`);
+      values[f.field_key] = checked?.value ?? '';
+    } else values[f.field_key] = form.elements[f.field_key]?.value ?? '';
   }
   return values;
 }
@@ -136,7 +139,7 @@ function renderField(f) {
 
     return `<div class="form-field form-field--check${widthCls}"${showWhen}${hidden} data-field-key="${name}">
       <label class="form-check">
-        <input type="checkbox" name="${name}" value="1"${req} />
+        <input type="checkbox" name="${name}" value="1"${req}${f.default_value && ['1', 'true', 'sim', 'yes'].includes(String(f.default_value).toLowerCase()) ? ' checked' : ''} />
         <span class="form-check__text">${label}${reqHtml}</span>
       </label>
       ${desc}
@@ -146,14 +149,32 @@ function renderField(f) {
   let inner = '';
 
   if (f.field_type === 'textarea') {
-    inner = `<textarea name="${name}" rows="4"${ph}${req}></textarea>`;
+    inner = `<textarea name="${name}" rows="4"${ph}${req}>${f.default_value ? escapeHtml(f.default_value) : ''}</textarea>`;
   } else if (f.field_type === 'select') {
-    const opts = (f.options || []).map((o) => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+    const opts = (f.options || []).map((o) => {
+      const sel = f.default_value && String(f.default_value) === String(o) ? ' selected' : '';
+      return `<option value="${escapeHtml(o)}"${sel}>${escapeHtml(o)}</option>`;
+    }).join('');
     inner = `<select name="${name}"${req}><option value="">Selecione…</option>${opts}</select>`;
+  } else if (f.field_type === 'radio') {
+    const opts = (f.options || []).filter(Boolean);
+    const radios = opts.map((o) => {
+      const checked = f.default_value && String(f.default_value) === String(o) ? ' checked' : '';
+      return `<label class="form-check">
+        <input type="radio" name="${name}" value="${escapeHtml(o)}"${checked}${req && opts[0] === o ? '' : ''} />
+        <span class="form-check__text">${escapeHtml(o)}</span>
+      </label>`;
+    }).join('');
+    return `<div class="form-field form-field--radio form-field--check-group${widthCls}"${showWhen}${hidden} data-field-key="${name}">
+      <span class="form-field__name">${label}${reqHtml}</span>
+      ${desc}
+      <div class="form-check-group form-radio-group">${radios}</div>
+    </div>`;
   } else {
     const type = ['email', 'tel', 'date', 'number'].includes(f.field_type) ? f.field_type : 'text';
     const extra = f.field_type === 'number' ? ' inputmode="decimal" step="any"' : '';
-    inner = `<input type="${type}" name="${name}"${ph}${extra}${req} />`;
+    const defVal = f.default_value ? ` value="${escapeHtml(f.default_value)}"` : '';
+    inner = `<input type="${type}" name="${name}"${ph}${extra}${defVal}${req} />`;
   }
 
   return `<div class="form-field${widthCls}" data-field-key="${name}"${showWhen}${hidden}>
@@ -201,6 +222,9 @@ function validateRequiredFields(fields, values) {
     if (!f.required || !fieldIsVisible(f, values)) continue;
     const val = values[f.field_key];
     if (isCheckboxGroup(f) && (!Array.isArray(val) || !val.length)) {
+      return `Campo obrigatório: ${f.label}`;
+    }
+    if (f.field_type === 'radio' && !String(val || '').trim()) {
       return `Campo obrigatório: ${f.label}`;
     }
   }

@@ -46,6 +46,8 @@ export default async function handler(req, res) {
   const page = Math.max(1, Number(q.page) || 1);
   const limit = Math.min(100, Math.max(1, Number(q.limit) || 25));
   const offset = (page - 1) * limit;
+  const sort = q.sort ? String(q.sort).trim() : 'created_at';
+  const order = q.order === 'asc' ? 'asc' : 'desc';
 
   try {
     let total = 0;
@@ -58,14 +60,18 @@ export default async function handler(req, res) {
       columns = meta.columns;
       labels = meta.labels;
       total = await countLegacySubmissions(form.legacy_table, from, to, search);
-      const raw = await fetchLegacySubmissions(form.legacy_table, { from, to, search, limit, offset });
+      const raw = await fetchLegacySubmissions(form.legacy_table, {
+        from, to, search, limit, offset, sort, order,
+      });
       rows = raw.map((r) => normalizeLegacyRow(r, form.legacy_table));
     } else {
       const fields = await getFormFields(formId);
       columns = fields.map((f) => f.field_key);
       labels = Object.fromEntries(fields.map((f) => [f.field_key, f.label]));
       total = await countDynamicSubmissions(formId, from, to, search);
-      const raw = await fetchDynamicSubmissions(formId, { from, to, search, limit, offset });
+      const raw = await fetchDynamicSubmissions(formId, {
+        from, to, search, limit, offset, sort, order, columns,
+      });
       rows = raw.map((r) => ({
         id: r.id,
         created_at: r.created_at,
@@ -82,6 +88,7 @@ export default async function handler(req, res) {
       labels,
       submissions: rows,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 },
+      sort: { field: sort, order },
     });
   } catch (err) {
     console.error('submissions', err);

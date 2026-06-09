@@ -147,11 +147,12 @@ await sql`
     form_id BIGINT NOT NULL REFERENCES forms(id) ON DELETE CASCADE,
     field_key TEXT NOT NULL,
     label TEXT NOT NULL,
-    field_type TEXT NOT NULL CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'date', 'number')),
+    field_type TEXT NOT NULL CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number')),
     required BOOLEAN NOT NULL DEFAULT false,
     options JSONB,
     description TEXT,
     placeholder TEXT,
+    default_value TEXT,
     show_when JSONB,
     field_width TEXT NOT NULL DEFAULT 'full',
     sort_order INT NOT NULL DEFAULT 0,
@@ -163,9 +164,15 @@ await sql`
   DO $$ BEGIN
     ALTER TABLE form_fields DROP CONSTRAINT IF EXISTS form_fields_field_type_check;
     ALTER TABLE form_fields ADD CONSTRAINT form_fields_field_type_check
-      CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'date', 'number'));
+      CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number'));
   EXCEPTION WHEN undefined_table THEN NULL;
   END $$;
+`;
+
+await sql`ALTER TABLE form_fields ADD COLUMN IF NOT EXISTS default_value TEXT;`;
+await sql`
+  UPDATE form_fields SET default_value = NULL
+  WHERE default_value IS NOT NULL AND LOWER(TRIM(default_value)) IN ('null', 'undefined')
 `;
 
 await sql`ALTER TABLE form_fields ADD COLUMN IF NOT EXISTS description TEXT;`;

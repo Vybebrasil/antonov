@@ -36,19 +36,19 @@
   <div id="panel-view" class="panel-view" hidden>
     <header class="panel-header">
       <div class="panel-brand">
-        <img src="/assets/logo-211.png" alt="" width="211" height="32" />
+        <img src="/assets/logo-211.png" alt="Antonov Center" width="211" height="32" />
         <span class="panel-brand__label">Admin</span>
       </div>
       <nav class="panel-tabs" role="tablist" aria-label="Seções do painel">
-        <button type="button" class="tab active" data-tab="dashboard" aria-selected="true">
+        <button type="button" class="tab active" id="tab-btn-dashboard" role="tab" data-tab="dashboard" aria-selected="true" aria-controls="tab-dashboard" tabindex="0">
           <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="13" y="3" width="8" height="5" rx="1.5" fill="currentColor"/><rect x="13" y="10" width="8" height="11" rx="1.5" fill="currentColor"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="currentColor"/></svg>
           <span class="tab-label">Dashboard</span>
         </button>
-        <button type="button" class="tab" data-tab="reports" aria-selected="false">
+        <button type="button" class="tab" id="tab-btn-reports" role="tab" data-tab="reports" aria-selected="false" aria-controls="tab-reports" tabindex="-1">
           <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v2H4V5zm0 6h10v2H4v-2zm0 6h14v2H4v-2z" fill="currentColor"/></svg>
           <span class="tab-label">Relatórios</span>
         </button>
-        <button type="button" class="tab" data-tab="forms" aria-selected="false">
+        <button type="button" class="tab" id="tab-btn-forms" role="tab" data-tab="forms" aria-selected="false" aria-controls="tab-forms" tabindex="-1">
           <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 1.5V7h2.5L14 4.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z" fill="currentColor"/></svg>
           <span class="tab-label">Formulários</span>
         </button>
@@ -60,17 +60,26 @@
     </header>
 
     <main class="panel-main">
-      <section id="tab-dashboard" class="tab-panel active">
+      <section id="tab-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="tab-btn-dashboard">
         <header class="dash-head">
           <div class="dash-head__main">
             <p class="dash-kicker">Visão geral</p>
-            <h2>Dashboard</h2>
+            <h2 tabindex="-1" id="tab-heading-dashboard">Dashboard</h2>
             <p class="dash-sub" id="dash-period-label">Leads e respostas dos formulários</p>
           </div>
-          <div class="dash-period" id="dash-period" role="group" aria-label="Período">
-            <button type="button" class="dash-period__btn" data-days="7">7 dias</button>
-            <button type="button" class="dash-period__btn active" data-days="30">30 dias</button>
-            <button type="button" class="dash-period__btn" data-days="90">90 dias</button>
+          <div class="dash-toolbar">
+            <label class="dash-form-filter">
+              <span class="dash-form-filter__label">Formulário</span>
+              <select id="dash-form-filter" aria-label="Filtrar por formulário">
+                <option value="">Todos</option>
+              </select>
+            </label>
+            <button type="button" id="dash-refresh" class="btn btn-secondary btn-sm" aria-label="Atualizar dashboard">Atualizar</button>
+            <div class="dash-period" id="dash-period" role="group" aria-label="Período">
+              <button type="button" class="dash-period__btn" data-days="7">7 dias</button>
+              <button type="button" class="dash-period__btn active" data-days="30">30 dias</button>
+              <button type="button" class="dash-period__btn" data-days="90">90 dias</button>
+            </div>
           </div>
         </header>
 
@@ -93,9 +102,14 @@
                 <div>
                   <h3>Leads por dia</h3>
                   <p class="dash-card__meta" id="chart-period-meta">Últimos 30 dias</p>
+                  <p class="dash-card__hint">Clique em uma barra para abrir o relatório daquele dia</p>
                 </div>
                 <span class="dash-card__badge" id="chart-total"></span>
               </header>
+              <div class="chart-legend" id="chart-legend" aria-hidden="true">
+                <span class="chart-legend__item"><span class="chart-legend__swatch chart-legend__swatch--current"></span> Período atual</span>
+                <span class="chart-legend__item"><span class="chart-legend__swatch chart-legend__swatch--prev"></span> Período anterior</span>
+              </div>
               <div class="chart-panel" id="chart-panel">
                 <div class="chart-stage">
                   <div class="chart-y-axis" id="chart-y-axis" aria-hidden="true"></div>
@@ -140,32 +154,49 @@
         </div>
       </section>
 
-      <section id="tab-reports" class="tab-panel">
-        <h2>Relatórios</h2>
-        <div class="filters card" id="report-filters">
-          <label>
-            <span>Formulário</span>
-            <select id="report-form"></select>
-          </label>
-          <label>
-            <span>De</span>
-            <input type="date" id="report-from" />
-          </label>
-          <label>
-            <span>Até</span>
-            <input type="date" id="report-to" />
-          </label>
-          <label>
-            <span>Busca (nome/e-mail)</span>
-            <input type="search" id="report-search" placeholder="Opcional" />
-          </label>
-          <button type="button" id="report-filter-btn" class="btn btn-primary">Filtrar</button>
-          <div class="export-btns">
-            <button type="button" id="export-xlsx" class="btn btn-secondary">Exportar XLSX</button>
-            <button type="button" id="export-pdf" class="btn btn-secondary">Exportar PDF</button>
+      <section id="tab-reports" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-reports" hidden>
+        <h2 tabindex="-1" id="tab-heading-reports">Relatórios</h2>
+        <div class="filters card report-filters" id="report-filters">
+          <div class="report-filters__grid">
+            <label class="report-filters__field report-filters__field--form">
+              <span>Formulário</span>
+              <select id="report-form"></select>
+            </label>
+            <label class="report-filters__field report-filters__field--search">
+              <span>Busca (nome/e-mail)</span>
+              <input type="search" id="report-search" placeholder="Opcional" />
+            </label>
+            <div class="report-filters__dates">
+              <label class="report-filters__field">
+                <span>De</span>
+                <input type="date" id="report-from" />
+              </label>
+              <label class="report-filters__field">
+                <span>Até</span>
+                <input type="date" id="report-to" />
+              </label>
+              <div class="report-range-presets" id="report-range-presets" role="group" aria-label="Período rápido">
+                <span class="report-range-presets__label">Período</span>
+                <div class="report-range-presets__btns">
+                  <button type="button" class="btn btn-sm btn-secondary" data-days="7">7 dias</button>
+                  <button type="button" class="btn btn-sm btn-secondary active" data-days="30">30 dias</button>
+                  <button type="button" class="btn btn-sm btn-secondary" data-days="90">90 dias</button>
+                </div>
+              </div>
+            </div>
+            <div class="report-filters__actions">
+              <button type="button" id="report-filter-btn" class="btn btn-primary">Filtrar</button>
+              <div class="export-btns">
+                <button type="button" id="export-csv" class="btn btn-secondary">Exportar CSV</button>
+                <button type="button" id="export-xlsx" class="btn btn-secondary">Exportar XLSX</button>
+                <button type="button" id="export-pdf" class="btn btn-secondary">Exportar PDF</button>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card table-wrap">
+        <p id="report-active-filters" class="report-active-filters" hidden aria-live="polite"></p>
+        <p id="report-range-error" class="form-error report-range-error" hidden></p>
+        <div class="card table-wrap" id="report-results">
           <table class="data-table" id="report-table">
             <thead></thead>
             <tbody></tbody>
@@ -175,10 +206,18 @@
         </div>
       </section>
 
-      <section id="tab-forms" class="tab-panel">
+      <section id="tab-forms" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-forms" hidden>
         <div class="forms-header">
-          <h2>Formulários</h2>
+          <h2 tabindex="-1" id="tab-heading-forms">Formulários</h2>
           <button type="button" id="new-form-btn" class="btn btn-primary">+ Novo formulário</button>
+        </div>
+        <p id="forms-action-error" class="section-error section-error--inline" hidden role="alert"></p>
+        <div id="forms-delete-confirm" class="inline-delete-confirm" hidden role="alert">
+          <p id="forms-delete-msg">Excluir este formulário e todas as respostas?</p>
+          <div class="inline-delete-confirm__actions">
+            <button type="button" id="forms-delete-cancel" class="btn btn-ghost btn-sm">Cancelar</button>
+            <button type="button" id="forms-delete-confirm-btn" class="btn btn-danger btn-sm">Confirmar exclusão</button>
+          </div>
         </div>
         <div id="forms-list" class="forms-list"></div>
         <div id="form-editor" class="form-editor card" hidden>
@@ -203,9 +242,18 @@
             <button type="submit" class="btn btn-sm btn-secondary">Salvar informações</button>
           </form>
           <div id="fields-list" class="fields-list"></div>
+          <div id="field-delete-confirm" class="inline-delete-confirm" hidden role="alert">
+            <p id="field-delete-msg">Remover este campo?</p>
+            <div class="inline-delete-confirm__actions">
+              <button type="button" id="field-delete-cancel" class="btn btn-ghost btn-sm">Cancelar</button>
+              <button type="button" id="field-delete-confirm-btn" class="btn btn-danger btn-sm">Confirmar exclusão</button>
+            </div>
+          </div>
           <p id="field-save-notice" class="field-save-notice" hidden></p>
+          <p id="editor-alert" class="section-error section-error--inline" hidden role="alert"></p>
           <form id="add-field-form" class="add-field-form">
             <h4 id="add-field-title">Adicionar campo</h4>
+            <p id="add-field-error" class="form-error" hidden></p>
             <input type="hidden" name="field_id" value="" />
             <div class="field-row">
               <label><span>Rótulo</span><input name="label" required /></label>
@@ -219,6 +267,7 @@
                   <option value="number">Número</option>
                   <option value="textarea">Área de texto</option>
                   <option value="select">Seleção</option>
+                  <option value="radio">Radio (uma opção)</option>
                   <option value="checkbox">Checkbox</option>
                 </select>
               </label>
@@ -226,8 +275,9 @@
             </div>
             <label><span>Descrição (texto de ajuda abaixo do rótulo)</span><textarea name="description" rows="2" placeholder="Opcional"></textarea></label>
             <label id="placeholder-wrap"><span>Placeholder (sugestão dentro do campo)</span><input name="placeholder" placeholder="Opcional" /></label>
+            <label><span>Valor padrão (pré-preenchido no formulário público)</span><input name="default_value" placeholder="Opcional" /></label>
             <label id="options-wrap" hidden>
-              <span>Opções (uma por linha — no checkbox, múltipla escolha)</span>
+              <span>Opções (uma por linha — checkbox: múltipla escolha · radio: uma opção)</span>
               <textarea name="options" rows="3"></textarea>
             </label>
             <fieldset class="conditional-fieldset">
@@ -261,13 +311,13 @@
   </div>
 </div>
 
-<div id="form-preview" class="form-preview" hidden>
+<div id="form-preview" class="form-preview" hidden role="dialog" aria-modal="true" aria-labelledby="preview-title">
   <div class="form-preview-backdrop"></div>
   <div class="form-preview-panel card">
     <header class="form-preview-header">
       <div>
         <h3 id="preview-title">Visualizar formulário</h3>
-        <p class="preview-hint">Arraste pelo ícone ⋮⋮ para reordenar · escolha o tamanho de cada campo</p>
+        <p class="preview-hint">Preencha os campos para testar condicionais · arraste ⋮⋮ para reordenar · ajuste a largura</p>
       </div>
       <div class="form-preview-actions">
         <a id="preview-open-public" href="#" target="_blank" rel="noopener" class="btn btn-ghost">Abrir público</a>
@@ -275,11 +325,12 @@
         <button type="button" id="preview-close" class="btn btn-ghost">Fechar</button>
       </div>
     </header>
+    <p id="preview-error" class="section-error section-error--inline" hidden role="alert"></p>
     <div id="preview-canvas" class="preview-canvas"></div>
   </div>
 </div>
 
-<div id="modal" class="modal" hidden>
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-backdrop"></div>
   <div class="modal-box card">
     <h3 id="modal-title">Novo formulário</h3>
@@ -293,6 +344,34 @@
         <button type="submit" class="btn btn-primary">Salvar</button>
       </div>
     </form>
+  </div>
+</div>
+
+<div id="submission-detail" class="modal submission-detail" hidden role="dialog" aria-modal="true" aria-labelledby="submission-detail-title">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box card submission-detail__box">
+    <header class="submission-detail__head">
+      <div>
+        <h3 id="submission-detail-title">Resposta</h3>
+        <time id="submission-detail-date" class="submission-detail__date"></time>
+      </div>
+      <button type="button" id="submission-detail-close" class="btn btn-ghost">Fechar</button>
+    </header>
+    <div class="submission-detail__actions" id="submission-detail-actions">
+      <button type="button" id="submission-copy" class="btn btn-secondary btn-sm">Copiar dados</button>
+      <a id="submission-email" class="btn btn-secondary btn-sm" href="#">E-mail</a>
+      <a id="submission-whatsapp" class="btn btn-secondary btn-sm" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <button type="button" id="submission-delete" class="btn btn-danger btn-sm">Excluir</button>
+    </div>
+    <div id="submission-delete-confirm" class="submission-delete-confirm" hidden role="alert">
+      <p>Excluir esta resposta permanentemente?</p>
+      <div class="submission-delete-confirm__actions">
+        <button type="button" id="submission-delete-cancel" class="btn btn-ghost btn-sm">Cancelar</button>
+        <button type="button" id="submission-delete-confirm-btn" class="btn btn-danger btn-sm">Confirmar exclusão</button>
+      </div>
+    </div>
+    <p id="submission-detail-error" class="form-error" hidden></p>
+    <dl id="submission-detail-fields" class="submission-detail__fields"></dl>
   </div>
 </div>
 
