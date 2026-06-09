@@ -37,16 +37,25 @@
     <header class="panel-header">
       <div class="panel-brand">
         <img src="/assets/logo-211.png" alt="" width="211" height="32" />
-        <span>Admin</span>
+        <span class="panel-brand__label">Admin</span>
       </div>
-      <nav class="panel-tabs" role="tablist">
-        <button type="button" class="tab active" data-tab="dashboard">Dashboard</button>
-        <button type="button" class="tab" data-tab="reports">Relatórios</button>
-        <button type="button" class="tab" data-tab="forms">Formulários</button>
+      <nav class="panel-tabs" role="tablist" aria-label="Seções do painel">
+        <button type="button" class="tab active" data-tab="dashboard" aria-selected="true">
+          <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5" fill="currentColor"/><rect x="13" y="3" width="8" height="5" rx="1.5" fill="currentColor"/><rect x="13" y="10" width="8" height="11" rx="1.5" fill="currentColor"/><rect x="3" y="13" width="8" height="8" rx="1.5" fill="currentColor"/></svg>
+          <span class="tab-label">Dashboard</span>
+        </button>
+        <button type="button" class="tab" data-tab="reports" aria-selected="false">
+          <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v2H4V5zm0 6h10v2H4v-2zm0 6h14v2H4v-2z" fill="currentColor"/></svg>
+          <span class="tab-label">Relatórios</span>
+        </button>
+        <button type="button" class="tab" data-tab="forms" aria-selected="false">
+          <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 1.5V7h2.5L14 4.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z" fill="currentColor"/></svg>
+          <span class="tab-label">Formulários</span>
+        </button>
       </nav>
       <div class="panel-user">
-        <span id="user-email"></span>
-        <button type="button" id="logout-btn" class="btn btn-ghost">Sair</button>
+        <span id="user-email" class="panel-user__email"></span>
+        <button type="button" id="logout-btn" class="btn btn-ghost btn-sm">Sair</button>
       </div>
     </header>
 
@@ -133,7 +142,11 @@
 
       <section id="tab-reports" class="tab-panel">
         <h2>Relatórios</h2>
-        <div class="filters card">
+        <button type="button" id="report-filters-toggle" class="report-filters-toggle btn btn-secondary" aria-expanded="false" aria-controls="report-filters">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 6h16v2H4V6zm3 5h10v2H7v-2zm4 5h2v2h-2v-2z" fill="currentColor"/></svg>
+          Filtros
+        </button>
+        <div class="filters card" id="report-filters">
           <label>
             <span>Formulário</span>
             <select id="report-form"></select>
@@ -161,6 +174,7 @@
             <thead></thead>
             <tbody></tbody>
           </table>
+          <div id="report-cards" class="report-cards" aria-live="polite"></div>
           <div class="pagination" id="report-pagination"></div>
         </div>
       </section>

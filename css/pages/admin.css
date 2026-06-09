@@ -171,7 +171,11 @@ input:focus, select:focus, textarea:focus {
   white-space: nowrap;
 }
 
-.panel-tabs { display: flex; gap: 0.25rem; flex: 1; }
+.panel-tabs {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+}
 
 .tab {
   background: transparent;
@@ -182,6 +186,20 @@ input:focus, select:focus, textarea:focus {
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.tab-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+  display: none;
+}
+
+.tab-label {
+  white-space: nowrap;
 }
 
 .tab.active {
@@ -197,6 +215,15 @@ input:focus, select:focus, textarea:focus {
   gap: 0.75rem;
   font-size: 0.85rem;
   color: var(--muted);
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.panel-user__email {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .panel-main {
@@ -1476,6 +1503,272 @@ input:focus, select:focus, textarea:focus {
   .dash-row { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 768px) {
+  .panel-view {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .panel-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    flex-wrap: nowrap;
+    gap: 0.65rem;
+    padding: 0.6rem 0.85rem;
+    padding-top: calc(0.6rem + env(safe-area-inset-top, 0px));
+  }
+
+  .panel-brand {
+    gap: 0.5rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .panel-brand img {
+    height: 26px;
+    max-width: 140px;
+  }
+
+  .panel-brand__label {
+    font-size: 0.85rem;
+  }
+
+  .panel-tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    flex: unset;
+    order: unset;
+    width: 100%;
+    gap: 0.15rem;
+    padding: 0.35rem 0.5rem calc(0.35rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(26, 26, 31, 0.98);
+    border-top: 1px solid #2a2a30;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: visible;
+  }
+
+  .tab {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+    min-height: 3.25rem;
+    padding: 0.35rem 0.25rem;
+    font-size: 0.68rem;
+    border-radius: 8px;
+  }
+
+  .tab-icon {
+    display: block;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .tab-label {
+    line-height: 1.1;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .panel-user {
+    flex-shrink: 0;
+    gap: 0.35rem;
+  }
+
+  .panel-user__email {
+    display: none;
+  }
+
+  .panel-main {
+    padding: 1rem 0.85rem 1.25rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .forms-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .forms-header .btn {
+    width: 100%;
+  }
+
+  .form-item {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .form-item-info p {
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .form-item-actions {
+    width: 100%;
+  }
+
+  .form-item-actions .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-width: 0;
+  }
+
+  .editor-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .editor-actions {
+    width: 100%;
+  }
+
+  .editor-actions .btn {
+    flex: 1;
+  }
+
+  .form-meta-info {
+    font-size: 0.82rem;
+    word-break: break-word;
+  }
+
+  .field-item {
+    align-items: flex-start;
+  }
+
+  .field-item .field-item-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .field-item .field-item-actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .check-label {
+    padding-top: 0;
+  }
+
+  .report-filters-toggle {
+    display: inline-flex;
+  }
+
+  #report-filters {
+    display: none;
+    margin-bottom: 0.75rem;
+  }
+
+  #report-filters.is-open {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .export-btns {
+    flex-direction: column;
+  }
+
+  .export-btns .btn {
+    width: 100%;
+  }
+
+  #report-filter-btn {
+    width: 100%;
+  }
+
+  .data-table {
+    display: none;
+  }
+
+  .report-cards {
+    display: block;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.65rem;
+  }
+
+  .pagination .btn {
+    flex: 1 1 auto;
+    min-width: 7rem;
+  }
+
+  .modal,
+  .form-preview {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .modal-box,
+  .form-preview-panel {
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-preview-panel {
+    padding: 1rem;
+    padding-top: calc(1rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modal-box {
+    padding: 1.25rem 1rem;
+    padding-top: calc(1.25rem + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .form-preview-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface);
+    margin: -1rem -1rem 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #2a2a30;
+  }
+
+  .form-preview-actions {
+    width: 100%;
+  }
+
+  .form-preview-actions .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+  }
+
+  .preview-canvas {
+    padding: 0.75rem;
+  }
+
+  .preview-field-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .preview-width-btns {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .ga-embed {
+    min-height: 280px;
+  }
+}
+
 @media (max-width: 640px) {
   .dash-head {
     flex-direction: column;
@@ -1505,24 +1798,38 @@ input:focus, select:focus, textarea:focus {
     align-items: stretch;
   }
 
-  .panel-header {
-    padding: 0.65rem 1rem;
-    gap: 0.75rem;
-  }
-
-  .panel-tabs {
-    order: 3;
+  .dash-card__head .btn {
     width: 100%;
-    overflow-x: auto;
-    padding-bottom: 0.15rem;
   }
 
-  .panel-user {
-    margin-left: auto;
+  .recent-item__btn {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
   }
 
-  .panel-main {
-    padding: 1rem;
+  .recent-item__time {
+    align-self: flex-start;
+  }
+
+  .login-card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .login-logo {
+    height: 34px;
+  }
+
+  .btn {
+    min-height: 2.75rem;
+  }
+
+  .btn-sm {
+    min-height: 2.35rem;
+  }
+
+  input, select, textarea {
+    font-size: 16px;
   }
 
   .chart-lbl {
@@ -1562,12 +1869,80 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Reports */
+.report-filters-toggle {
+  display: none;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
 .filters {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 1rem;
   align-items: end;
   margin-bottom: 1rem;
+}
+
+.report-cards {
+  display: none;
+}
+
+.report-cards-empty {
+  padding: 1.5rem 0;
+}
+
+.report-card {
+  padding: 1rem 0;
+  border-bottom: 1px solid #2a2a30;
+}
+
+.report-card:last-child {
+  border-bottom: none;
+}
+
+.report-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.report-card__id {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.report-card__date {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.report-card__body {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.report-card__field {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.report-card__lbl {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.report-card__val {
+  font-size: 0.92rem;
+  line-height: 1.45;
+  word-break: break-word;
 }
 
 .export-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
@@ -1703,6 +2078,13 @@ input:focus, select:focus, textarea:focus {
 .field-item .field-info { flex: 1; min-width: 120px; }
 .field-item .field-info strong { display: block; }
 .field-item .field-info small { color: var(--muted); }
+
+.field-item-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
 
 .add-field-form h4 { margin: 0 0 1rem; font-size: 0.95rem; }
 .field-row {

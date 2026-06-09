@@ -77,8 +77,13 @@ function showPanel(email) {
 }
 
 function switchTab(name) {
-  $$('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
+  $$('.tab').forEach((t) => {
+    const active = t.dataset.tab === name;
+    t.classList.toggle('active', active);
+    t.setAttribute('aria-selected', active ? 'true' : 'false');
+  });
   $$('.tab-panel').forEach((p) => p.classList.toggle('active', p.id === `tab-${name}`));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   if (name === 'dashboard') loadDashboard();
   if (name === 'reports') initReports();
   if (name === 'forms') loadForms();
@@ -174,7 +179,17 @@ function initAdmin() {
 
   bind('#dash-view-reports', 'click', () => switchTab('reports'));
 
-  bind('#report-filter-btn', 'click', () => loadReport(1));
+  bind('#report-filter-btn', 'click', () => {
+    loadReport(1);
+    closeReportFilters();
+  });
+  bind('#report-filters-toggle', 'click', () => {
+    const filters = $('#report-filters');
+    const toggle = $('#report-filters-toggle');
+    if (!filters || !toggle) return;
+    const open = filters.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
   bind('#export-xlsx', 'click', () => exportReport('xlsx'));
   bind('#export-pdf', 'click', () => exportReport('pdf'));
   bind('#editor-close', 'click', () => {
@@ -1002,6 +1017,43 @@ function readOptionsFromForm(form, fieldType) {
   return list.length ? list : null;
 }
 
+function closeReportFilters() {
+  const filters = $('#report-filters');
+  const toggle = $('#report-filters-toggle');
+  if (!filters || !toggle) return;
+  filters.classList.remove('is-open');
+  toggle.setAttribute('aria-expanded', 'false');
+}
+
+function renderReportCards(data) {
+  const el = $('#report-cards');
+  if (!el) return;
+
+  if (!data.submissions.length) {
+    el.innerHTML = '<p class="empty-msg report-cards-empty">Nenhuma resposta</p>';
+    return;
+  }
+
+  el.innerHTML = data.submissions.map((s) => {
+    const fields = data.columns.map((c) => `
+      <div class="report-card__field">
+        <span class="report-card__lbl">${escapeHtml(data.labels[c] || c)}</span>
+        <span class="report-card__val">${escapeHtml(String(formatSubmissionValue(s.payload[c])))}</span>
+      </div>
+    `).join('');
+
+    return `
+      <article class="report-card">
+        <header class="report-card__head">
+          <span class="report-card__id">#${s.id}</span>
+          <time class="report-card__date">${formatDate(s.created_at)}</time>
+        </header>
+        <div class="report-card__body">${fields}</div>
+      </article>
+    `;
+  }).join('');
+}
+
 function renderReportTable(data) {
   const thead = $('#report-table thead');
   const tbody = $('#report-table tbody');
@@ -1033,6 +1085,8 @@ function renderReportTable(data) {
   $$('#report-pagination [data-page]').forEach((btn) => {
     btn.addEventListener('click', () => loadReport(Number(btn.dataset.page)));
   });
+
+  renderReportCards(data);
 }
 
 async function exportReport(format) {
