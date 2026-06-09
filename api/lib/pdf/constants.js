@@ -1,0 +1,11 @@
+export const PDF_MARGIN = 28;
+export const PDF_MAX_ROWS = 300;
+export const PDF_HEADER_FONT = 7;
+export const PDF_CELL_FONT = 7;
+export const PDF_CELL_PAD = 6;
+export const PDF_LINE_GAP = 1;
+export const PDF_ID_COL_WIDTH = 34;
+export const PDF_DATA_COL_WIDTH = 62;
+export const PDF_TARGET_FIELDS_MIN = 6;
+export const PDF_TARGET_FIELDS_MAX = 8;
+export const PDF_NUMERIC_CHUNK = 4;

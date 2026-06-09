@@ -78,8 +78,30 @@ function cpDirResilient(src, dest) {
   }
 }
 
+function rmDirResilient(dir) {
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+    return;
+  } catch (err) {
+    console.warn('dist: limpeza completa falhou —', err.message);
+  }
+  try {
+    for (const name of readdirSync(dir)) {
+      const path = join(dir, name);
+      try {
+        if (statSync(path).isDirectory()) rmDirResilient(path);
+        else rmSync(path, { force: true, maxRetries: 3, retryDelay: 100 });
+      } catch (e) {
+        console.warn('skip rm', path, e.message);
+      }
+    }
+  } catch {
+    /* dist inexistente */
+  }
+}
+
 function prepareDist() {
-  rmSync(dist, { recursive: true, force: true });
+  rmDirResilient(dist);
   mkdirSync(dist, { recursive: true });
   cpDirResilient(join(root, 'assets'), join(dist, 'assets'));
   cpSync(join(root, 'assets', 'favicon.ico'), join(dist, 'favicon.ico'));
@@ -92,8 +114,30 @@ function prepareDist() {
   }
 }
 
+const HOME_SOURCE = 'home.html';
+
+function resolveHtmlSource(name) {
+  if (name !== 'index.html') return name;
+  const candidates = [HOME_SOURCE, 'index.html.fixed'];
+  for (const file of candidates) {
+    const path = join(root, file);
+    try {
+      if (statSync(path).isFile()) {
+        if (file !== HOME_SOURCE) {
+          console.warn(`home: usando ${file} (migre para ${HOME_SOURCE})`);
+        }
+        return file;
+      }
+    } catch {
+      /* tenta próximo */
+    }
+  }
+  throw new Error(`Fonte da home não encontrada (${HOME_SOURCE})`);
+}
+
 function processHtml(name) {
-  let html = readFileSync(join(root, name), 'utf8');
+  const source = resolveHtmlSource(name);
+  let html = readFileSync(join(root, source), 'utf8');
 
   for (const file of JS_FILES) {
     const base = file.replace(/\.js$/, '');
@@ -192,10 +236,17 @@ async function main() {
     await minifyJsToDist(file);
   }
 
-  const htmlFiles = readdirSync(root).filter((n) => n.endsWith('.html'));
+  const htmlFiles = readdirSync(root).filter(
+    (n) =>
+      n.endsWith('.html') &&
+      n !== 'index.html' &&
+      n !== HOME_SOURCE &&
+      !/\.(fixed|restored|new|broken|bak)$/.test(n)
+  );
   for (const name of htmlFiles) {
     processHtml(name);
   }
+  processHtml('index.html');
 
   injectCriticalHomeIntoDist();
 

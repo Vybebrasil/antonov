@@ -1924,6 +1924,7 @@ async function exportReport(format) {
 
   const btnId = format === 'pdf' ? 'export-pdf' : format === 'csv' ? 'export-csv' : 'export-xlsx';
   const btn = $(`#${btnId}`);
+  const exportButtons = ['#export-csv', '#export-xlsx', '#export-pdf'].map((id) => $(id)).filter(Boolean);
   const params = new URLSearchParams({
     format,
     from: new Date($('#report-from').value).toISOString(),
@@ -1933,6 +1934,9 @@ async function exportReport(format) {
   if (search) params.set('search', search);
 
   setButtonLoading(btn, true, 'Exportando…');
+  exportButtons.forEach((b) => {
+    if (b !== btn) b.disabled = true;
+  });
   clearSectionError($('#report-results'));
 
   try {
@@ -1952,6 +1956,9 @@ async function exportReport(format) {
     setSectionError($('#report-results'), err.message || 'Erro ao exportar.', () => exportReport(format));
   } finally {
     setButtonLoading(btn, false);
+    exportButtons.forEach((b) => {
+      if (b !== btn) b.disabled = false;
+    });
   }
 }
 

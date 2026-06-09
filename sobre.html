@@ -77,12 +77,30 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:hidden}
       <a href="/planos">Planos</a>
       <a href="/contato">Contato</a>
     </nav>
-    <a href="/planos" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <div class="nav__actions">
+      <div class="nav__stores" aria-label="Baixar app FITI">
+        <a href="https://apps.apple.com/br/app/fiti/id1452917007" class="nav__store nav__store--apple" target="_blank" rel="noopener noreferrer" aria-label="Baixar na App Store">
+          <img src="assets/badge-app-store.png" alt="Disponível na App Store" width="118" height="34" decoding="async">
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=br.com.w12.evobeta&amp;pli=1" class="nav__store nav__store--play" target="_blank" rel="noopener noreferrer" aria-label="Baixar no Google Play">
+          <img src="assets/badge-google-play.png" alt="Disponível no Google Play" width="118" height="34" decoding="async">
+        </a>
+      </div>
+      <a href="/planos" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    </div>
     <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
   </div>
   <div class="nav__backdrop" aria-hidden="true"></div>
   <aside id="nav-drawer" class="nav__drawer" aria-hidden="true" aria-label="Menu de navegação">
     <div class="nav__drawer-links" role="navigation"></div>
+    <div class="nav__drawer-stores" aria-label="Baixar app FITI">
+      <a href="https://apps.apple.com/br/app/fiti/id1452917007" class="nav__store nav__store--apple" target="_blank" rel="noopener noreferrer" aria-label="Baixar na App Store">
+          <img src="assets/badge-app-store.png" alt="Disponível na App Store" width="118" height="34" decoding="async">
+        </a>
+      <a href="https://play.google.com/store/apps/details?id=br.com.w12.evobeta&amp;pli=1" class="nav__store nav__store--play" target="_blank" rel="noopener noreferrer" aria-label="Baixar no Google Play">
+          <img src="assets/badge-google-play.png" alt="Disponível no Google Play" width="118" height="34" decoding="async">
+        </a>
+    </div>
     <a href="/planos" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a>
   </aside>
 </header>
