@@ -3015,3 +3015,87 @@ input:focus, select:focus, textarea:focus {
   .preview-field--half,
   .preview-field--third { grid-column: span 6; }
 }
+
+/* ----- RH / PDI ----- */
+.pdi-subtabs { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.pdi-muted { color: var(--muted); font-size: 0.9rem; }
+.pdi-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+.pdi-stat {
+  background: var(--surface);
+  border: 1px solid #2a2a30;
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+}
+.pdi-stat__val { display: block; font-size: 1.35rem; font-weight: 700; color: var(--yellow); }
+.pdi-stat__lbl { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.pdi-stat--warn .pdi-stat__val { color: var(--danger); }
+.pdi-toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.pdi-section-title { margin: 0 0 0.75rem; font-size: 1rem; }
+.pdi-table-wrap { overflow-x: auto; margin-bottom: 1.25rem; }
+.pdi-row--alert { background: rgba(231, 76, 60, 0.08); }
+.pdi-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--surface2);
+  border: 1px solid #333;
+}
+.pdi-badge--ativo { background: rgba(42, 143, 214, 0.2); border-color: var(--blue); color: #8ec5f0; }
+.pdi-progress {
+  height: 6px;
+  background: #2a2a30;
+  border-radius: 999px;
+  overflow: hidden;
+  display: inline-block;
+  width: 80px;
+  vertical-align: middle;
+  margin-right: 0.35rem;
+}
+.pdi-progress span { display: block; height: 100%; background: var(--yellow); border-radius: inherit; }
+.pdi-progress--lg { width: 100%; height: 10px; margin: 0.5rem 0; }
+.pdi-ciclos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.pdi-ciclo-card header { display: flex; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
+.pdi-ciclo-card h4 { margin: 0; font-size: 0.95rem; text-transform: none; font-family: var(--font); }
+.pdi-smart { font-size: 0.95rem; line-height: 1.45; margin: 0.5rem 0; }
+.pdi-budget { font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0; }
+.pdi-alert {
+  margin: 0.35rem 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(250, 177, 15, 0.12);
+  border: 1px solid rgba(250, 177, 15, 0.35);
+  font-size: 0.85rem;
+}
+.pdi-702010__bar { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: #2a2a30; }
+.pdi-702010__seg--70 { background: var(--yellow); }
+.pdi-702010__seg--20 { background: var(--blue); }
+.pdi-702010__seg--10 { background: #6bcb77; }
+.pdi-702010__legend { list-style: none; padding: 0; margin: 0.5rem 0 0; display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.8rem; color: var(--muted); }
+.pdi-modal-box { max-width: 720px; max-height: 90vh; overflow-y: auto; }
+.pdi-form label { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.75rem; }
+.pdi-form input, .pdi-form select, .pdi-form textarea {
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: var(--surface2);
+  color: var(--ink);
+  font: inherit;
+}
+.pdi-fieldset { border: 1px solid #333; border-radius: var(--radius); padding: 1rem; margin-bottom: 1rem; }
+.pdi-fieldset legend { padding: 0 0.5rem; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+.pdi-acao-row { display: grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem; align-items: end; }
+.pdi-workspace__head { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.pdi-kicker { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin: 0; }
+.pdi-block { margin-bottom: 1.25rem; padding-top: 0.5rem; border-top: 1px solid #2a2a30; }
+.pdi-acao-card { padding: 0.85rem; border-radius: 8px; background: var(--surface2); border: 1px solid #333; }
+.pdi-checkpoints { list-style: none; padding: 0; margin: 0; }
+.pdi-colab-hint { margin-bottom: 1rem; }
+@media (max-width: 720px) { .pdi-acao-row { grid-template-columns: 1fr; } }

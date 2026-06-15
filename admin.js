@@ -491,6 +491,13 @@ function switchTab(name, opts = {}) {
   if (name === 'dashboard') loadDashboard();
   if (name === 'reports') initReports();
   if (name === 'forms') loadForms();
+  if (name === 'hr') {
+    if (typeof initPdiAdmin === 'function' && !window._pdiInited) {
+      initPdiAdmin();
+      window._pdiInited = true;
+    }
+    if (typeof onPdiTabOpen === 'function') onPdiTabOpen();
+  }
   requestAnimationFrame(() => {
     if (opts.focusTab) focusTabButton(name);
     else $(`#tab-heading-${name}`)?.focus({ preventScroll: true });

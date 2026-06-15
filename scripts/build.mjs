@@ -44,7 +44,10 @@ const COPY_FILES = [
 const cssMin = new CleanCSS({ level: 2 });
 
 async function minifyJsToDist(file) {
-  const code = readFileSync(join(root, file), 'utf8');
+  let code = readFileSync(join(root, file), 'utf8');
+  if (file === 'admin.js') {
+    code += `\n${readFileSync(join(root, 'admin-pdi.js'), 'utf8')}`;
+  }
   const out = await esbuild.transform(code, {
     minify: true,
     target: 'es2020',

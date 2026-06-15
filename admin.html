@@ -52,6 +52,10 @@
           <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 1.5V7h2.5L14 4.5zM8 11h8v2H8v-2zm0 4h8v2H8v-2z" fill="currentColor"/></svg>
           <span class="tab-label">Formulários</span>
         </button>
+        <button type="button" class="tab" id="tab-btn-hr" role="tab" data-tab="hr" aria-selected="false" aria-controls="tab-hr" tabindex="-1">
+          <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 9a7 7 0 0 1 14 0H5zm14-2a6 6 0 0 0-3.5-5.47A6.02 6.02 0 0 1 21 18h-2z" fill="currentColor"/></svg>
+          <span class="tab-label">RH / PDI</span>
+        </button>
       </nav>
       <div class="panel-user">
         <span id="user-email" class="panel-user__email"></span>
@@ -312,6 +316,32 @@
           </form>
         </div>
       </section>
+
+      <section id="tab-hr" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-hr" hidden>
+        <header class="dash-head">
+          <div class="dash-head__main">
+            <p class="dash-kicker">Recursos humanos</p>
+            <h2 tabindex="-1" id="tab-heading-hr">Gestão de PDI</h2>
+            <p class="dash-sub">Plano de Desenvolvimento Individual — acompanhamento contínuo da equipe</p>
+          </div>
+          <div class="dash-toolbar">
+            <div class="pdi-subtabs" role="tablist" aria-label="Visão RH">
+              <button type="button" class="btn btn-sm btn-secondary active" data-pdi-subview="gestor">Visão gestor</button>
+              <button type="button" class="btn btn-sm btn-secondary" data-pdi-subview="colaborador">Workspace colaborador</button>
+            </div>
+            <button type="button" id="pdi-refresh" class="btn btn-secondary btn-sm">Atualizar</button>
+          </div>
+        </header>
+        <p id="pdi-loading" class="dash-loading" hidden><span class="dash-skeleton__block"></span> Carregando…</p>
+        <p id="pdi-error" class="section-error" hidden role="alert"></p>
+        <div id="pdi-view-gestor">
+          <div id="pdi-gestor-content"></div>
+        </div>
+        <div id="pdi-view-colaborador" hidden>
+          <p class="pdi-muted pdi-colab-hint">Selecione um colaborador na visão gestor (botão Abrir) para ver o workspace de autodesenvolvimento.</p>
+          <div id="pdi-colab-content"></div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
@@ -380,6 +410,14 @@
   </div>
 </div>
 
+<div id="pdi-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="pdi-modal-title">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box card pdi-modal-box">
+    <div id="pdi-modal-body"></div>
+  </div>
+</div>
+
 <script src="/admin.js" defer></script>
+<script src="/admin-pdi.js" defer></script>
 </body>
 </html>

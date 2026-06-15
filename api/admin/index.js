@@ -59,6 +59,11 @@ export default async function handler(req, res) {
       withId(req, parts[1]);
       return (await import('../../handlers/admin/forms-export.js')).default(req, res);
     }
+    if (parts[0] === 'pdi') {
+      if (!req.query) req.query = {};
+      req.query.path = parts.slice(1).join('/');
+      return (await import('../../handlers/admin/pdi.js')).default(req, res);
+    }
 
     res.statusCode = 404;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
