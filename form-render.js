@@ -3,6 +3,35 @@ const SUBMIT_BTN_HTML = `
   <span class="form-submit__meta">Enviar <span class="arrow" aria-hidden="true"></span></span>
 `;
 
+const MAX_FILE_BYTES = 4 * 1024 * 1024;
+
+function fileAcceptFromOptions(field) {
+  if (!Array.isArray(field?.options) || !field.options.length) return '';
+  return field.options
+    .map((item) => String(item).trim())
+    .filter(Boolean)
+    .map((ext) => (ext.startsWith('.') ? ext : `.${ext}`))
+    .join(',');
+}
+
+async function readFilePayload(input, label) {
+  const file = input?.files?.[0];
+  if (!file) return null;
+  if (file.size > MAX_FILE_BYTES) {
+    throw new Error(`${label}: arquivo excede ${Math.round(MAX_FILE_BYTES / (1024 * 1024))} MB.`);
+  }
+  const data = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      resolve(result.includes(',') ? result.split(',')[1] : result);
+    };
+    reader.onerror = () => reject(new Error(`${label}: não foi possível ler o arquivo.`));
+    reader.readAsDataURL(file);
+  });
+  return { name: file.name, type: file.type, size: file.size, data };
+}
+
 function getSlug() {
   const params = new URLSearchParams(window.location.search);
   if (params.get('slug')) return params.get('slug');
@@ -95,6 +124,9 @@ function getFormValues(form, fields) {
     else if (f.field_type === 'radio') {
       const checked = form.querySelector(`input[type="radio"][name="${CSS.escape(f.field_key)}"]:checked`);
       values[f.field_key] = checked?.value ?? '';
+    } else if (f.field_type === 'file') {
+      const input = form.elements[f.field_key];
+      values[f.field_key] = input?.files?.length ? input.files[0].name : '';
     } else values[f.field_key] = form.elements[f.field_key]?.value ?? '';
   }
   return values;
@@ -170,6 +202,17 @@ function renderField(f) {
       ${desc}
       <div class="form-check-group form-radio-group">${radios}</div>
     </div>`;
+  } else if (f.field_type === 'file') {
+    const accept = fileAcceptFromOptions(f);
+    const acceptAttr = accept ? ` accept="${escapeHtml(accept)}"` : '';
+    inner = `<input type="file" name="${name}" class="form-file-input"${acceptAttr}${req} />`;
+    return `<div class="form-field form-field--file${widthCls}" data-field-key="${name}"${showWhen}${hidden}>
+      <label class="form-field__label">
+        <span class="form-field__name">${label}${reqHtml}</span>
+        ${desc}
+        ${inner}
+      </label>
+    </div>`;
   } else {
     const type = ['email', 'tel', 'date', 'number'].includes(f.field_type) ? f.field_type : 'text';
     const extra = f.field_type === 'number' ? ' inputmode="decimal" step="any"' : '';
@@ -203,6 +246,7 @@ function syncConditionalFields(form, fields) {
     if (!visible) {
       inputs.forEach((input) => {
         if (input.type === 'checkbox') input.checked = false;
+        else if (input.type === 'file') input.value = '';
         else input.value = '';
         input.removeAttribute('required');
       });
@@ -211,7 +255,7 @@ function syncConditionalFields(form, fields) {
 
     if (f.required) {
       if (isCheckboxGroup(f)) continue;
-      if (f.field_type === 'checkbox') inputs[0]?.setAttribute('required', '');
+      if (f.field_type === 'checkbox' || f.field_type === 'file') inputs[0]?.setAttribute('required', '');
       else inputs[0]?.setAttribute('required', '');
     }
   }
@@ -226,6 +270,10 @@ function validateRequiredFields(fields, values) {
     }
     if (f.field_type === 'radio' && !String(val || '').trim()) {
       return `Campo obrigatório: ${f.label}`;
+    }
+    if (f.field_type === 'file') {
+      const input = form.querySelector(`input[type="file"][name="${CSS.escape(f.field_key)}"]`);
+      if (!input?.files?.length) return `Campo obrigatório: ${f.label}`;
     }
   }
   return null;
@@ -303,12 +351,24 @@ async function init() {
       btn.innerHTML = '<span class="form-submit__label">Enviando…</span>';
 
       const body = {};
-      for (const f of fields) {
-        if (!fieldIsVisible(f, values)) {
-          body[f.field_key] = isCheckboxGroup(f) ? [] : (f.field_type === 'checkbox' ? false : '');
-          continue;
+      try {
+        for (const f of fields) {
+          if (!fieldIsVisible(f, values)) {
+            body[f.field_key] = isCheckboxGroup(f)
+              ? []
+              : (f.field_type === 'checkbox' ? false : (f.field_type === 'file' ? null : ''));
+            continue;
+          }
+          if (f.field_type === 'file') {
+            body[f.field_key] = await readFilePayload(form.elements[f.field_key], f.label);
+          } else {
+            body[f.field_key] = values[f.field_key];
+          }
         }
-        body[f.field_key] = values[f.field_key];
+      } catch (fileErr) {
+        resetSubmitButton(btn);
+        alert(fileErr.message);
+        return;
       }
       body.page = window.location.pathname;
 

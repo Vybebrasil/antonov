@@ -269,15 +269,16 @@
                   <option value="select">Seleção</option>
                   <option value="radio">Radio (uma opção)</option>
                   <option value="checkbox">Checkbox</option>
+                  <option value="file">Upload de arquivos</option>
                 </select>
               </label>
               <label class="check-label"><input type="checkbox" name="required" /> Obrigatório</label>
             </div>
             <label><span>Descrição (texto de ajuda abaixo do rótulo)</span><textarea name="description" rows="2" placeholder="Opcional"></textarea></label>
             <label id="placeholder-wrap"><span>Placeholder (sugestão dentro do campo)</span><input name="placeholder" placeholder="Opcional" /></label>
-            <label><span>Valor padrão (pré-preenchido no formulário público)</span><input name="default_value" placeholder="Opcional" /></label>
+            <label id="default-wrap"><span>Valor padrão (pré-preenchido no formulário público)</span><input name="default_value" placeholder="Opcional" /></label>
             <label id="options-wrap" hidden>
-              <span>Opções (uma por linha — checkbox: múltipla escolha · radio: uma opção)</span>
+              <span id="options-wrap-label">Opções (uma por linha — checkbox: múltipla escolha · radio: uma opção)</span>
               <textarea name="options" rows="3"></textarea>
             </label>
             <fieldset class="conditional-fieldset">

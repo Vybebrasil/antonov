@@ -3,7 +3,7 @@ import { requireAdmin } from '../../api/lib/admin-auth.js';
 import { getFormById, getFormFields, parseShowWhen, normalizeOptionalText } from '../../api/lib/forms.js';
 import { getSql } from '../../api/lib/db.js';
 
-const FIELD_TYPES = new Set(['text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number']);
+const FIELD_TYPES = new Set(['text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number', 'file']);
 const FIELD_WIDTHS = new Set(['full', 'half', 'third']);
 
 function normalizeOptions(raw) {

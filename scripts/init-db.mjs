@@ -147,7 +147,7 @@ await sql`
     form_id BIGINT NOT NULL REFERENCES forms(id) ON DELETE CASCADE,
     field_key TEXT NOT NULL,
     label TEXT NOT NULL,
-    field_type TEXT NOT NULL CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number')),
+    field_type TEXT NOT NULL CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number', 'file')),
     required BOOLEAN NOT NULL DEFAULT false,
     options JSONB,
     description TEXT,
@@ -164,7 +164,7 @@ await sql`
   DO $$ BEGIN
     ALTER TABLE form_fields DROP CONSTRAINT IF EXISTS form_fields_field_type_check;
     ALTER TABLE form_fields ADD CONSTRAINT form_fields_field_type_check
-      CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number'));
+      CHECK (field_type IN ('text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number', 'file'));
   EXCEPTION WHEN undefined_table THEN NULL;
   END $$;
 `;

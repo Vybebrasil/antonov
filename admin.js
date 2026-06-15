@@ -639,17 +639,7 @@ function initAdmin() {
   bind('#preview-save', 'click', savePreviewLayout);
   bind('#form-preview .form-preview-backdrop', 'click', closeFormPreview);
   bind('select[name="field_type"]', 'change', (e) => {
-    const wrap = $('#options-wrap');
-    const phWrap = $('#placeholder-wrap');
-    const type = e.target.value;
-    if (wrap) {
-      if (fieldUsesOptions(type)) wrap.removeAttribute('hidden');
-      else wrap.setAttribute('hidden', '');
-    }
-    if (phWrap) {
-      if (type === 'checkbox') phWrap.setAttribute('hidden', '');
-      else phWrap.removeAttribute('hidden');
-    }
+    syncFieldTypeUi(e.target.value);
     updateCondUi();
   });
   bind('select[name="cond_field"]', 'change', () => updateCondUi());
@@ -1662,6 +1652,10 @@ async function onConfirmDeleteSubmission() {
 
 function formatSubmissionValue(v) {
   if (Array.isArray(v)) return v.map(formatSubmissionValue).filter(Boolean).join(', ');
+  if (v && typeof v === 'object' && typeof v.name === 'string' && typeof v.data === 'string') {
+    const kb = v.size ? ` (${Math.max(1, Math.round(v.size / 1024))} KB)` : '';
+    return `${v.name}${kb}`;
+  }
   if (v === true) return 'Sim';
   if (v === false) return 'Não';
   if (v == null) return '';
@@ -1672,6 +1666,50 @@ function formatSubmissionValue(v) {
 
 function fieldUsesOptions(type) {
   return type === 'select' || type === 'checkbox' || type === 'radio';
+}
+
+function fieldUsesFileExtensions(type) {
+  return type === 'file';
+}
+
+function syncFieldTypeUi(type) {
+  const wrap = $('#options-wrap');
+  const phWrap = $('#placeholder-wrap');
+  const defWrap = $('#default-wrap');
+  const optLabel = $('#options-wrap-label');
+
+  if (wrap) {
+    if (fieldUsesFileExtensions(type)) {
+      wrap.removeAttribute('hidden');
+      if (optLabel) {
+        optLabel.textContent = 'Extensões permitidas (uma por linha, ex.: pdf, jpg — vazio = qualquer tipo)';
+      }
+    } else if (fieldUsesOptions(type)) {
+      wrap.removeAttribute('hidden');
+      if (optLabel) {
+        optLabel.textContent = 'Opções (uma por linha — checkbox: múltipla escolha · radio: uma opção)';
+      }
+    } else {
+      wrap.setAttribute('hidden', '');
+    }
+  }
+  if (phWrap) {
+    if (type === 'checkbox' || fieldUsesFileExtensions(type)) phWrap.setAttribute('hidden', '');
+    else phWrap.removeAttribute('hidden');
+  }
+  if (defWrap) {
+    if (fieldUsesFileExtensions(type)) defWrap.setAttribute('hidden', '');
+    else defWrap.removeAttribute('hidden');
+  }
+}
+
+function fileAcceptFromOptions(options) {
+  if (!Array.isArray(options) || !options.length) return '';
+  return options
+    .map((item) => String(item).trim())
+    .filter(Boolean)
+    .map((ext) => (ext.startsWith('.') ? ext : `.${ext}`))
+    .join(',');
 }
 
 function hideFieldDeleteConfirm() {
@@ -1807,7 +1845,7 @@ async function duplicateField(fieldId) {
 }
 
 function readOptionsFromForm(form, fieldType) {
-  if (!fieldUsesOptions(fieldType)) return null;
+  if (!fieldUsesOptions(fieldType) && !fieldUsesFileExtensions(fieldType)) return null;
   const raw = form.querySelector('[name=options]')?.value;
   if (!raw) return null;
   const list = String(raw).split('\n').map((s) => s.trim()).filter(Boolean);
@@ -2186,6 +2224,7 @@ function resetFieldForm(clearFields = true) {
   $('#cancel-field-edit')?.setAttribute('hidden', '');
   $('#options-wrap')?.setAttribute('hidden', '');
   $('#placeholder-wrap')?.removeAttribute('hidden');
+  $('#default-wrap')?.removeAttribute('hidden');
   refreshCondFieldOptions();
 }
 
@@ -2211,11 +2250,7 @@ function fillFieldForm(field) {
     form.querySelector('[name=cond_value]').value = cond.value || '';
   }
   updateCondUi();
-
-  if (field.field_type === 'select' || field.field_type === 'checkbox' || field.field_type === 'radio') {
-    $('#options-wrap')?.removeAttribute('hidden');
-  }
-  if (field.field_type === 'checkbox') $('#placeholder-wrap')?.setAttribute('hidden', '');
+  syncFieldTypeUi(field.field_type || 'text');
 
   $('#add-field-title').textContent = 'Editar campo';
   $('#add-field-submit').textContent = 'Salvar alterações';
@@ -2364,6 +2399,10 @@ function getPreviewFieldValue(wrap, field) {
     const checked = wrap.querySelector('input[type="radio"]:checked');
     return checked?.value || '';
   }
+  if (field.field_type === 'file') {
+    const input = wrap.querySelector('input[type="file"]');
+    return input?.files?.length ? input.files[0].name : '';
+  }
   const input = wrap.querySelector('input, select, textarea');
   return input?.value ?? '';
 }
@@ -2443,6 +2482,11 @@ function previewFieldBody(f) {
     }
     const checked = f.default_value && ['1', 'true', 'sim', 'yes'].includes(String(f.default_value).toLowerCase()) ? ' checked' : '';
     return `<div class="preview-field-body" data-field-key="${key}"${showWhen}${hidden}><label class="check-row"><input type="checkbox"${checked} /><span>${label}${f.required ? ' *' : ''}</span></label>${desc}</div>`;
+  }
+  if (f.field_type === 'file') {
+    const accept = fileAcceptFromOptions(f.options);
+    const acceptAttr = accept ? ` accept="${escapeHtml(accept)}"` : '';
+    return `<div class="preview-field-body" data-field-key="${key}"${showWhen}${hidden}><label><span>${label}${f.required ? ' *' : ''}</span>${desc}<input type="file"${acceptAttr} disabled /></label></div>`;
   }
   const type = ['email', 'tel', 'date', 'number'].includes(f.field_type) ? f.field_type : 'text';
   return `<div class="preview-field-body" data-field-key="${key}"${showWhen}${hidden}><label><span>${label}${f.required ? ' *' : ''}</span>${desc}<input type="${type}"${ph}${previewDefaultAttr(f)} /></label></div>`;

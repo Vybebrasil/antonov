@@ -1,5 +1,46 @@
 import { getSql } from './db.js';
 
+export const MAX_FILE_BYTES = 4 * 1024 * 1024;
+
+export function isFilePayload(value) {
+  return Boolean(
+    value &&
+      typeof value === 'object' &&
+      !Array.isArray(value) &&
+      typeof value.name === 'string' &&
+      typeof value.data === 'string'
+  );
+}
+
+export function fileAcceptFromOptions(field) {
+  if (!Array.isArray(field?.options) || !field.options.length) return '';
+  return field.options
+    .map((item) => String(item).trim())
+    .filter(Boolean)
+    .map((ext) => (ext.startsWith('.') ? ext : `.${ext}`))
+    .join(',');
+}
+
+export function parseFilePayload(raw, label = 'Arquivo') {
+  if (raw == null || raw === '') return { value: null };
+  if (!isFilePayload(raw)) return { error: `${label}: arquivo inválido.` };
+
+  const name = String(raw.name).trim();
+  const data = String(raw.data).trim();
+  const type = String(raw.type || '').trim();
+  const size = Number(raw.size) || 0;
+
+  if (!name || !data) return { error: `${label}: arquivo inválido.` };
+  if (size > MAX_FILE_BYTES) {
+    return { error: `${label}: arquivo excede ${Math.round(MAX_FILE_BYTES / (1024 * 1024))} MB.` };
+  }
+  if (!/^[A-Za-z0-9+/=]+$/.test(data)) {
+    return { error: `${label}: arquivo corrompido.` };
+  }
+
+  return { value: { name, type, size, data } };
+}
+
 /** Chave YYYY-MM-DD a partir de DATE do Postgres (string ou Date). */
 export function dayKey(value) {
   if (value == null) return '';
@@ -24,6 +65,10 @@ export function formatSubmissionValue(value) {
   if (Array.isArray(value)) {
     return value.map((item) => formatSubmissionValue(item)).filter(Boolean).join(', ');
   }
+  if (isFilePayload(value)) {
+    const kb = value.size ? ` (${Math.max(1, Math.round(value.size / 1024))} KB)` : '';
+    return `${value.name}${kb}`;
+  }
   if (value === true) return 'Sim';
   if (value === false) return 'Não';
   if (value == null) return '';
@@ -41,7 +86,14 @@ export function normalizeSubmissionPayload(raw) {
         .map((item) => formatSubmissionValue(item))
         .filter((item) => item !== '');
     } else if (value === true || value === false) out[key] = value;
-    else out[key] = formatSubmissionValue(value);
+    else if (isFilePayload(value)) {
+      out[key] = {
+        name: String(value.name),
+        type: String(value.type || ''),
+        size: Number(value.size) || 0,
+        data: String(value.data),
+      };
+    } else out[key] = formatSubmissionValue(value);
   }
   return out;
 }
@@ -766,6 +818,7 @@ export function buildFieldValues(fields, body) {
   for (const f of fields) {
     if (isCheckboxGroup(f)) values[f.field_key] = parseCheckboxGroupFromBody(body, f);
     else if (f.field_type === 'checkbox') values[f.field_key] = Boolean(body[f.field_key]);
+    else if (f.field_type === 'file') values[f.field_key] = body[f.field_key] ?? null;
     else values[f.field_key] = String(body[f.field_key] ?? '').trim();
   }
   return values;
@@ -812,6 +865,21 @@ export async function validateDynamicPayload(fields, body) {
         if (visible && f.required && !payload[f.field_key]) {
           return { error: `Campo obrigatório: ${f.label}` };
         }
+      }
+      continue;
+    }
+
+    if (f.field_type === 'file') {
+      const raw = visible ? body[f.field_key] : null;
+      if (visible && f.required && (raw == null || raw === '')) {
+        return { error: `Campo obrigatório: ${f.label}` };
+      }
+      if (raw != null && raw !== '') {
+        const parsed = parseFilePayload(raw, f.label);
+        if (parsed.error) return { error: parsed.error };
+        payload[f.field_key] = parsed.value;
+      } else {
+        payload[f.field_key] = null;
       }
       continue;
     }

@@ -345,6 +345,30 @@
   gap: 0.65rem;
 }
 
+.form-field--file .form-file-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.65rem 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.form-field--file .form-file-input::file-selector-button {
+  margin-right: 0.85rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.form-field--file .form-file-input::file-selector-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 /* Botão enviar */
 .form-submit {
   grid-column: 1 / -1;
