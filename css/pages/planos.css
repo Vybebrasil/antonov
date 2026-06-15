@@ -250,6 +250,63 @@
   .plan--featured { transform: none; }
 }
 
+/* Plano Personal */
+.plan-personal {
+  padding: 0 var(--pad-x) 80px;
+  background: var(--bg);
+}
+.plan-personal__inner {
+  max-width: 880px;
+  margin: 0 auto;
+}
+.plan-personal__card {
+  width: 100%;
+}
+.plan-personal__steps {
+  list-style: none;
+  margin: 0 0 32px;
+  padding: 24px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  display: grid;
+  gap: 16px;
+}
+.plan-personal__step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 16px;
+  align-items: start;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+.plan-personal__step-no {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--yellow);
+  padding-top: 2px;
+}
+.plan-personal__step-body strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+.plan-personal__step-body p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  opacity: 0.82;
+}
+.plan-personal__step-body p strong {
+  display: inline;
+  font-size: inherit;
+  margin: 0;
+  color: var(--yellow);
+}
+
 /* Corporate benefits */
 .corp-benefits {
   padding: 0 var(--pad-x) 100px;
