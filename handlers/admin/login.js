@@ -1,6 +1,6 @@
-import { json, adminCors, parseBody } from '../../api/lib/admin-http.js';
-import { loginUser, signToken, setAuthCookie } from '../../api/lib/admin-auth.js';
-import { checkRateLimit, clientIp } from '../../api/lib/rate-limit.js';
+import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
+import { loginUser, signToken, setAuthCookie } from '../../api/_lib/admin-auth.js';
+import { checkRateLimit, clientIp } from '../../api/_lib/rate-limit.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);

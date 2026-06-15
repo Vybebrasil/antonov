@@ -18,9 +18,9 @@ const moves = [
 
 function fixImports(code) {
   return code
-    .replace(/from '\.\.\/\.\.\/\.\.\/lib\//g, "from '../../api/lib/")
-    .replace(/from '\.\.\/\.\.\/lib\//g, "from '../../api/lib/")
-    .replace(/from '\.\.\/lib\//g, "from '../../api/lib/");
+    .replace(/from '\.\.\/\.\.\/\.\.\/lib\//g, "from '../../api/_lib/")
+    .replace(/from '\.\.\/\.\.\/lib\//g, "from '../../api/_lib/")
+    .replace(/from '\.\.\/lib\//g, "from '../../api/_lib/");
 }
 
 mkdirSync(join(root, 'handlers/admin'), { recursive: true });
@@ -56,11 +56,11 @@ export default async function handler(req, res) {
 mkdirSync(join(root, 'handlers/forms'), { recursive: true });
 writeFileSync(
   join(root, 'handlers/forms/get.js'),
-  getForm.replace(/from '\.\.\/\.\.\/lib\//g, "from '../../api/lib/")
+  getForm.replace(/from '\.\.\/\.\.\/lib\//g, "from '../../api/_lib/")
 );
 writeFileSync(
   join(root, 'handlers/forms/submit.js'),
-  submitForm.replace(/from '\.\.\/\.\.\/lib\//g, "from '../../api/lib/")
+  submitForm.replace(/from '\.\.\/\.\.\/lib\//g, "from '../../api/_lib/")
 );
 writeFileSync(join(root, 'api/forms/[slug].js'), publicForm);
 

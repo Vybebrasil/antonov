@@ -1,5 +1,5 @@
-import { json, adminCors } from '../../api/lib/admin-http.js';
-import { clearAuthCookie } from '../../api/lib/admin-auth.js';
+import { json, adminCors } from '../../api/_lib/admin-http.js';
+import { clearAuthCookie } from '../../api/_lib/admin-auth.js';
 
 export default function handler(req, res) {
   adminCors(req, res);

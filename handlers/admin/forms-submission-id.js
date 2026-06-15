@@ -1,11 +1,11 @@
-import { json, adminCors } from '../../api/lib/admin-http.js';
-import { requireAdmin } from '../../api/lib/admin-auth.js';
+import { json, adminCors } from '../../api/_lib/admin-http.js';
+import { requireAdmin } from '../../api/_lib/admin-auth.js';
 import {
   getFormById,
   deleteDynamicSubmission,
   deleteLegacySubmission,
   LEGACY_TABLES,
-} from '../../api/lib/forms.js';
+} from '../../api/_lib/forms.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);

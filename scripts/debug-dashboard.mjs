@@ -2,7 +2,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { neon } from '@neondatabase/serverless';
-import { countAllInRange, getDailyCountsBetween, getDailyCounts } from '../api/lib/forms.js';
+import { countAllInRange, getDailyCountsBetween, getDailyCounts } from '../api/_lib/forms.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const envPath = join(root, '.env');

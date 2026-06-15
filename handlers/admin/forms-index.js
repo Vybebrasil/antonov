@@ -1,7 +1,7 @@
-import { json, adminCors, parseBody } from '../../api/lib/admin-http.js';
-import { requireAdmin, RESERVED_SLUGS } from '../../api/lib/admin-auth.js';
-import { listForms, slugify } from '../../api/lib/forms.js';
-import { getSql } from '../../api/lib/db.js';
+import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
+import { requireAdmin, RESERVED_SLUGS } from '../../api/_lib/admin-auth.js';
+import { listForms, slugify } from '../../api/_lib/forms.js';
+import { getSql } from '../../api/_lib/db.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);

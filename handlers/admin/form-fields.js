@@ -1,7 +1,7 @@
-import { json, adminCors, parseBody } from '../../api/lib/admin-http.js';
-import { requireAdmin } from '../../api/lib/admin-auth.js';
-import { getFormById, getFormFields, parseShowWhen, normalizeOptionalText } from '../../api/lib/forms.js';
-import { getSql } from '../../api/lib/db.js';
+import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
+import { requireAdmin } from '../../api/_lib/admin-auth.js';
+import { getFormById, getFormFields, parseShowWhen, normalizeOptionalText } from '../../api/_lib/forms.js';
+import { getSql } from '../../api/_lib/db.js';
 
 const FIELD_TYPES = new Set(['text', 'email', 'tel', 'textarea', 'select', 'checkbox', 'radio', 'date', 'number', 'file']);
 const FIELD_WIDTHS = new Set(['full', 'half', 'third']);

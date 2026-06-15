@@ -23,7 +23,7 @@ const FILES = [
   'llms.txt',
   'google-review-prompt.js',
   'app.js',
-  'api/lib/resend.js',
+  'api/_lib/resend.js',
   'api/leads/tour.js',
   'api/leads/pre-matricula.js',
   'api/leads/curriculos.js',

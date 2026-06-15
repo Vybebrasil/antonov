@@ -1,5 +1,5 @@
-import { json, adminCors } from '../../api/lib/admin-http.js';
-import { getSession } from '../../api/lib/admin-auth.js';
+import { json, adminCors } from '../../api/_lib/admin-http.js';
+import { getSession } from '../../api/_lib/admin-auth.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);

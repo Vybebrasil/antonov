@@ -1,4 +1,4 @@
-import { handleLeadPost, sanitizeContact } from '../lib/db.js';
+import { handleLeadPost, sanitizeContact } from '../../api/_lib/db.js';
 
 function parseTour(raw) {
   const base = sanitizeContact(raw);

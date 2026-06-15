@@ -1,8 +1,8 @@
-import { json, parseBody } from '../../api/lib/admin-http.js';
-import { getFormBySlug, getFormFields, validateDynamicPayload } from '../../api/lib/forms.js';
-import { getSql } from '../../api/lib/db.js';
-import { checkRateLimit, clientIp, hashIp } from '../../api/lib/rate-limit.js';
-import { isResendConfigured, sendDynamicFormEmails } from '../../api/lib/resend.js';
+import { json, parseBody } from '../../api/_lib/admin-http.js';
+import { getFormBySlug, getFormFields, validateDynamicPayload } from '../../api/_lib/forms.js';
+import { getSql } from '../../api/_lib/db.js';
+import { checkRateLimit, clientIp, hashIp } from '../../api/_lib/rate-limit.js';
+import { isResendConfigured, sendDynamicFormEmails } from '../../api/_lib/resend.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

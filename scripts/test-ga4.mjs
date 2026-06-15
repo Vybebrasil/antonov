@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { fetchGa4Metrics, ga4EnvStatus } from '../api/lib/ga4.js';
+import { fetchGa4Metrics, ga4EnvStatus } from '../api/_lib/ga4.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const envPath = join(root, '.env');
