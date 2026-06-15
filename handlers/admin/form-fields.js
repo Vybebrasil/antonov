@@ -12,6 +12,30 @@ function normalizeOptions(raw) {
   return null;
 }
 
+function normalizeFileFieldOptions(raw) {
+  if (raw == null) return null;
+
+  let extensions = [];
+  let maxFiles = 1;
+
+  if (Array.isArray(raw)) {
+    extensions = raw.map(String).map((s) => s.trim()).filter(Boolean);
+  } else if (typeof raw === 'object') {
+    extensions = Array.isArray(raw.extensions)
+      ? raw.extensions.map(String).map((s) => s.trim()).filter(Boolean)
+      : [];
+    const n = parseInt(raw.maxFiles, 10);
+    if (Number.isFinite(n) && n >= 1) maxFiles = Math.min(n, 20);
+  }
+
+  if (!extensions.length && maxFiles === 1) return null;
+  return { extensions, maxFiles };
+}
+
+function optionsForField(fieldType, raw) {
+  return fieldType === 'file' ? normalizeFileFieldOptions(raw) : normalizeOptions(raw);
+}
+
 function normalizeWidth(raw) {
   const w = String(raw || 'full');
   return FIELD_WIDTHS.has(w) ? w : 'full';
@@ -60,7 +84,7 @@ export default async function handler(req, res) {
     if (!fieldKey || !label) return json(res, 400, { error: 'Chave e rótulo são obrigatórios.' });
     if (!FIELD_TYPES.has(fieldType)) return json(res, 400, { error: 'Tipo de campo inválido.' });
 
-    const options = normalizeOptions(body?.options);
+    const options = optionsForField(fieldType, body?.options);
     const existing = await getFormFields(formId);
     const meta = fieldMeta(body, fieldKey, existing);
 
@@ -135,7 +159,9 @@ export default async function handler(req, res) {
       return json(res, 400, { error: 'Tipo de campo inválido.' });
     }
 
-    const options = body?.options !== undefined ? normalizeOptions(body.options) : normalizeOptions(current.options);
+    const options = body?.options !== undefined
+      ? optionsForField(fieldType, body.options)
+      : optionsForField(fieldType, current.options);
     const description = body?.description !== undefined
       ? normalizeOptionalText(body.description)
       : normalizeOptionalText(current.description);
@@ -165,7 +191,7 @@ export default async function handler(req, res) {
           label = ${label},
           field_type = ${fieldType},
           required = ${Boolean(body?.required)},
-          options = ${options?.length ? JSON.stringify(options) : null},
+          options = ${options ? JSON.stringify(options) : null},
           description = ${description},
           placeholder = ${placeholder},
           default_value = ${default_value},

@@ -395,7 +395,12 @@ export async function sendLeadEmails(notify) {
 }
 
 function formatDynamicValue(value) {
-  if (Array.isArray(value)) return value.filter((v) => v != null && String(v).trim()).join(', ');
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => formatDynamicValue(item))
+      .filter(Boolean)
+      .join(', ');
+  }
   if (value && typeof value === 'object' && typeof value.name === 'string' && typeof value.data === 'string') {
     const kb = value.size ? ` (${Math.max(1, Math.round(value.size / 1024))} KB)` : '';
     return `${value.name}${kb}`;

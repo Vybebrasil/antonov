@@ -369,6 +369,11 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.form-field--file .field-file-hint {
+  margin-top: 0.35rem;
+  opacity: 0.85;
+}
+
 /* Botão enviar */
 .form-submit {
   grid-column: 1 / -1;

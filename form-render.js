@@ -4,21 +4,37 @@ const SUBMIT_BTN_HTML = `
 `;
 
 const MAX_FILE_BYTES = 4 * 1024 * 1024;
+const MAX_FILE_COUNT = 20;
+
+function parseFileFieldOptions(field) {
+  const raw = field?.options;
+  let extensions = [];
+  let maxFiles = 1;
+
+  if (Array.isArray(raw)) {
+    extensions = raw.map((item) => String(item).trim()).filter(Boolean);
+  } else if (raw && typeof raw === 'object') {
+    extensions = Array.isArray(raw.extensions)
+      ? raw.extensions.map((item) => String(item).trim()).filter(Boolean)
+      : [];
+    const n = parseInt(raw.maxFiles, 10);
+    if (Number.isFinite(n) && n >= 1) maxFiles = Math.min(n, MAX_FILE_COUNT);
+  }
+
+  return { extensions, maxFiles };
+}
 
 function fileAcceptFromOptions(field) {
-  if (!Array.isArray(field?.options) || !field.options.length) return '';
-  return field.options
-    .map((item) => String(item).trim())
-    .filter(Boolean)
+  const { extensions } = parseFileFieldOptions(field);
+  if (!extensions.length) return '';
+  return extensions
     .map((ext) => (ext.startsWith('.') ? ext : `.${ext}`))
     .join(',');
 }
 
-async function readFilePayload(input, label) {
-  const file = input?.files?.[0];
-  if (!file) return null;
+async function readOneFile(file, label) {
   if (file.size > MAX_FILE_BYTES) {
-    throw new Error(`${label}: arquivo excede ${Math.round(MAX_FILE_BYTES / (1024 * 1024))} MB.`);
+    throw new Error(`${label}: "${file.name}" excede ${Math.round(MAX_FILE_BYTES / (1024 * 1024))} MB.`);
   }
   const data = await new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -26,10 +42,26 @@ async function readFilePayload(input, label) {
       const result = String(reader.result || '');
       resolve(result.includes(',') ? result.split(',')[1] : result);
     };
-    reader.onerror = () => reject(new Error(`${label}: não foi possível ler o arquivo.`));
+    reader.onerror = () => reject(new Error(`${label}: não foi possível ler "${file.name}".`));
     reader.readAsDataURL(file);
   });
   return { name: file.name, type: file.type, size: file.size, data };
+}
+
+async function readFilesPayload(input, label, maxFiles) {
+  const files = [...(input?.files || [])];
+  if (!files.length) return null;
+
+  const limit = Math.max(1, Math.min(maxFiles, MAX_FILE_COUNT));
+  if (files.length > limit) {
+    throw new Error(`${label}: selecione no máximo ${limit} arquivo(s).`);
+  }
+
+  const out = [];
+  for (const file of files) {
+    out.push(await readOneFile(file, label));
+  }
+  return limit === 1 ? out[0] : out;
 }
 
 function getSlug() {
@@ -126,7 +158,9 @@ function getFormValues(form, fields) {
       values[f.field_key] = checked?.value ?? '';
     } else if (f.field_type === 'file') {
       const input = form.elements[f.field_key];
-      values[f.field_key] = input?.files?.length ? input.files[0].name : '';
+      values[f.field_key] = input?.files?.length
+        ? [...input.files].map((file) => file.name).join(', ')
+        : '';
     } else values[f.field_key] = form.elements[f.field_key]?.value ?? '';
   }
   return values;
@@ -203,13 +237,18 @@ function renderField(f) {
       <div class="form-check-group form-radio-group">${radios}</div>
     </div>`;
   } else if (f.field_type === 'file') {
+    const { maxFiles } = parseFileFieldOptions(f);
     const accept = fileAcceptFromOptions(f);
     const acceptAttr = accept ? ` accept="${escapeHtml(accept)}"` : '';
-    inner = `<input type="file" name="${name}" class="form-file-input"${acceptAttr}${req} />`;
+    const multiple = maxFiles > 1 ? ' multiple' : '';
+    const hint = maxFiles > 1
+      ? `<p class="field-desc field-file-hint">Você pode enviar até ${maxFiles} arquivos.</p>`
+      : '';
+    inner = `<input type="file" name="${name}" class="form-file-input"${acceptAttr}${multiple}${req} />`;
     return `<div class="form-field form-field--file${widthCls}" data-field-key="${name}"${showWhen}${hidden}>
       <label class="form-field__label">
         <span class="form-field__name">${label}${reqHtml}</span>
-        ${desc}
+        ${desc}${hint}
         ${inner}
       </label>
     </div>`;
@@ -331,8 +370,21 @@ async function init() {
     form.innerHTML = fields.map(renderField).join('') +
       `<button type="submit" class="form-submit">${SUBMIT_BTN_HTML}</button>`;
 
+    form.addEventListener('change', (e) => {
+      const input = e.target;
+      if (input?.type === 'file' && input.name) {
+        const field = fields.find((f) => f.field_key === input.name && f.field_type === 'file');
+        if (field) {
+          const { maxFiles } = parseFileFieldOptions(field);
+          if (input.files.length > maxFiles) {
+            alert(`${field.label}: selecione no máximo ${maxFiles} arquivo(s).`);
+            input.value = '';
+          }
+        }
+      }
+      syncConditionalFields(form, fields);
+    });
     form.addEventListener('input', () => syncConditionalFields(form, fields));
-    form.addEventListener('change', () => syncConditionalFields(form, fields));
     syncConditionalFields(form, fields);
 
     form.addEventListener('submit', async (e) => {
@@ -360,7 +412,8 @@ async function init() {
             continue;
           }
           if (f.field_type === 'file') {
-            body[f.field_key] = await readFilePayload(form.elements[f.field_key], f.label);
+            const { maxFiles } = parseFileFieldOptions(f);
+            body[f.field_key] = await readFilesPayload(form.elements[f.field_key], f.label, maxFiles);
           } else {
             body[f.field_key] = values[f.field_key];
           }

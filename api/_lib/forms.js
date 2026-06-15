@@ -1,6 +1,7 @@
 import { getSql } from './db.js';
 
 export const MAX_FILE_BYTES = 4 * 1024 * 1024;
+export const MAX_FILE_COUNT = 20;
 
 export function isFilePayload(value) {
   return Boolean(
@@ -12,11 +13,28 @@ export function isFilePayload(value) {
   );
 }
 
+export function parseFileFieldOptions(field) {
+  const raw = field?.options;
+  let extensions = [];
+  let maxFiles = 1;
+
+  if (Array.isArray(raw)) {
+    extensions = raw.map((item) => String(item).trim()).filter(Boolean);
+  } else if (raw && typeof raw === 'object') {
+    extensions = Array.isArray(raw.extensions)
+      ? raw.extensions.map((item) => String(item).trim()).filter(Boolean)
+      : [];
+    const n = parseInt(raw.maxFiles, 10);
+    if (Number.isFinite(n) && n >= 1) maxFiles = Math.min(n, MAX_FILE_COUNT);
+  }
+
+  return { extensions, maxFiles };
+}
+
 export function fileAcceptFromOptions(field) {
-  if (!Array.isArray(field?.options) || !field.options.length) return '';
-  return field.options
-    .map((item) => String(item).trim())
-    .filter(Boolean)
+  const { extensions } = parseFileFieldOptions(field);
+  if (!extensions.length) return '';
+  return extensions
     .map((ext) => (ext.startsWith('.') ? ext : `.${ext}`))
     .join(',');
 }
@@ -39,6 +57,33 @@ export function parseFilePayload(raw, label = 'Arquivo') {
   }
 
   return { value: { name, type, size, data } };
+}
+
+export function parseFilesPayload(raw, label = 'Arquivo', maxFiles = 1) {
+  if (raw == null || raw === '') return { value: null };
+
+  const limit = Math.max(1, Math.min(maxFiles, MAX_FILE_COUNT));
+
+  if (limit === 1) {
+    if (Array.isArray(raw)) {
+      if (!raw.length) return { value: null };
+      if (raw.length > 1) return { error: `${label}: envie no máximo 1 arquivo.` };
+      return parseFilePayload(raw[0], label);
+    }
+    return parseFilePayload(raw, label);
+  }
+
+  if (!Array.isArray(raw)) return { error: `${label}: formato de arquivo inválido.` };
+  if (!raw.length) return { value: null };
+  if (raw.length > limit) return { error: `${label}: envie no máximo ${limit} arquivo(s).` };
+
+  const files = [];
+  for (const item of raw) {
+    const parsed = parseFilePayload(item, label);
+    if (parsed.error) return parsed;
+    if (parsed.value) files.push(parsed.value);
+  }
+  return { value: files.length ? files : null };
 }
 
 /** Chave YYYY-MM-DD a partir de DATE do Postgres (string ou Date). */
@@ -82,9 +127,18 @@ export function normalizeSubmissionPayload(raw) {
   const out = {};
   for (const [key, value] of Object.entries(payload)) {
     if (Array.isArray(value)) {
-      out[key] = value
-        .map((item) => formatSubmissionValue(item))
-        .filter((item) => item !== '');
+      if (value.length && value.every(isFilePayload)) {
+        out[key] = value.map((item) => ({
+          name: String(item.name),
+          type: String(item.type || ''),
+          size: Number(item.size) || 0,
+          data: String(item.data),
+        }));
+      } else {
+        out[key] = value
+          .map((item) => formatSubmissionValue(item))
+          .filter((item) => item !== '');
+      }
     } else if (value === true || value === false) out[key] = value;
     else if (isFilePayload(value)) {
       out[key] = {
@@ -871,11 +925,13 @@ export async function validateDynamicPayload(fields, body) {
 
     if (f.field_type === 'file') {
       const raw = visible ? body[f.field_key] : null;
-      if (visible && f.required && (raw == null || raw === '')) {
+      const { maxFiles } = parseFileFieldOptions(f);
+      const empty = raw == null || raw === '' || (Array.isArray(raw) && !raw.length);
+      if (visible && f.required && empty) {
         return { error: `Campo obrigatório: ${f.label}` };
       }
-      if (raw != null && raw !== '') {
-        const parsed = parseFilePayload(raw, f.label);
+      if (!empty) {
+        const parsed = parseFilesPayload(raw, f.label, maxFiles);
         if (parsed.error) return { error: parsed.error };
         payload[f.field_key] = parsed.value;
       } else {

@@ -1676,6 +1676,7 @@ function syncFieldTypeUi(type) {
   const wrap = $('#options-wrap');
   const phWrap = $('#placeholder-wrap');
   const defWrap = $('#default-wrap');
+  const fileMaxWrap = $('#file-max-wrap');
   const optLabel = $('#options-wrap-label');
 
   if (wrap) {
@@ -1693,6 +1694,10 @@ function syncFieldTypeUi(type) {
       wrap.setAttribute('hidden', '');
     }
   }
+  if (fileMaxWrap) {
+    if (fieldUsesFileExtensions(type)) fileMaxWrap.removeAttribute('hidden');
+    else fileMaxWrap.setAttribute('hidden', '');
+  }
   if (phWrap) {
     if (type === 'checkbox' || fieldUsesFileExtensions(type)) phWrap.setAttribute('hidden', '');
     else phWrap.removeAttribute('hidden');
@@ -1703,11 +1708,28 @@ function syncFieldTypeUi(type) {
   }
 }
 
-function fileAcceptFromOptions(options) {
-  if (!Array.isArray(options) || !options.length) return '';
-  return options
-    .map((item) => String(item).trim())
-    .filter(Boolean)
+function parseFileFieldOptions(field) {
+  const raw = field?.options;
+  let extensions = [];
+  let maxFiles = 1;
+
+  if (Array.isArray(raw)) {
+    extensions = raw.map((item) => String(item).trim()).filter(Boolean);
+  } else if (raw && typeof raw === 'object') {
+    extensions = Array.isArray(raw.extensions)
+      ? raw.extensions.map((item) => String(item).trim()).filter(Boolean)
+      : [];
+    const n = parseInt(raw.maxFiles, 10);
+    if (Number.isFinite(n) && n >= 1) maxFiles = Math.min(n, 20);
+  }
+
+  return { extensions, maxFiles };
+}
+
+function fileAcceptFromOptions(field) {
+  const { extensions } = parseFileFieldOptions(field);
+  if (!extensions.length) return '';
+  return extensions
     .map((ext) => (ext.startsWith('.') ? ext : `.${ext}`))
     .join(',');
 }
@@ -1845,7 +1867,17 @@ async function duplicateField(fieldId) {
 }
 
 function readOptionsFromForm(form, fieldType) {
-  if (!fieldUsesOptions(fieldType) && !fieldUsesFileExtensions(fieldType)) return null;
+  if (fieldUsesFileExtensions(fieldType)) {
+    const raw = form.querySelector('[name=options]')?.value;
+    const extensions = raw
+      ? String(raw).split('\n').map((s) => s.trim()).filter(Boolean)
+      : [];
+    const maxRaw = parseInt(form.querySelector('[name=file_max_files]')?.value, 10);
+    const maxFiles = Number.isFinite(maxRaw) && maxRaw >= 1 ? Math.min(maxRaw, 20) : 1;
+    if (!extensions.length && maxFiles === 1) return null;
+    return { extensions, maxFiles };
+  }
+  if (!fieldUsesOptions(fieldType)) return null;
   const raw = form.querySelector('[name=options]')?.value;
   if (!raw) return null;
   const list = String(raw).split('\n').map((s) => s.trim()).filter(Boolean);
@@ -2223,8 +2255,11 @@ function resetFieldForm(clearFields = true) {
   $('#add-field-submit').textContent = 'Adicionar campo';
   $('#cancel-field-edit')?.setAttribute('hidden', '');
   $('#options-wrap')?.setAttribute('hidden', '');
+  $('#file-max-wrap')?.setAttribute('hidden', '');
   $('#placeholder-wrap')?.removeAttribute('hidden');
   $('#default-wrap')?.removeAttribute('hidden');
+  const fileMaxInput = form.querySelector('[name=file_max_files]');
+  if (fileMaxInput) fileMaxInput.value = '1';
   refreshCondFieldOptions();
 }
 
@@ -2240,7 +2275,13 @@ function fillFieldForm(field) {
   form.querySelector('[name=description]').value = field.description || '';
   form.querySelector('[name=placeholder]').value = field.placeholder || '';
   form.querySelector('[name=default_value]').value = field.default_value || '';
-  form.querySelector('[name=options]').value = Array.isArray(field.options) ? field.options.join('\n') : '';
+  form.querySelector('[name=options]').value = Array.isArray(field.options)
+    ? field.options.join('\n')
+    : (field.field_type === 'file' ? parseFileFieldOptions(field).extensions.join('\n') : '');
+  const fileMaxInput = form.querySelector('[name=file_max_files]');
+  if (fileMaxInput && field.field_type === 'file') {
+    fileMaxInput.value = String(parseFileFieldOptions(field).maxFiles);
+  }
 
   refreshCondFieldOptions(field.id);
   const cond = field.show_when;
@@ -2283,6 +2324,9 @@ function renderFields(fields) {
     const desc = f.description ? `<small class="field-meta">${escapeHtml(f.description)}</small>` : '';
     const ph = f.placeholder ? `<small class="field-meta">Placeholder: ${escapeHtml(f.placeholder)}</small>` : '';
     const def = f.default_value ? `<small class="field-meta">Padrão: ${escapeHtml(f.default_value)}</small>` : '';
+    const fileMax = f.field_type === 'file'
+      ? `<small class="field-meta">Máx. arquivos: ${parseFileFieldOptions(f).maxFiles}</small>`
+      : '';
     return `
     <div class="field-item" data-field-id="${f.id}">
       <div class="field-item-order">
@@ -2292,7 +2336,7 @@ function renderFields(fields) {
       <div class="field-info">
         <strong>${escapeHtml(f.label)}</strong>
         <small>${f.field_key} · ${f.field_type}${f.required ? ' · obrigatório' : ''}${cond}</small>
-        ${desc}${ph}${def}
+        ${desc}${ph}${def}${fileMax}
       </div>
       <div class="field-item-actions">
         <button type="button" class="btn btn-sm btn-secondary" data-edit-field="${f.id}">Editar</button>
@@ -2401,7 +2445,8 @@ function getPreviewFieldValue(wrap, field) {
   }
   if (field.field_type === 'file') {
     const input = wrap.querySelector('input[type="file"]');
-    return input?.files?.length ? input.files[0].name : '';
+    if (!input?.files?.length) return '';
+    return [...input.files].map((file) => file.name).join(', ');
   }
   const input = wrap.querySelector('input, select, textarea');
   return input?.value ?? '';
@@ -2484,9 +2529,14 @@ function previewFieldBody(f) {
     return `<div class="preview-field-body" data-field-key="${key}"${showWhen}${hidden}><label class="check-row"><input type="checkbox"${checked} /><span>${label}${f.required ? ' *' : ''}</span></label>${desc}</div>`;
   }
   if (f.field_type === 'file') {
-    const accept = fileAcceptFromOptions(f.options);
+    const { maxFiles } = parseFileFieldOptions(f);
+    const accept = fileAcceptFromOptions(f);
     const acceptAttr = accept ? ` accept="${escapeHtml(accept)}"` : '';
-    return `<div class="preview-field-body" data-field-key="${key}"${showWhen}${hidden}><label><span>${label}${f.required ? ' *' : ''}</span>${desc}<input type="file"${acceptAttr} disabled /></label></div>`;
+    const multiple = maxFiles > 1 ? ' multiple' : '';
+    const hint = maxFiles > 1
+      ? `<p class="preview-field-desc">Até ${maxFiles} arquivos</p>`
+      : '';
+    return `<div class="preview-field-body" data-field-key="${key}"${showWhen}${hidden}><label><span>${label}${f.required ? ' *' : ''}</span>${desc}${hint}<input type="file"${acceptAttr}${multiple} disabled /></label></div>`;
   }
   const type = ['email', 'tel', 'date', 'number'].includes(f.field_type) ? f.field_type : 'text';
   return `<div class="preview-field-body" data-field-key="${key}"${showWhen}${hidden}><label><span>${label}${f.required ? ' *' : ''}</span>${desc}<input type="${type}"${ph}${previewDefaultAttr(f)} /></label></div>`;
