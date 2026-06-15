@@ -6,6 +6,7 @@ const pdiState = {
   colaboradorId: null,
   cicloId: null,
   detail: null,
+  mentores: null,
 };
 
 const DIM_LABELS = {
@@ -57,8 +58,66 @@ async function pdiApi(path, opts = {}) {
   return api(`/pdi${path}`, opts);
 }
 
+async function loadMentores() {
+  if (pdiState.mentores) return pdiState.mentores;
+  try {
+    const data = await pdiApi('/mentores');
+    pdiState.mentores = data.mentores || [];
+  } catch {
+    pdiState.mentores = [];
+  }
+  return pdiState.mentores;
+}
+
+function pdiCalc702010(acoes) {
+  const total = acoes.length;
+  if (!total) {
+    return { total: 0, pct: { pratico_70: 0, social_20: 0, formal_10: 0 }, pratico_70: 0, social_20: 0, formal_10: 0 };
+  }
+  const counts = { pratico_70: 0, social_20: 0, formal_10: 0 };
+  for (const a of acoes) {
+    if (counts[a.dimensao_70_20_10] != null) counts[a.dimensao_70_20_10] += 1;
+  }
+  return {
+    total,
+    ...counts,
+    pct: {
+      pratico_70: Math.round((counts.pratico_70 / total) * 100),
+      social_20: Math.round((counts.social_20 / total) * 100),
+      formal_10: Math.round((counts.formal_10 / total) * 100),
+    },
+  };
+}
+
+function pdiEvaluate702010(acoes) {
+  const distribuicao = pdiCalc702010(acoes);
+  if (!distribuicao.total) return { desbalanceado: false, alerta: null, distribuicao };
+  if (distribuicao.total < 3) {
+    return {
+      desbalanceado: true,
+      alerta: 'Recomendamos pelo menos 3 ações no plano para uma distribuição 70·20·10 equilibrada.',
+      distribuicao,
+    };
+  }
+  const ideal = { pratico_70: 70, social_20: 20, formal_10: 10 };
+  const maxDev = Math.max(
+    Math.abs(distribuicao.pct.pratico_70 - ideal.pratico_70),
+    Math.abs(distribuicao.pct.social_20 - ideal.social_20),
+    Math.abs(distribuicao.pct.formal_10 - ideal.formal_10),
+  );
+  if (maxDev > 15) {
+    const { pct } = distribuicao;
+    return {
+      desbalanceado: true,
+      alerta: `Distribuição ${pct.pratico_70}/${pct.social_20}/${pct.formal_10} difere do ideal 70/20/10. Considere reequilibrar as dimensões.`,
+      distribuicao,
+    };
+  }
+  return { desbalanceado: false, alerta: null, distribuicao };
+}
+
 function render702010Bar(metricas) {
-  const d = metricas?.distribuicao;
+  const d = metricas?.distribuicao || metricas?.dist702010?.distribuicao;
   if (!d?.total) {
     return '<p class="pdi-muted">Cadastre ações para ver a distribuição 70·20·10.</p>';
   }
@@ -79,6 +138,7 @@ function render702010Bar(metricas) {
 
 function renderAlertas(metricas) {
   const alerts = [];
+  if (metricas?.dist702010?.alerta) alerts.push(metricas.dist702010.alerta);
   if (metricas?.equilibrio?.alerta) alerts.push(metricas.equilibrio.alerta);
   if (metricas?.checkpoints?.message) alerts.push(metricas.checkpoints.message);
   if (metricas?.acoesAtrasadas > 0) {
@@ -86,6 +146,67 @@ function renderAlertas(metricas) {
   }
   if (!alerts.length) return '';
   return `<div class="pdi-alerts">${alerts.map((a) => `<p class="pdi-alert">${pdiEsc(a)}</p>`).join('')}</div>`;
+}
+
+function renderMentorSelect(name, mentores, selected = '') {
+  return `
+    <label><span>Mentor</span>
+      <select name="${name}">
+        <option value="">Nenhum</option>
+        ${mentores.map((m) => `<option value="${m.id}" ${String(m.id) === String(selected) ? 'selected' : ''}>${pdiEsc(m.email)}</option>`).join('')}
+      </select>
+    </label>`;
+}
+
+function renderAcaoRowHtml(index, mentores, values = {}) {
+  return `
+    <div class="pdi-acao-row" data-acao-row="${index}">
+      <label><span>Dimensão</span>
+        <select name="dim_${index}">
+          <option value="pratico_70" ${values.dimensao === 'pratico_70' ? 'selected' : ''}>Prático 70%</option>
+          <option value="social_20" ${values.dimensao === 'social_20' ? 'selected' : ''}>Social 20%</option>
+          <option value="formal_10" ${values.dimensao === 'formal_10' ? 'selected' : ''}>Formal 10%</option>
+        </select>
+      </label>
+      <label class="pdi-grow"><span>Ação</span>
+        <input name="acao_${index}" value="${pdiEsc(values.descricao || '')}" placeholder="Qual formato de aprendizado prefere?" />
+      </label>
+      <label><span>Prazo</span><input type="date" name="prazo_${index}" value="${pdiEsc(values.prazo || '')}" /></label>
+      <label><span>Investimento R$</span><input type="number" name="inv_${index}" min="0" step="0.01" value="${values.investimento ?? ''}" /></label>
+      ${renderMentorSelect(`mentor_${index}`, mentores, values.mentor_id || '')}
+      ${index > 0 ? `<button type="button" class="btn btn-ghost btn-sm pdi-remove-row" data-remove-row="${index}" title="Remover">×</button>` : ''}
+    </div>`;
+}
+
+function collectAcoesFromForm(form, rowCount) {
+  const acoes = [];
+  for (let i = 0; i < rowCount; i++) {
+    const desc = form[`acao_${i}`]?.value?.trim();
+    if (!desc) continue;
+    const mentorVal = form[`mentor_${i}`]?.value;
+    acoes.push({
+      dimensao_70_20_10: form[`dim_${i}`]?.value || 'pratico_70',
+      acao_descricao: desc,
+      prazo_limite: form[`prazo_${i}`]?.value || null,
+      investimento_estimado: form[`inv_${i}`]?.value || 0,
+      mentor_id: mentorVal || null,
+    });
+  }
+  return acoes;
+}
+
+function bind702010Preview(container, getAcoes) {
+  const preview = container.querySelector('#pdi-702010-preview');
+  if (!preview) return;
+  const update = () => {
+    const eval702010 = pdiEvaluate702010(getAcoes());
+    preview.innerHTML = `
+      ${render702010Bar({ distribuicao: eval702010.distribuicao })}
+      ${eval702010.alerta ? `<p class="pdi-alert">${pdiEsc(eval702010.alerta)}</p>` : ''}`;
+  };
+  container.addEventListener('change', update);
+  container.addEventListener('input', update);
+  update();
 }
 
 function renderGestorDashboard(data) {
@@ -121,7 +242,9 @@ function renderGestorDashboard(data) {
           ${(data.colaboradores || []).map((c) => {
             const ciclo = (data.ciclosAtivos || []).find((x) => x.colaborador_id === c.id);
             const prog = ciclo?.progresso ?? 0;
-            const alert = ciclo?.metricas?.acoesAtrasadas > 0 || ciclo?.metricas?.checkpoints?.overdue;
+            const alert = ciclo?.metricas?.acoesAtrasadas > 0
+              || ciclo?.metricas?.checkpoints?.overdue
+              || ciclo?.metricas?.dist702010?.desbalanceado;
             return `<tr class="${alert ? 'pdi-row--alert' : ''}">
               <td><strong>${pdiEsc(c.nome)}</strong><br><small>${pdiEsc(c.email)}</small></td>
               <td>${pdiEsc(c.cargo_atual || '—')} → ${pdiEsc(c.cargo_almejado || '—')}</td>
@@ -206,7 +329,7 @@ function renderColaboradorWorkspace(data) {
                 <span class="pdi-badge">${STATUS_ACAO[a.status]}</span>
               </div>
               <p>${pdiEsc(a.acao_descricao)}</p>
-              <p class="pdi-muted">Prazo: ${pdiFmtDate(a.prazo_limite)} · ${pdiFmtMoney(a.investimento_estimado)}</p>
+              <p class="pdi-muted">Prazo: ${pdiFmtDate(a.prazo_limite)} · ${pdiFmtMoney(a.investimento_estimado)}${a.mentor_email ? ` · Mentor: ${pdiEsc(a.mentor_email)}` : ''}</p>
               <label class="pdi-evidencia">
                 <span>Evidência de aprendizado</span>
                 <textarea rows="2" data-evidencia="${a.id}" placeholder="Link, certificado, dashboard criado…">${pdiEsc(a.evidencia_aprendizado || '')}</textarea>
@@ -304,10 +427,11 @@ function openColaboradorForm(existing = null) {
   });
 }
 
-function openCocriacaoForm(colaboradorId = null) {
+async function openCocriacaoForm(colaboradorId = null) {
   const modal = document.getElementById('pdi-modal');
   const box = document.getElementById('pdi-modal-body');
   const cols = pdiState.dashboard?.colaboradores || [];
+  const mentores = await loadMentores();
   if (!modal || !box) return;
 
   box.innerHTML = `
@@ -340,19 +464,9 @@ function openCocriacaoForm(colaboradorId = null) {
       </fieldset>
       <fieldset class="pdi-fieldset pdi-fieldset--acao">
         <legend>Bloco 3 · Ação (70·20·10)</legend>
+        <div id="pdi-702010-preview" class="pdi-702010-preview"></div>
         <div id="pdi-acoes-builder">
-          <div class="pdi-acao-row">
-            <label><span>Dimensão</span>
-              <select name="dim_0">
-                <option value="pratico_70">Prático 70%</option>
-                <option value="social_20">Social 20%</option>
-                <option value="formal_10">Formal 10%</option>
-              </select>
-            </label>
-            <label class="pdi-grow"><span>Ação</span><input name="acao_0" placeholder="Qual formato de aprendizado prefere?" /></label>
-            <label><span>Prazo</span><input type="date" name="prazo_0" /></label>
-            <label><span>Investimento R$</span><input type="number" name="inv_0" min="0" step="0.01" /></label>
-          </div>
+          ${renderAcaoRowHtml(0, mentores)}
         </div>
         <button type="button" class="btn btn-ghost btn-sm" id="pdi-add-acao-row">+ Ação</button>
       </fieldset>
@@ -364,37 +478,27 @@ function openCocriacaoForm(colaboradorId = null) {
 
   modal.removeAttribute('hidden');
   let acaoRows = 1;
+  const form = box.querySelector('#pdi-cocriacao-form');
+
+  bind702010Preview(form, () => collectAcoesFromForm(form, acaoRows));
+
   box.querySelector('#pdi-add-acao-row')?.addEventListener('click', () => {
     const wrap = box.querySelector('#pdi-acoes-builder');
     const i = acaoRows++;
-    wrap.insertAdjacentHTML('beforeend', `
-      <div class="pdi-acao-row">
-        <label><span>Dimensão</span>
-          <select name="dim_${i}">
-            <option value="pratico_70">Prático 70%</option>
-            <option value="social_20">Social 20%</option>
-            <option value="formal_10">Formal 10%</option>
-          </select>
-        </label>
-        <label class="pdi-grow"><span>Ação</span><input name="acao_${i}" /></label>
-        <label><span>Prazo</span><input type="date" name="prazo_${i}" /></label>
-        <label><span>Investimento R$</span><input type="number" name="inv_${i}" min="0" step="0.01" /></label>
-      </div>`);
+    wrap.insertAdjacentHTML('beforeend', renderAcaoRowHtml(i, mentores));
+    wrap.querySelector(`[data-remove-row="${i}"]`)?.addEventListener('click', () => {
+      wrap.querySelector(`[data-acao-row="${i}"]`)?.remove();
+    });
   });
+
   box.querySelector('#pdi-modal-cancel')?.addEventListener('click', () => modal.setAttribute('hidden', ''));
-  box.querySelector('#pdi-cocriacao-form')?.addEventListener('submit', async (e) => {
+  form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = e.target;
-    const acoes = [];
-    for (let i = 0; i < acaoRows; i++) {
-      const desc = f[`acao_${i}`]?.value?.trim();
-      if (!desc) continue;
-      acoes.push({
-        dimensao_70_20_10: f[`dim_${i}`]?.value || 'pratico_70',
-        acao_descricao: desc,
-        prazo_limite: f[`prazo_${i}`]?.value || null,
-        investimento_estimado: f[`inv_${i}`]?.value || 0,
-      });
+    const acoes = collectAcoesFromForm(f, acaoRows);
+    const eval702010 = pdiEvaluate702010(acoes);
+    if (eval702010.desbalanceado && !confirm(`${eval702010.alerta}\n\nDeseja criar o PDI mesmo assim?`)) {
+      return;
     }
     const colId = f.colaborador_id.value;
     const pontos = pdiReadLines('pontos_fortes');
@@ -427,30 +531,88 @@ function openCocriacaoForm(colaboradorId = null) {
   });
 }
 
-async function openColaboradorWorkspace(id) {
-  pdiState.colaboradorId = id;
-  pdiState.view = 'colaborador';
-  document.getElementById('pdi-view-gestor')?.setAttribute('hidden', '');
-  document.getElementById('pdi-view-colaborador')?.removeAttribute('hidden');
-  document.querySelectorAll('[data-pdi-subview]').forEach((b) => {
-    b.classList.toggle('active', b.dataset.pdiSubview === 'colaborador');
-  });
-  const data = await pdiApi(`/colaboradores/${id}`);
-  renderColaboradorWorkspace(data);
+function renderCicloAcaoItem(a, mentores) {
+  return `
+    <article class="pdi-acao-manage" data-acao-id="${a.id}">
+      <div class="pdi-acao-manage__view">
+        <div class="pdi-acao-card__head">
+          <span class="pdi-badge pdi-badge--dim">${DIM_LABELS[a.dimensao_70_20_10]}</span>
+          <span class="pdi-badge">${STATUS_ACAO[a.status]}</span>
+        </div>
+        <p>${pdiEsc(a.acao_descricao)}</p>
+        <p class="pdi-muted">Prazo: ${pdiFmtDate(a.prazo_limite)} · ${pdiFmtMoney(a.investimento_estimado)}${a.mentor_email ? ` · Mentor: ${pdiEsc(a.mentor_email)}` : ''}</p>
+        <div class="pdi-acao-manage__actions">
+          <button type="button" class="btn btn-sm btn-secondary" data-edit-acao="${a.id}">Editar</button>
+          <button type="button" class="btn btn-sm btn-ghost pdi-btn-danger" data-delete-acao="${a.id}">Remover</button>
+        </div>
+      </div>
+      <form class="pdi-acao-manage__edit pdi-form" data-edit-form="${a.id}" hidden>
+        <div class="pdi-acao-row pdi-acao-row--edit">
+          <label><span>Dimensão</span>
+            <select name="dim">
+              <option value="pratico_70" ${a.dimensao_70_20_10 === 'pratico_70' ? 'selected' : ''}>Prático 70%</option>
+              <option value="social_20" ${a.dimensao_70_20_10 === 'social_20' ? 'selected' : ''}>Social 20%</option>
+              <option value="formal_10" ${a.dimensao_70_20_10 === 'formal_10' ? 'selected' : ''}>Formal 10%</option>
+            </select>
+          </label>
+          <label class="pdi-grow"><span>Ação</span><input name="desc" value="${pdiEsc(a.acao_descricao)}" required /></label>
+          <label><span>Prazo</span><input type="date" name="prazo" value="${String(a.prazo_limite || '').slice(0, 10)}" /></label>
+          <label><span>Investimento R$</span><input type="number" name="inv" min="0" step="0.01" value="${a.investimento_estimado ?? 0}" /></label>
+          ${renderMentorSelect('mentor', mentores, a.mentor_id || '')}
+          <label><span>Status</span>
+            <select name="status">
+              ${Object.entries(STATUS_ACAO).map(([k, v]) => `<option value="${k}" ${a.status === k ? 'selected' : ''}>${v}</option>`).join('')}
+            </select>
+          </label>
+        </div>
+        <div class="pdi-acao-manage__actions">
+          <button type="submit" class="btn btn-sm btn-primary">Salvar</button>
+          <button type="button" class="btn btn-sm btn-ghost" data-cancel-edit="${a.id}">Cancelar</button>
+        </div>
+      </form>
+    </article>`;
 }
 
 async function openCicloDetail(cicloId) {
   const modal = document.getElementById('pdi-modal');
   const box = document.getElementById('pdi-modal-body');
+  const mentores = await loadMentores();
   const full = await pdiApi(`/ciclos/${cicloId}`);
   pdiState.cicloId = cicloId;
   if (!modal || !box) return;
 
   box.innerHTML = `
     <h3>PDI · ${pdiEsc(full.ciclo.colaborador_nome)}</h3>
+    <p class="pdi-smart">${pdiEsc(full.ciclo.objetivo_principal_smart)}</p>
     ${renderAlertas(full.metricas)}
     ${render702010Bar(full.metricas)}
     <p class="pdi-budget">Budget: ${pdiFmtMoney(full.metricas.budget.gasto)} / ${pdiFmtMoney(full.metricas.budget.limite)}</p>
+
+    <section class="pdi-block">
+      <h4>Plano de ação</h4>
+      <div id="pdi-ciclo-acoes-list" class="pdi-acoes-manage-list">
+        ${(full.acoes || []).map((a) => renderCicloAcaoItem(a, mentores)).join('') || '<p class="pdi-muted">Nenhuma ação cadastrada.</p>'}
+      </div>
+    </section>
+
+    <form id="pdi-add-acao-form" class="pdi-form pdi-fieldset">
+      <h4>Adicionar ação</h4>
+      <div class="pdi-acao-row">
+        <label><span>Dimensão</span>
+          <select name="dimensao_70_20_10">
+            <option value="pratico_70">Prático 70%</option>
+            <option value="social_20">Social 20%</option>
+            <option value="formal_10">Formal 10%</option>
+          </select>
+        </label>
+        <label class="pdi-grow"><span>Ação</span><input name="acao_descricao" required placeholder="Nova ação de desenvolvimento" /></label>
+        <label><span>Prazo</span><input type="date" name="prazo_limite" /></label>
+        <label><span>Investimento R$</span><input type="number" name="investimento_estimado" min="0" step="0.01" /></label>
+        ${renderMentorSelect('mentor_id', mentores)}
+      </div>
+      <button type="submit" class="btn btn-secondary btn-sm">+ Adicionar ação</button>
+    </form>
+
     <form id="pdi-checkpoint-form" class="pdi-form">
       <h4>Registrar checkpoint (1:1)</h4>
       <label><span>Data</span><input type="date" name="data_reuniao" required /></label>
@@ -460,8 +622,86 @@ async function openCicloDetail(cicloId) {
       <button type="submit" class="btn btn-secondary btn-sm">Salvar checkpoint</button>
     </form>
     <button type="button" class="btn btn-ghost" id="pdi-modal-close">Fechar</button>`;
+
   modal.removeAttribute('hidden');
   box.querySelector('#pdi-modal-close')?.addEventListener('click', () => modal.setAttribute('hidden', ''));
+
+  box.querySelectorAll('[data-edit-acao]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.editAcao;
+      const item = box.querySelector(`[data-acao-id="${id}"]`);
+      item?.querySelector('.pdi-acao-manage__view')?.setAttribute('hidden', '');
+      item?.querySelector(`[data-edit-form="${id}"]`)?.removeAttribute('hidden');
+    });
+  });
+
+  box.querySelectorAll('[data-cancel-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.cancelEdit;
+      const item = box.querySelector(`[data-acao-id="${id}"]`);
+      item?.querySelector('.pdi-acao-manage__view')?.removeAttribute('hidden');
+      item?.querySelector(`[data-edit-form="${id}"]`)?.setAttribute('hidden', '');
+    });
+  });
+
+  box.querySelectorAll('[data-edit-form]').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = form.dataset.editForm;
+      try {
+        await pdiApi(`/acoes/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            dimensao_70_20_10: form.dim.value,
+            acao_descricao: form.desc.value.trim(),
+            prazo_limite: form.prazo.value || null,
+            investimento_estimado: form.inv.value || 0,
+            mentor_id: form.mentor.value || null,
+            status: form.status.value,
+          }),
+        });
+        await openCicloDetail(cicloId);
+        await loadPdiHr();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  });
+
+  box.querySelectorAll('[data-delete-acao]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Remover esta ação do plano?')) return;
+      try {
+        await pdiApi(`/acoes/${btn.dataset.deleteAcao}`, { method: 'DELETE' });
+        await openCicloDetail(cicloId);
+        await loadPdiHr();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  });
+
+  box.querySelector('#pdi-add-acao-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    try {
+      await pdiApi(`/ciclos/${cicloId}/acoes`, {
+        method: 'POST',
+        body: JSON.stringify({
+          dimensao_70_20_10: f.dimensao_70_20_10.value,
+          acao_descricao: f.acao_descricao.value.trim(),
+          prazo_limite: f.prazo_limite.value || null,
+          investimento_estimado: f.investimento_estimado.value || 0,
+          mentor_id: f.mentor_id.value || null,
+        }),
+      });
+      await openCicloDetail(cicloId);
+      await loadPdiHr();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
   box.querySelector('#pdi-checkpoint-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = e.target;
@@ -481,6 +721,18 @@ async function openCicloDetail(cicloId) {
       alert(err.message);
     }
   });
+}
+
+async function openColaboradorWorkspace(id) {
+  pdiState.colaboradorId = id;
+  pdiState.view = 'colaborador';
+  document.getElementById('pdi-view-gestor')?.setAttribute('hidden', '');
+  document.getElementById('pdi-view-colaborador')?.removeAttribute('hidden');
+  document.querySelectorAll('[data-pdi-subview]').forEach((b) => {
+    b.classList.toggle('active', b.dataset.pdiSubview === 'colaborador');
+  });
+  const data = await pdiApi(`/colaboradores/${id}`);
+  renderColaboradorWorkspace(data);
 }
 
 async function loadPdiHr() {

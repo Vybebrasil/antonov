@@ -60,6 +60,42 @@ export function calc702010(acoes = []) {
   };
 }
 
+const IDEAL_702010 = { pratico_70: 70, social_20: 20, formal_10: 10 };
+const TOLERANCE_702010 = 15;
+
+export function evaluate702010(acoes = []) {
+  const distribuicao = calc702010(acoes);
+  if (!distribuicao.total) {
+    return { desbalanceado: false, alerta: null, distribuicao };
+  }
+
+  if (distribuicao.total < 3) {
+    return {
+      desbalanceado: true,
+      alerta: 'Recomendamos pelo menos 3 ações no plano para uma distribuição 70·20·10 equilibrada.',
+      distribuicao,
+    };
+  }
+
+  const deviations = [
+    Math.abs(distribuicao.pct.pratico_70 - IDEAL_702010.pratico_70),
+    Math.abs(distribuicao.pct.social_20 - IDEAL_702010.social_20),
+    Math.abs(distribuicao.pct.formal_10 - IDEAL_702010.formal_10),
+  ];
+  const maxDev = Math.max(...deviations);
+
+  if (maxDev > TOLERANCE_702010) {
+    const { pct } = distribuicao;
+    return {
+      desbalanceado: true,
+      alerta: `Distribuição ${pct.pratico_70}/${pct.social_20}/${pct.formal_10} difere do ideal 70/20/10. Considere reequilibrar as dimensões.`,
+      distribuicao,
+    };
+  }
+
+  return { desbalanceado: false, alerta: null, distribuicao };
+}
+
 export function calcBudget(acoes = [], budgetLimite = 0) {
   const gasto = acoes.reduce((sum, a) => sum + (Number(a.investimento_estimado) || 0), 0);
   const limite = Number(budgetLimite) || 0;
@@ -177,8 +213,11 @@ export async function getCicloFull(cicloId) {
   if (!ciclo) return null;
 
   const acoes = await sql`
-    SELECT * FROM pdis_planos_acao WHERE ciclo_id = ${cicloId}
-    ORDER BY prazo_limite ASC NULLS LAST, created_at ASC
+    SELECT pa.*, u.email AS mentor_email
+    FROM pdis_planos_acao pa
+    LEFT JOIN admin_users u ON u.id = pa.mentor_id
+    WHERE pa.ciclo_id = ${cicloId}
+    ORDER BY pa.prazo_limite ASC NULLS LAST, pa.created_at ASC
   `;
   const checkpoints = await sql`
     SELECT * FROM pdis_checkpoints WHERE ciclo_id = ${cicloId}
@@ -186,6 +225,7 @@ export async function getCicloFull(cicloId) {
   `;
 
   const distribuicao = calc702010(acoes);
+  const dist702010 = evaluate702010(acoes);
   const budget = calcBudget(acoes, ciclo.budget_limite ?? ciclo.budget_anual);
   const equilibrio = analyzeEquilibrio(
     { ...ciclo, pontos_fortes_colaborador: ciclo.pontos_fortes },
@@ -204,6 +244,7 @@ export async function getCicloFull(cicloId) {
     checkpoints,
     metricas: {
       distribuicao,
+      dist702010,
       budget,
       equilibrio,
       checkpoints: checkpointsInfo,
@@ -246,7 +287,8 @@ export async function getDashboardGestor(liderId = null) {
   const alertas = enriched.filter((c) =>
     c.metricas?.acoesAtrasadas > 0
     || c.metricas?.checkpoints?.overdue
-    || c.metricas?.equilibrio?.onlyGaps,
+    || c.metricas?.equilibrio?.onlyGaps
+    || c.metricas?.dist702010?.desbalanceado,
   );
 
   const budgetTotal = enriched.reduce((s, c) => s + (c.metricas?.budget?.gasto || 0), 0);

@@ -1,3 +1,6 @@
 Antonov/
 LOJAS
+dist/
+dist_bak*/
+dist_old*/
 _build_vip.py

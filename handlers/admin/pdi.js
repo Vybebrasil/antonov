@@ -43,6 +43,11 @@ export default async function handler(req, res) {
       return json(res, 200, data);
     }
 
+    if (parts[0] === 'mentores' && parts.length === 1 && req.method === 'GET') {
+      const rows = await sql`SELECT id, email FROM admin_users ORDER BY email ASC`;
+      return json(res, 200, { mentores: rows });
+    }
+
     if (parts[0] === 'colaboradores') {
       if (parts.length === 1 && req.method === 'GET') {
         const rows = await listColaboradores();
@@ -138,15 +143,17 @@ export default async function handler(req, res) {
         for (const ac of acoes) {
           if (!String(ac.acao_descricao || '').trim()) continue;
           const dim = DIMENSAO_702010.has(ac.dimensao_70_20_10) ? ac.dimensao_70_20_10 : 'pratico_70';
+          const mentorId = ac.mentor_id ? Number(ac.mentor_id) : null;
           await sql`
             INSERT INTO pdis_planos_acao (
               ciclo_id, dimensao_70_20_10, acao_descricao, prazo_limite,
-              evidencia_aprendizado, investimento_estimado, status
+              mentor_id, evidencia_aprendizado, investimento_estimado, status
             ) VALUES (
               ${ciclo.id},
               ${dim},
               ${String(ac.acao_descricao).trim()},
               ${ac.prazo_limite || null},
+              ${mentorId},
               ${String(ac.evidencia_aprendizado || '').trim() || null},
               ${Number(ac.investimento_estimado) || 0},
               ${ACAO_STATUS.has(ac.status) ? ac.status : 'nao_iniciado'}
@@ -205,13 +212,15 @@ export default async function handler(req, res) {
         const desc = String(body.acao_descricao || '').trim();
         if (!desc) return json(res, 400, { error: 'Descrição da ação é obrigatória.' });
         const dim = DIMENSAO_702010.has(body.dimensao_70_20_10) ? body.dimensao_70_20_10 : 'pratico_70';
+        const mentorId = body.mentor_id ? Number(body.mentor_id) : null;
         const rows = await sql`
           INSERT INTO pdis_planos_acao (
             ciclo_id, dimensao_70_20_10, acao_descricao, prazo_limite,
-            evidencia_aprendizado, investimento_estimado, status, anotacoes_colaborador
+            mentor_id, evidencia_aprendizado, investimento_estimado, status, anotacoes_colaborador
           ) VALUES (
             ${parts[1]}, ${dim}, ${desc},
             ${body.prazo_limite || null},
+            ${mentorId},
             ${String(body.evidencia_aprendizado || '').trim() || null},
             ${Number(body.investimento_estimado) || 0},
             ${ACAO_STATUS.has(body.status) ? body.status : 'nao_iniciado'},
@@ -253,6 +262,9 @@ export default async function handler(req, res) {
             ? body.dimensao_70_20_10 : ac.dimensao_70_20_10},
           acao_descricao = ${body.acao_descricao != null ? String(body.acao_descricao).trim() : ac.acao_descricao},
           prazo_limite = ${body.prazo_limite !== undefined ? body.prazo_limite || null : ac.prazo_limite},
+          mentor_id = ${body.mentor_id !== undefined
+            ? (body.mentor_id ? Number(body.mentor_id) : null)
+            : ac.mentor_id},
           evidencia_aprendizado = ${body.evidencia_aprendizado != null
             ? String(body.evidencia_aprendizado).trim() || null
             : ac.evidencia_aprendizado},
@@ -270,6 +282,15 @@ export default async function handler(req, res) {
       const updated = await sql`SELECT * FROM pdis_planos_acao WHERE id = ${parts[1]} LIMIT 1`;
       const ciclo = await getCicloFull(ac.ciclo_id);
       return json(res, 200, { acao: updated[0], ciclo });
+    }
+
+    if (parts[0] === 'acoes' && parts.length === 2 && req.method === 'DELETE') {
+      const acoes = await sql`SELECT * FROM pdis_planos_acao WHERE id = ${parts[1]} LIMIT 1`;
+      const ac = acoes[0];
+      if (!ac) return json(res, 404, { error: 'Ação não encontrada.' });
+      await sql`DELETE FROM pdis_planos_acao WHERE id = ${parts[1]}`;
+      const ciclo = await getCicloFull(ac.ciclo_id);
+      return json(res, 200, { ok: true, ciclo });
     }
 
     return json(res, 404, { error: 'Rota PDI não encontrada.' });
