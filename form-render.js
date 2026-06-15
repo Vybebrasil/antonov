@@ -300,19 +300,26 @@ function syncConditionalFields(form, fields) {
   }
 }
 
-function validateRequiredFields(fields, values) {
+function validateRequiredFields(formEl, fields, values) {
   for (const f of fields) {
     if (!f.required || !fieldIsVisible(f, values)) continue;
     const val = values[f.field_key];
     if (isCheckboxGroup(f) && (!Array.isArray(val) || !val.length)) {
       return `Campo obrigatório: ${f.label}`;
     }
+    if (f.field_type === 'checkbox' && !isCheckboxGroup(f) && !val) {
+      return `Campo obrigatório: ${f.label}`;
+    }
     if (f.field_type === 'radio' && !String(val || '').trim()) {
       return `Campo obrigatório: ${f.label}`;
     }
     if (f.field_type === 'file') {
-      const input = form.querySelector(`input[type="file"][name="${CSS.escape(f.field_key)}"]`);
+      const input = formEl.querySelector(`input[type="file"][name="${CSS.escape(f.field_key)}"]`);
       if (!input?.files?.length) return `Campo obrigatório: ${f.label}`;
+      continue;
+    }
+    if (!String(val || '').trim()) {
+      return `Campo obrigatório: ${f.label}`;
     }
   }
   return null;
@@ -392,18 +399,18 @@ async function init() {
       syncConditionalFields(form, fields);
 
       const btn = form.querySelector('[type="submit"]');
-      const values = getFormValues(form, fields);
-      const requiredError = validateRequiredFields(fields, values);
-      if (requiredError) {
-        alert(requiredError);
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="form-submit__label">Enviando…</span>';
-
-      const body = {};
       try {
+        const values = getFormValues(form, fields);
+        const requiredError = validateRequiredFields(form, fields, values);
+        if (requiredError) {
+          alert(requiredError);
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="form-submit__label">Enviando…</span>';
+
+        const body = {};
         for (const f of fields) {
           if (!fieldIsVisible(f, values)) {
             body[f.field_key] = isCheckboxGroup(f)
@@ -418,14 +425,8 @@ async function init() {
             body[f.field_key] = values[f.field_key];
           }
         }
-      } catch (fileErr) {
-        resetSubmitButton(btn);
-        alert(fileErr.message);
-        return;
-      }
-      body.page = window.location.pathname;
+        body.page = window.location.pathname;
 
-      try {
         const r = await fetch(`/api/forms/${slug}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -439,7 +440,7 @@ async function init() {
         document.getElementById('form-success').removeAttribute('hidden');
       } catch (err) {
         resetSubmitButton(btn);
-        alert(err.message);
+        alert(err?.message || 'Não foi possível enviar o formulário.');
       }
     });
   } catch (err) {
