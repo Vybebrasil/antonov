@@ -3098,6 +3098,13 @@ input:focus, select:focus, textarea:focus {
 .pdi-acao-manage { padding: 0.85rem; border-radius: 8px; background: var(--surface2); border: 1px solid #333; }
 .pdi-acao-manage__actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
 .pdi-btn-danger { color: var(--danger); }
+.pdi-danger-zone {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(231, 76, 60, 0.35);
+}
+.pdi-danger-zone h4 { margin: 0 0 0.35rem; color: var(--danger); font-size: 0.9rem; }
+.pdi-modal-footer { display: flex; justify-content: flex-end; margin-top: 1rem; }
 .pdi-remove-row { align-self: center; min-width: 2rem; padding: 0.25rem 0.5rem; font-size: 1.1rem; line-height: 1; }
 .pdi-workspace__head { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .pdi-kicker { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin: 0; }

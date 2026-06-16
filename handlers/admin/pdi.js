@@ -206,6 +206,13 @@ export default async function handler(req, res) {
         return json(res, 200, full);
       }
 
+      if (parts.length === 2 && req.method === 'DELETE') {
+        const existing = await getCicloFull(parts[1]);
+        if (!existing) return json(res, 404, { error: 'Ciclo não encontrado.' });
+        await sql`DELETE FROM pdis_ciclos WHERE id = ${parts[1]}`;
+        return json(res, 200, { ok: true, id: parts[1] });
+      }
+
       if (parts.length === 3 && parts[2] === 'acoes' && req.method === 'POST') {
         const full = await getCicloFull(parts[1]);
         if (!full) return json(res, 404, { error: 'Ciclo não encontrado.' });

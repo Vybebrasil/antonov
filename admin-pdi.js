@@ -621,10 +621,31 @@ async function openCicloDetail(cicloId) {
       <label><span>Próximos passos</span><textarea name="proximos_passos" rows="2"></textarea></label>
       <button type="submit" class="btn btn-secondary btn-sm">Salvar checkpoint</button>
     </form>
-    <button type="button" class="btn btn-ghost" id="pdi-modal-close">Fechar</button>`;
+    <div class="pdi-danger-zone">
+      <h4>Zona de risco</h4>
+      <p class="pdi-muted">Excluir o PDI remove permanentemente o ciclo, todas as ações e checkpoints registrados.</p>
+      <button type="button" class="btn btn-sm btn-ghost pdi-btn-danger" id="pdi-delete-ciclo">Excluir PDI</button>
+    </div>
+    <div class="pdi-modal-footer">
+      <button type="button" class="btn btn-ghost" id="pdi-modal-close">Fechar</button>
+    </div>`;
 
   modal.removeAttribute('hidden');
   box.querySelector('#pdi-modal-close')?.addEventListener('click', () => modal.setAttribute('hidden', ''));
+
+  box.querySelector('#pdi-delete-ciclo')?.addEventListener('click', async () => {
+    const nome = full.ciclo.colaborador_nome;
+    const msg = `Excluir o PDI de ${nome}?\n\nTodas as ações e checkpoints serão removidos permanentemente.`;
+    if (!confirm(msg)) return;
+    try {
+      await pdiApi(`/ciclos/${cicloId}`, { method: 'DELETE' });
+      modal.setAttribute('hidden', '');
+      pdiState.cicloId = null;
+      await loadPdiHr();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
 
   box.querySelectorAll('[data-edit-acao]').forEach((btn) => {
     btn.addEventListener('click', () => {
