@@ -89,7 +89,7 @@ function renderAchadosList() {
               </td>
               <td class="pdi-muted">
                 ${item.status === 'entregue'
-                  ? `${achFmtDate(item.data_entrega)} · ${achEsc(item.entregue_a || '—')}`
+                  ? `${achFmtDate(item.data_entrega)} · ${achEsc(item.entregue_a || '—')}${item.entregue_a_id ? ` (ID ${achEsc(item.entregue_a_id)})` : ''}`
                   : '—'}
               </td>
               <td class="achados-row-actions">
@@ -179,8 +179,11 @@ function openAchadosForm(existing = null, opts = {}) {
         <label><span>Data de entrega</span>
           <input type="date" name="data_entrega" value="${String(existing?.data_entrega || achToday()).slice(0, 10)}" ${markFound ? 'required' : ''} />
         </label>
-        <label><span>A quem foi entregue</span>
-          <input name="entregue_a" value="${achEsc(existing?.entregue_a || '')}" placeholder="Nome do dono / responsável" ${markFound ? 'required' : ''} />
+        <label><span>A quem foi entregue (nome do aluno)</span>
+          <input name="entregue_a" value="${achEsc(existing?.entregue_a || '')}" placeholder="Nome do aluno" ${markFound ? 'required' : ''} />
+        </label>
+        <label><span>ID do aluno</span>
+          <input name="entregue_a_id" value="${achEsc(existing?.entregue_a_id || '')}" placeholder="ID / matrícula" ${markFound ? 'required' : ''} />
         </label>
         <label><span>Por quem foi entregue</span>
           <input name="entregue_por" value="${achEsc(existing?.entregue_por || '')}" placeholder="Nome do colaborador" ${markFound ? 'required' : ''} />
@@ -208,7 +211,7 @@ function openAchadosForm(existing = null, opts = {}) {
 
   box.querySelector('#achados-toggle-found')?.addEventListener('click', () => {
     foundBlock?.removeAttribute('hidden');
-    ['data_entrega', 'entregue_a', 'entregue_por'].forEach((name) => {
+    ['data_entrega', 'entregue_a', 'entregue_a_id', 'entregue_por'].forEach((name) => {
       const input = form?.[name];
       if (input) input.required = true;
     });
@@ -264,9 +267,10 @@ function openAchadosForm(existing = null, opts = {}) {
       payload.status = 'entregue';
       payload.data_entrega = f.data_entrega.value;
       payload.entregue_a = f.entregue_a.value.trim();
+      payload.entregue_a_id = f.entregue_a_id.value.trim();
       payload.entregue_por = f.entregue_por.value.trim();
-      if (!payload.data_entrega || !payload.entregue_a || !payload.entregue_por) {
-        alert('Preencha data de entrega, a quem e por quem foi entregue.');
+      if (!payload.data_entrega || !payload.entregue_a || !payload.entregue_a_id || !payload.entregue_por) {
+        alert('Preencha data de entrega, nome do aluno, ID e por quem foi entregue.');
         return;
       }
     }

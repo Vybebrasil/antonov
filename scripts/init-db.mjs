@@ -339,12 +339,15 @@ await sql`
       CHECK (status IN ('pendente', 'entregue')),
     data_entrega DATE,
     entregue_a TEXT,
+    entregue_a_id TEXT,
     entregue_por TEXT,
     criado_por BIGINT REFERENCES admin_users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 `;
+
+await sql`ALTER TABLE achados_perdidos ADD COLUMN IF NOT EXISTS entregue_a_id TEXT;`;
 
 await sql`CREATE INDEX IF NOT EXISTS achados_perdidos_status_idx ON achados_perdidos (status, data_cadastro DESC);`;
 

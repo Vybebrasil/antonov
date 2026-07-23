@@ -94,12 +94,15 @@ export default async function handler(req, res) {
         if (body.status === 'entregue') {
           const dataEntrega = body.data_entrega;
           const entregueA = String(body.entregue_a || '').trim();
+          const entregueAId = String(body.entregue_a_id || '').trim();
           const entreguePor = String(body.entregue_por || '').trim();
           if (!dataEntrega) return json(res, 400, { error: 'Data de entrega é obrigatória.' });
           if (!entregueA) return json(res, 400, { error: 'Informe a quem foi entregue.' });
+          if (!entregueAId) return json(res, 400, { error: 'Informe o ID do aluno.' });
           if (!entreguePor) return json(res, 400, { error: 'Informe por quem foi entregue.' });
           patch.data_entrega = dataEntrega;
           patch.entregue_a = entregueA;
+          patch.entregue_a_id = entregueAId;
           patch.entregue_por = entreguePor;
         }
       }

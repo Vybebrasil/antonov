@@ -18,6 +18,7 @@ export function mapItem(row, { includeFotoData = true } = {}) {
     status: row.status,
     data_entrega: row.data_entrega,
     entregue_a: row.entregue_a,
+    entregue_a_id: row.entregue_a_id,
     entregue_por: row.entregue_por,
     criado_por: row.criado_por,
     criado_por_email: row.criado_por_email || null,
@@ -125,15 +126,18 @@ export async function updateItem(id, patch) {
 
   let dataEntrega = cur.data_entrega;
   let entregueA = cur.entregue_a;
+  let entregueAId = cur.entregue_a_id;
   let entreguePor = cur.entregue_por;
 
   if (status === 'entregue') {
     dataEntrega = patch.data_entrega != null ? patch.data_entrega : cur.data_entrega;
     entregueA = patch.entregue_a != null ? String(patch.entregue_a).trim() : cur.entregue_a;
+    entregueAId = patch.entregue_a_id != null ? String(patch.entregue_a_id).trim() : cur.entregue_a_id;
     entreguePor = patch.entregue_por != null ? String(patch.entregue_por).trim() : cur.entregue_por;
   } else if (status === 'pendente' && patch.status === 'pendente') {
     dataEntrega = null;
     entregueA = null;
+    entregueAId = null;
     entreguePor = null;
   }
 
@@ -147,6 +151,7 @@ export async function updateItem(id, patch) {
       status = ${status},
       data_entrega = ${dataEntrega || null},
       entregue_a = ${entregueA || null},
+      entregue_a_id = ${entregueAId || null},
       entregue_por = ${entreguePor || null},
       updated_at = NOW()
     WHERE id = ${id}
