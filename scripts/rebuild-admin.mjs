@@ -9,7 +9,9 @@ const cssMin = new CleanCSS({ level: 2 });
 
 const adminBundle = readFileSync(join(root, 'admin.js'), 'utf8')
   + '\n'
-  + readFileSync(join(root, 'admin-pdi.js'), 'utf8');
+  + readFileSync(join(root, 'admin-pdi.js'), 'utf8')
+  + '\n'
+  + readFileSync(join(root, 'admin-achados.js'), 'utf8');
 
 writeFileSync(
   join(root, 'dist', 'admin.min.js'),
@@ -33,7 +35,9 @@ html = html
   .split('href="/css/pages/admin.css"').join('href="/css/pages/admin.min.css"')
   .split("href='/css/pages/admin.css'").join("href='/css/pages/admin.min.css'")
   .split('src="/admin-pdi.js"').join('')
-  .split("src='/admin-pdi.js'").join('');
+  .split("src='/admin-pdi.js'").join('')
+  .split('src="/admin-achados.js"').join('')
+  .split("src='/admin-achados.js'").join('');
 writeFileSync(join(root, 'dist', 'admin.html'), html);
 
 console.log('admin rebuilt');

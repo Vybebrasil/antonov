@@ -64,6 +64,11 @@ export default async function handler(req, res) {
       req.query.path = parts.slice(1).join('/');
       return (await import('../../handlers/admin/pdi.js')).default(req, res);
     }
+    if (parts[0] === 'achados-perdidos') {
+      if (!req.query) req.query = {};
+      req.query.path = parts.slice(1).join('/');
+      return (await import('../../handlers/admin/achados-perdidos.js')).default(req, res);
+    }
 
     res.statusCode = 404;
     res.setHeader('Content-Type', 'application/json; charset=utf-8');

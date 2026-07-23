@@ -3106,6 +3106,61 @@ input:focus, select:focus, textarea:focus {
 .pdi-danger-zone h4 { margin: 0 0 0.35rem; color: var(--danger); font-size: 0.9rem; }
 .pdi-modal-footer { display: flex; justify-content: flex-end; margin-top: 1rem; }
 .pdi-remove-row { align-self: center; min-width: 2rem; padding: 0.25rem 0.5rem; font-size: 1.1rem; line-height: 1; }
+.achados-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #333;
+  display: block;
+  background: #1a1a1e;
+}
+.achados-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+.achados-foto-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.achados-foto-field__label { font-size: 0.85rem; }
+.achados-foto-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.achados-foto-btn { cursor: pointer; display: inline-flex; align-items: center; }
+.achados-foto-preview {
+  margin: 0 0 0.75rem;
+  min-height: 0;
+}
+.achados-foto-preview img {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  object-fit: contain;
+  background: #1a1a1e;
+}
+.achados-check {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.5rem !important;
+}
+.achados-check input { width: auto; }
+.achados-found-block {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #333;
+}
+.achados-found-block h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+}
+.achados-modal-actions {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 .pdi-workspace__head { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .pdi-kicker { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin: 0; }
 .pdi-block { margin-bottom: 1.25rem; padding-top: 0.5rem; border-top: 1px solid #2a2a30; }

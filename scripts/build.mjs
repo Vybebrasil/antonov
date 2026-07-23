@@ -32,6 +32,7 @@ const JS_FILES = [
   'trabalhe-conosco-form.js',
   'admin.js',
   'form-render.js',
+  'achados-e-perdidos.js',
 ];
 
 const COPY_FILES = [
@@ -47,6 +48,7 @@ async function minifyJsToDist(file) {
   let code = readFileSync(join(root, file), 'utf8');
   if (file === 'admin.js') {
     code += `\n${readFileSync(join(root, 'admin-pdi.js'), 'utf8')}`;
+    code += `\n${readFileSync(join(root, 'admin-achados.js'), 'utf8')}`;
   }
   const out = await esbuild.transform(code, {
     minify: true,
@@ -193,6 +195,12 @@ function processHtml(name) {
       new RegExp(`<script src="${base}\\.min\\.js"(?![^>]*\\bdefer\\b)`, 'g'),
       `<script src="${base}.min.js" defer`
     );
+  }
+
+  if (name === 'admin.html') {
+    html = html
+      .replace(/<script[^>]*src=["']\/?admin-pdi\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '');
   }
 
   writeFileSync(join(dist, name), html, 'utf8');

@@ -326,3 +326,26 @@ await sql`CREATE INDEX IF NOT EXISTS pdis_planos_acao_ciclo_idx ON pdis_planos_a
 await sql`CREATE INDEX IF NOT EXISTS pdis_checkpoints_ciclo_idx ON pdis_checkpoints (ciclo_id, data_reuniao DESC);`;
 
 console.log('Tabelas RH/PDI (colaboradores, ciclos, planos de ação, checkpoints) prontas.');
+
+await sql`
+  CREATE TABLE IF NOT EXISTS achados_perdidos (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nome_produto TEXT NOT NULL,
+    data_cadastro DATE NOT NULL,
+    foto_name TEXT,
+    foto_type TEXT,
+    foto_data TEXT,
+    status TEXT NOT NULL DEFAULT 'pendente'
+      CHECK (status IN ('pendente', 'entregue')),
+    data_entrega DATE,
+    entregue_a TEXT,
+    entregue_por TEXT,
+    criado_por BIGINT REFERENCES admin_users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+`;
+
+await sql`CREATE INDEX IF NOT EXISTS achados_perdidos_status_idx ON achados_perdidos (status, data_cadastro DESC);`;
+
+console.log('Tabela achados_perdidos pronta.');

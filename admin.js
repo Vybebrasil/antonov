@@ -498,6 +498,13 @@ function switchTab(name, opts = {}) {
     }
     if (typeof onPdiTabOpen === 'function') onPdiTabOpen();
   }
+  if (name === 'achados') {
+    if (typeof initAchadosAdmin === 'function' && !window._achadosInited) {
+      initAchadosAdmin();
+      window._achadosInited = true;
+    }
+    if (typeof onAchadosTabOpen === 'function') onAchadosTabOpen();
+  }
   requestAnimationFrame(() => {
     if (opts.focusTab) focusTabButton(name);
     else $(`#tab-heading-${name}`)?.focus({ preventScroll: true });

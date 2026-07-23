@@ -56,6 +56,10 @@
           <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 9a7 7 0 0 1 14 0H5zm14-2a6 6 0 0 0-3.5-5.47A6.02 6.02 0 0 1 21 18h-2z" fill="currentColor"/></svg>
           <span class="tab-label">RH / PDI</span>
         </button>
+        <button type="button" class="tab" id="tab-btn-achados" role="tab" data-tab="achados" aria-selected="false" aria-controls="tab-achados" tabindex="-1">
+          <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l1 3h3v2h-1.1l-1.7 10.1A2 2 0 0 1 16.22 21H7.78a2 2 0 0 1-1.98-1.9L4.1 9H3V7h3l1-3zm1.2 5-.9 5.5h9.4L15.8 9H8.2zM9 14h6v2H9v-2z" fill="currentColor"/></svg>
+          <span class="tab-label">Achados</span>
+        </button>
       </nav>
       <div class="panel-user">
         <span id="user-email" class="panel-user__email"></span>
@@ -342,6 +346,22 @@
           <div id="pdi-colab-content"></div>
         </div>
       </section>
+
+      <section id="tab-achados" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-achados" hidden>
+        <header class="dash-head">
+          <div class="dash-head__main">
+            <p class="dash-kicker">Recepção</p>
+            <h2 tabindex="-1" id="tab-heading-achados">Achados e Perdidos</h2>
+            <p class="dash-sub">Registre itens encontrados na academia e registre a entrega aos donos</p>
+          </div>
+          <div class="dash-toolbar">
+            <button type="button" id="achados-refresh" class="btn btn-secondary btn-sm">Atualizar</button>
+          </div>
+        </header>
+        <p id="achados-loading" class="dash-loading" hidden><span class="dash-skeleton__block"></span> Carregando…</p>
+        <p id="achados-error" class="section-error" hidden role="alert"></p>
+        <div id="achados-content"></div>
+      </section>
     </main>
   </div>
 </div>
@@ -417,7 +437,15 @@
   </div>
 </div>
 
+<div id="achados-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="achados-modal-title">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box card pdi-modal-box">
+    <div id="achados-modal-body"></div>
+  </div>
+</div>
+
 <script src="/admin.js" defer></script>
 <script src="/admin-pdi.js" defer></script>
+<script src="/admin-achados.js" defer></script>
 </body>
 </html>
