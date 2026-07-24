@@ -42,8 +42,8 @@ function fileToBase64Payload(file) {
   });
 }
 
-/** Redimensiona/comprime foto para caber no banco e na API (max ~1.2MB). */
-function compressImageFile(file, { maxSide = 1280, quality = 0.72 } = {}) {
+/** Redimensiona/comprime foto em WebP (fallback JPEG) para carregar mais rápido. */
+function compressImageFile(file, { maxSide = 1200, quality = 0.7 } = {}) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
@@ -62,20 +62,40 @@ function compressImageFile(file, { maxSide = 1280, quality = 0.72 } = {}) {
         return;
       }
       ctx.drawImage(img, 0, 0, width, height);
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          reject(new Error('Falha ao comprimir a foto.'));
-          return;
-        }
+
+      const tryEncode = (mime, ext) => new Promise((res) => {
+        canvas.toBlob((blob) => res(blob), mime, quality);
+      });
+
+      (async () => {
         try {
-          const outFile = new File([blob], (file.name || 'foto').replace(/\.\w+$/, '.jpg'), {
-            type: 'image/jpeg',
-          });
+          let blob = await tryEncode('image/webp', 'webp');
+          let mime = 'image/webp';
+          let ext = '.webp';
+          // Safari antigo / browsers sem WebP no canvas
+          if (!blob || blob.size === 0) {
+            blob = await tryEncode('image/jpeg', 'jpg');
+            mime = 'image/jpeg';
+            ext = '.jpg';
+          }
+          if (!blob) {
+            reject(new Error('Falha ao comprimir a foto.'));
+            return;
+          }
+          // Se WebP ainda ficou grande, tenta de novo mais agressivo
+          if (blob.size > 900 * 1024 && mime === 'image/webp') {
+            const smaller = await new Promise((res) => {
+              canvas.toBlob((b) => res(b), 'image/webp', 0.55);
+            });
+            if (smaller && smaller.size < blob.size) blob = smaller;
+          }
+          const baseName = (file.name || 'foto').replace(/\.\w+$/, '');
+          const outFile = new File([blob], `${baseName}${ext}`, { type: mime });
           resolve(await fileToBase64Payload(outFile));
         } catch (err) {
           reject(err);
         }
-      }, 'image/jpeg', quality);
+      })();
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
@@ -300,8 +320,8 @@ function openAchadosForm(existing = null, opts = {}) {
     }
     try {
       achadosState.pendingFoto = await compressImageFile(file);
-      if (achadosState.pendingFoto.size > 4 * 1024 * 1024) {
-        achadosState.pendingFoto = await compressImageFile(file, { maxSide: 960, quality: 0.6 });
+      if (achadosState.pendingFoto.size > 900 * 1024) {
+        achadosState.pendingFoto = await compressImageFile(file, { maxSide: 960, quality: 0.55 });
       }
       if (preview) {
         preview.innerHTML = `<img src="data:${achadosState.pendingFoto.type};base64,${achadosState.pendingFoto.data}" alt="Preview" />`;
