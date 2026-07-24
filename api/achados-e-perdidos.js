@@ -1,4 +1,4 @@
-import { listPendentesPublic } from './_lib/achados-perdidos.js';
+import { listPendentesPublic, getById, getFotoById } from './_lib/achados-perdidos.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -24,6 +24,23 @@ export default async function handler(req, res) {
   }
 
   try {
+    const id = String(req.query?.id || '').trim();
+    const fotoOnly = String(req.query?.foto || '').trim();
+
+    if (fotoOnly) {
+      const foto = await getFotoById(fotoOnly);
+      if (!foto) return json(res, 404, { error: 'Item não encontrado.' });
+      return json(res, 200, foto);
+    }
+
+    if (id) {
+      const item = await getById(id);
+      if (!item || item.status !== 'pendente') {
+        return json(res, 404, { error: 'Item não encontrado.' });
+      }
+      return json(res, 200, { item });
+    }
+
     const itens = await listPendentesPublic();
     return json(res, 200, { itens });
   } catch (err) {

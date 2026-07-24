@@ -42,6 +42,63 @@ function fileToBase64Payload(file) {
   });
 }
 
+/** Redimensiona/comprime foto para caber no banco e na API (max ~1.2MB). */
+function compressImageFile(file, { maxSide = 1280, quality = 0.72 } = {}) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      const scale = Math.min(1, maxSide / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Não foi possível processar a imagem.'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          reject(new Error('Falha ao comprimir a foto.'));
+          return;
+        }
+        try {
+          const outFile = new File([blob], (file.name || 'foto').replace(/\.\w+$/, '.jpg'), {
+            type: 'image/jpeg',
+          });
+          resolve(await fileToBase64Payload(outFile));
+        } catch (err) {
+          reject(err);
+        }
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Imagem inválida.'));
+    };
+    img.src = url;
+  });
+}
+
+async function loadFotoThumb(imgEl, id) {
+  if (!imgEl || !id) return;
+  try {
+    const data = await achadosApi(`/${id}/foto`);
+    if (data.foto_url) {
+      imgEl.src = data.foto_url;
+      imgEl.hidden = false;
+      imgEl.previousElementSibling?.remove();
+    }
+  } catch {
+    /* thumb opcional */
+  }
+}
+
 function renderAchadosList() {
   const el = document.getElementById('achados-content');
   if (!el) return;
@@ -76,8 +133,8 @@ function renderAchadosList() {
           ${itens.map((item) => `
             <tr>
               <td>
-                ${item.foto_url
-                  ? `<img class="achados-thumb" src="${item.foto_url}" alt="" width="56" height="56" />`
+                ${item.has_foto
+                  ? `<span class="pdi-muted achados-thumb-placeholder">…</span><img class="achados-thumb" data-foto-id="${item.id}" alt="" width="56" height="56" hidden />`
                   : '<span class="pdi-muted">—</span>'}
               </td>
               <td><strong>${achEsc(item.nome_produto)}</strong></td>
@@ -106,16 +163,27 @@ function renderAchadosList() {
     </div>`;
 
   el.querySelector('#achados-new')?.addEventListener('click', () => openAchadosForm());
+  el.querySelectorAll('[data-foto-id]').forEach((img) => {
+    loadFotoThumb(img, img.dataset.fotoId);
+  });
   el.querySelectorAll('[data-ach-edit]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const item = itens.find((i) => i.id === btn.dataset.achEdit);
-      if (item) openAchadosForm(item);
+    btn.addEventListener('click', async () => {
+      try {
+        const data = await achadosApi(`/${btn.dataset.achEdit}`);
+        openAchadosForm(data.item);
+      } catch (err) {
+        alert(err.message);
+      }
     });
   });
   el.querySelectorAll('[data-ach-found]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const item = itens.find((i) => i.id === btn.dataset.achFound);
-      if (item) openAchadosForm(item, { markFound: true });
+    btn.addEventListener('click', async () => {
+      try {
+        const data = await achadosApi(`/${btn.dataset.achFound}`);
+        openAchadosForm(data.item, { markFound: true });
+      } catch (err) {
+        alert(err.message);
+      }
     });
   });
   el.querySelectorAll('[data-ach-del]').forEach((btn) => {
@@ -225,18 +293,20 @@ function openAchadosForm(existing = null, opts = {}) {
       achadosState.pendingFoto = undefined;
       return;
     }
-    if (file.size > 4 * 1024 * 1024) {
-      alert('A foto deve ter no máximo 4 MB.');
+    if (file.size > 12 * 1024 * 1024) {
+      alert('A foto deve ter no máximo 12 MB antes da compressão.');
       input.value = '';
       return;
     }
     try {
-      achadosState.pendingFoto = await fileToBase64Payload(file);
+      achadosState.pendingFoto = await compressImageFile(file);
+      if (achadosState.pendingFoto.size > 4 * 1024 * 1024) {
+        achadosState.pendingFoto = await compressImageFile(file, { maxSide: 960, quality: 0.6 });
+      }
       if (preview) {
         preview.innerHTML = `<img src="data:${achadosState.pendingFoto.type};base64,${achadosState.pendingFoto.data}" alt="Preview" />`;
       }
       if (form.remover_foto) form.remover_foto.checked = false;
-      // limpa o outro input para não haver conflito
       if (input.name === 'foto_camera' && form.foto_galeria) form.foto_galeria.value = '';
       if (input.name === 'foto_galeria' && form.foto_camera) form.foto_camera.value = '';
     } catch (err) {

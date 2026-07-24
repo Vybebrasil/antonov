@@ -11,6 +11,9 @@ export function fotoToDataUrl(row) {
 
 export function mapItem(row, { includeFotoData = true } = {}) {
   if (!row) return null;
+  const hasFoto = row.has_foto != null
+    ? Boolean(row.has_foto)
+    : Boolean(row.foto_data);
   const item = {
     id: row.id,
     nome_produto: row.nome_produto,
@@ -24,7 +27,7 @@ export function mapItem(row, { includeFotoData = true } = {}) {
     criado_por_email: row.criado_por_email || null,
     foto_name: row.foto_name,
     foto_type: row.foto_type,
-    has_foto: Boolean(row.foto_data),
+    has_foto: hasFoto,
     created_at: row.created_at,
     updated_at: row.updated_at,
   };
@@ -41,10 +44,16 @@ export function parseFotoBody(body) {
   return parseFilePayload(body.foto, 'Foto');
 }
 
+/** Lista sem foto_data — evita estourar limite de resposta do Neon (~64MB). */
 export async function listAll() {
   const sql = getSql();
   const rows = await sql`
-    SELECT a.*, u.email AS criado_por_email
+    SELECT
+      a.id, a.nome_produto, a.data_cadastro, a.foto_name, a.foto_type,
+      a.status, a.data_entrega, a.entregue_a, a.entregue_a_id, a.entregue_por,
+      a.criado_por, a.created_at, a.updated_at,
+      (a.foto_data IS NOT NULL AND length(a.foto_data) > 0) AS has_foto,
+      u.email AS criado_por_email
     FROM achados_perdidos a
     LEFT JOIN admin_users u ON u.id = a.criado_por
     ORDER BY
@@ -52,18 +61,20 @@ export async function listAll() {
       a.data_cadastro DESC,
       a.created_at DESC
   `;
-  return rows.map((r) => mapItem(r));
+  return rows.map((r) => mapItem(r, { includeFotoData: false }));
 }
 
 export async function listPendentesPublic() {
   const sql = getSql();
   const rows = await sql`
-    SELECT id, nome_produto, data_cadastro, foto_name, foto_type, foto_data, status
+    SELECT
+      id, nome_produto, data_cadastro, foto_name, foto_type, status,
+      (foto_data IS NOT NULL AND length(foto_data) > 0) AS has_foto
     FROM achados_perdidos
     WHERE status = 'pendente'
     ORDER BY data_cadastro DESC, created_at DESC
   `;
-  return rows.map((r) => mapItem(r));
+  return rows.map((r) => mapItem(r, { includeFotoData: false }));
 }
 
 export async function getById(id) {
@@ -76,6 +87,26 @@ export async function getById(id) {
     LIMIT 1
   `;
   return rows[0] ? mapItem(rows[0]) : null;
+}
+
+export async function getFotoById(id) {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT id, foto_name, foto_type, foto_data
+    FROM achados_perdidos
+    WHERE id = ${id}
+    LIMIT 1
+  `;
+  const row = rows[0];
+  if (!row) return null;
+  if (!row.foto_data) return { id: row.id, foto_url: null, has_foto: false };
+  return {
+    id: row.id,
+    foto_url: fotoToDataUrl(row),
+    has_foto: true,
+    foto_name: row.foto_name,
+    foto_type: row.foto_type,
+  };
 }
 
 export async function createItem({ nome_produto, data_cadastro, foto, criado_por }) {

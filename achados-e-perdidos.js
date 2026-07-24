@@ -39,10 +39,10 @@
     }
 
     listEl.innerHTML = itens.map((item) => `
-      <article class="found-card">
-        <div class="found-card__media ${item.foto_url ? '' : 'found-card__media--empty'}">
-          ${item.foto_url
-            ? `<img src="${item.foto_url}" alt="${esc(item.nome_produto)}" loading="lazy" decoding="async" />`
+      <article class="found-card" data-item-id="${esc(item.id)}">
+        <div class="found-card__media ${item.has_foto ? '' : 'found-card__media--empty'}" data-media="${esc(item.id)}">
+          ${item.has_foto
+            ? '<span class="found-card__loading">Carregando…</span>'
             : '<span>Sem foto</span>'}
         </div>
         <div class="found-card__body">
@@ -51,6 +51,43 @@
         </div>
       </article>
     `).join('');
+
+    loadFotosLazy();
+  }
+
+  async function loadFotosLazy() {
+    const withFoto = itens.filter((i) => i.has_foto);
+    const concurrency = 2;
+    let i = 0;
+
+    async function worker() {
+      while (i < withFoto.length) {
+        const item = withFoto[i++];
+        try {
+          const res = await fetch(`/api/achados-e-perdidos?foto=${encodeURIComponent(item.id)}`, {
+            headers: { Accept: 'application/json' },
+          });
+          const data = await res.json().catch(() => ({}));
+          const media = listEl.querySelector(`[data-media="${CSS.escape(item.id)}"]`);
+          if (!media) continue;
+          if (res.ok && data.foto_url) {
+            media.classList.remove('found-card__media--empty');
+            media.innerHTML = `<img src="${data.foto_url}" alt="${esc(item.nome_produto)}" loading="lazy" decoding="async" />`;
+          } else {
+            media.classList.add('found-card__media--empty');
+            media.innerHTML = '<span>Sem foto</span>';
+          }
+        } catch {
+          const media = listEl.querySelector(`[data-media="${CSS.escape(item.id)}"]`);
+          if (media) {
+            media.classList.add('found-card__media--empty');
+            media.innerHTML = '<span>Sem foto</span>';
+          }
+        }
+      }
+    }
+
+    await Promise.all(Array.from({ length: concurrency }, () => worker()));
   }
 
   document.querySelectorAll('.found__view-btn').forEach((btn) => {

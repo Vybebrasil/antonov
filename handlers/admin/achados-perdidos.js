@@ -5,6 +5,7 @@ import {
   parseFotoBody,
   listAll,
   getById,
+  getFotoById,
   createItem,
   updateItem,
   deleteItem,
@@ -62,6 +63,12 @@ export default async function handler(req, res) {
       const item = await getById(parts[0]);
       if (!item) return json(res, 404, { error: 'Item não encontrado.' });
       return json(res, 200, { item });
+    }
+
+    if (parts.length === 2 && parts[1] === 'foto' && req.method === 'GET') {
+      const foto = await getFotoById(parts[0]);
+      if (!foto) return json(res, 404, { error: 'Item não encontrado.' });
+      return json(res, 200, foto);
     }
 
     if (parts.length === 1 && req.method === 'PATCH') {
