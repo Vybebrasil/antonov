@@ -505,6 +505,13 @@ function switchTab(name, opts = {}) {
     }
     if (typeof onAchadosTabOpen === 'function') onAchadosTabOpen();
   }
+  if (name === 'roleta') {
+    if (typeof initRoletaAdmin === 'function' && !window._roletaInited) {
+      initRoletaAdmin();
+      window._roletaInited = true;
+    }
+    if (typeof onRoletaTabOpen === 'function') onRoletaTabOpen();
+  }
   requestAnimationFrame(() => {
     if (opts.focusTab) focusTabButton(name);
     else $(`#tab-heading-${name}`)?.focus({ preventScroll: true });

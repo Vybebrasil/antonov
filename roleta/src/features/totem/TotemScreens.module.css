@@ -1,0 +1,147 @@
+.idleHit {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 8vh;
+  background: transparent;
+}
+
+.idleHint {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  letter-spacing: 0.08em;
+  color: var(--color-yellow);
+  animation: float-y 2s ease-in-out infinite;
+}
+
+.idlePulse {
+  margin-top: 1rem;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-blue);
+  box-shadow: 0 0 0 0 rgba(0, 156, 222, 0.55);
+  animation: pulse-glow 1.8s ease-out infinite;
+}
+
+.panel {
+  width: min(92vw, 440px);
+  margin-inline: auto;
+  animation: fade-up 0.45s var(--ease-out);
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 10vw, 3.6rem);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.panelSubtitle {
+  margin: 0.4rem 0 1.5rem;
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+}
+
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.field span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.field input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text);
+  padding: 1rem 1.1rem;
+  font-size: 1.15rem;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px rgba(0, 156, 222, 0.25);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: 0.95rem;
+}
+
+.primaryBtn,
+.ghostBtn {
+  min-height: 3.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, var(--color-yellow), #ffe066);
+  color: #000;
+}
+
+.primaryBtn:disabled {
+  opacity: 0.65;
+}
+
+.ghostBtn {
+  background: transparent;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.result {
+  width: min(92vw, 480px);
+  margin-inline: auto;
+  text-align: center;
+  animation: confetti-burst 0.55s var(--ease-out);
+}
+
+.resultEyebrow {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-blue);
+  font-weight: 700;
+}
+
+.resultTitle {
+  margin: 0.6rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 9vw, 3.8rem);
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  color: var(--color-yellow);
+}
+
+.resultInstruction {
+  margin: 0 0 1.75rem;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  line-height: 1.45;
+}

@@ -47,6 +47,7 @@ const adminBundle = [
   readFileSync(join(root, 'admin.js'), 'utf8'),
   readFileSync(join(root, 'admin-pdi.js'), 'utf8'),
   readFileSync(join(root, 'admin-achados.js'), 'utf8'),
+  readFileSync(join(root, 'admin-roleta.js'), 'utf8'),
 ].join('\n');
 writeFileSync(
   join(dist, 'admin.min.js'),
@@ -73,7 +74,8 @@ adminHtml = adminHtml
   .replaceAll('src="/admin.js"', 'src="/admin.min.js"')
   .replaceAll('href="/css/pages/admin.css"', 'href="/css/pages/admin.min.css"')
   .replace(/<script[^>]*src=["']\/?admin-pdi\.js["'][^>]*>\s*<\/script>\s*/gi, '')
-  .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '');
+  .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+  .replace(/<script[^>]*src=["']\/?admin-roleta\.js["'][^>]*>\s*<\/script>\s*/gi, '');
 writeFileSync(join(dist, 'admin.html'), adminHtml);
 
 try {

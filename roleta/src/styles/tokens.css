@@ -1,0 +1,143 @@
+:root {
+  --color-bg: #000000;
+  --color-bg-elevated: #0d0d0d;
+  --color-yellow: #ffc20e;
+  --color-blue: #009cde;
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.65);
+  --color-danger: #ff4d4d;
+  --color-success: #2ecc71;
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spin: cubic-bezier(0.12, 0.75, 0.08, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+html {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body.totem-mode,
+body.totem-mode #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body.admin-mode {
+  overflow: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+body.admin-mode #root {
+  height: auto;
+  min-height: 100%;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confetti-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

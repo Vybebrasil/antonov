@@ -11,7 +11,9 @@ const adminBundle = readFileSync(join(root, 'admin.js'), 'utf8')
   + '\n'
   + readFileSync(join(root, 'admin-pdi.js'), 'utf8')
   + '\n'
-  + readFileSync(join(root, 'admin-achados.js'), 'utf8');
+  + readFileSync(join(root, 'admin-achados.js'), 'utf8')
+  + '\n'
+  + readFileSync(join(root, 'admin-roleta.js'), 'utf8');
 
 writeFileSync(
   join(root, 'dist', 'admin.min.js'),
@@ -37,7 +39,9 @@ html = html
   .split('src="/admin-pdi.js"').join('')
   .split("src='/admin-pdi.js'").join('')
   .split('src="/admin-achados.js"').join('')
-  .split("src='/admin-achados.js'").join('');
+  .split("src='/admin-achados.js'").join('')
+  .split('src="/admin-roleta.js"').join('')
+  .split("src='/admin-roleta.js'").join('');
 writeFileSync(join(root, 'dist', 'admin.html'), html);
 
 console.log('admin rebuilt');

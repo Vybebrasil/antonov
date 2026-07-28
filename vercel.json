@@ -15,6 +15,14 @@
     {
       "source": "/api/forms/:slug/submit",
       "destination": "/api/forms/:slug"
+    },
+    {
+      "source": "/roleta",
+      "destination": "/roleta/index.html"
+    },
+    {
+      "source": "/roleta/(.*)",
+      "destination": "/roleta/index.html"
     }
   ],
   "redirects": [

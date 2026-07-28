@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/optimize-images.mjs && node scripts/build.mjs",
+    "build:roleta": "npm run build --prefix roleta",
     "images:optimize": "node scripts/optimize-images.mjs",
     "extract:page-css": "node scripts/extract-page-styles.mjs",
     "db:init": "node scripts/init-db.mjs",

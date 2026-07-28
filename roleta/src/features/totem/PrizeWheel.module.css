@@ -1,0 +1,104 @@
+.wrap {
+  position: relative;
+  width: min(88vw, 520px);
+  aspect-ratio: 1;
+  margin-inline: auto;
+}
+
+.idle .wheel {
+  animation: slow-spin 28s linear infinite;
+}
+
+.idle .glow {
+  animation: pulse-glow 2.4s ease-in-out infinite;
+}
+
+.pointer {
+  position: absolute;
+  top: -0.35rem;
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.55));
+}
+
+.pointer span {
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 28px solid var(--color-yellow);
+}
+
+.glow {
+  position: absolute;
+  inset: 6%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 194, 14, 0.28) 0%,
+    rgba(0, 156, 222, 0.12) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.wheel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: visible;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55));
+}
+
+.label {
+  font-family: var(--font-body);
+  letter-spacing: -0.02em;
+  pointer-events: none;
+}
+
+.hub {
+  position: absolute;
+  inset: 38%;
+  width: 24%;
+  height: 24%;
+  margin: auto;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+
+.ring {
+  position: absolute;
+  inset: -2%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 0 0 6px rgba(0, 0, 0, 0.35),
+    0 0 0 2px rgba(255, 194, 14, 0.35);
+  pointer-events: none;
+}
+
+@keyframes slow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-height: 800px) {
+  .wrap {
+    width: min(78vw, 420px);
+  }
+}

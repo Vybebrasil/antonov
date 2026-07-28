@@ -2,6 +2,7 @@
  * Build estático: minifica JS/CSS externos → pasta dist/
  * Uso: npm run build
  */
+import { spawnSync } from 'child_process';
 import {
   readFileSync,
   writeFileSync,
@@ -10,12 +11,12 @@ import {
   cpSync,
   rmSync,
   statSync,
+  existsSync,
 } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import * as esbuild from 'esbuild';
 import CleanCSS from 'clean-css';
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const dist = join(root, 'dist');
@@ -49,6 +50,7 @@ async function minifyJsToDist(file) {
   if (file === 'admin.js') {
     code += `\n${readFileSync(join(root, 'admin-pdi.js'), 'utf8')}`;
     code += `\n${readFileSync(join(root, 'admin-achados.js'), 'utf8')}`;
+    code += `\n${readFileSync(join(root, 'admin-roleta.js'), 'utf8')}`;
   }
   const out = await esbuild.transform(code, {
     minify: true,
@@ -200,7 +202,8 @@ function processHtml(name) {
   if (name === 'admin.html') {
     html = html
       .replace(/<script[^>]*src=["']\/?admin-pdi\.js["'][^>]*>\s*<\/script>\s*/gi, '')
-      .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '');
+      .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-roleta\.js["'][^>]*>\s*<\/script>\s*/gi, '');
   }
 
   writeFileSync(join(dist, name), html, 'utf8');
@@ -261,7 +264,44 @@ async function main() {
 
   injectCriticalHomeIntoDist();
 
+  buildRoletaIntoDist();
+
   console.log(`\nBuild concluído → ${dist}`);
+}
+
+function buildRoletaIntoDist() {
+  const roletaDir = join(root, 'roleta');
+  if (!existsSync(join(roletaDir, 'package.json'))) {
+    console.warn('roleta: pasta não encontrada — pulando');
+    return;
+  }
+
+  console.log('roleta: instalando deps (se preciso) e build…');
+  if (!existsSync(join(roletaDir, 'node_modules'))) {
+    const install = spawnSync('npm', ['install'], {
+      cwd: roletaDir,
+      stdio: 'inherit',
+      shell: true,
+    });
+    if (install.status !== 0) {
+      throw new Error('Falha no npm install da roleta');
+    }
+  }
+
+  const built = spawnSync('npm', ['run', 'build'], {
+    cwd: roletaDir,
+    stdio: 'inherit',
+    shell: true,
+  });
+  if (built.status !== 0) {
+    throw new Error('Falha no build da roleta');
+  }
+
+  const from = join(roletaDir, 'dist');
+  const to = join(dist, 'roleta');
+  mkdirSync(to, { recursive: true });
+  cpDirResilient(from, to);
+  console.log('roleta: copiado para dist/roleta');
 }
 
 main().catch((err) => {
