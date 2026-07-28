@@ -50,6 +50,7 @@ async function minifyJsToDist(file) {
   if (file === 'admin.js') {
     code += `\n${readFileSync(join(root, 'admin-pdi.js'), 'utf8')}`;
     code += `\n${readFileSync(join(root, 'admin-achados.js'), 'utf8')}`;
+    code += `\n${readFileSync(join(root, 'admin-roleta-guide.js'), 'utf8')}`;
     code += `\n${readFileSync(join(root, 'admin-roleta.js'), 'utf8')}`;
   }
   const out = await esbuild.transform(code, {
@@ -203,6 +204,7 @@ function processHtml(name) {
     html = html
       .replace(/<script[^>]*src=["']\/?admin-pdi\.js["'][^>]*>\s*<\/script>\s*/gi, '')
       .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-roleta-guide\.js["'][^>]*>\s*<\/script>\s*/gi, '')
       .replace(/<script[^>]*src=["']\/?admin-roleta\.js["'][^>]*>\s*<\/script>\s*/gi, '');
   }
 
