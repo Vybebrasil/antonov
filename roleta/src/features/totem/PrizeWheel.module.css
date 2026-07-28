@@ -1,6 +1,6 @@
 .wrap {
   position: relative;
-  width: min(88vw, 520px);
+  width: min(78%, 720px);
   aspect-ratio: 1;
   margin-inline: auto;
 }
@@ -99,6 +99,6 @@
 
 @media (max-height: 800px) {
   .wrap {
-    width: min(78vw, 420px);
+    width: min(72%, 520px);
   }
 }

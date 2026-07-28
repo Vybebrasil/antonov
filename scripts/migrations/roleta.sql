@@ -41,52 +41,14 @@ CREATE TABLE IF NOT EXISTS roleta_settings (
   id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
   whatsapp_cooldown_hours INTEGER NOT NULL DEFAULT 24,
   result_timeout_seconds INTEGER NOT NULL DEFAULT 15,
-  allow_repeat_spin BOOLEAN NOT NULL DEFAULT FALSE
+  allow_repeat_spin BOOLEAN NOT NULL DEFAULT FALSE,
+  layout_name TEXT,
+  layout_type TEXT,
+  layout_data TEXT
 );
 
 INSERT INTO roleta_settings (id)
 VALUES (1)
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO roleta_premios (name, slug, weight, stock, active, sort_order, color, instruction, pity_every, pity_counter)
-VALUES
-  ('Copo', 'copo', 10, 50, TRUE, 1, '#FFC20E', 'Retire seu prêmio no balcão da Antonov.', 10, 0),
-  ('Boné', 'bone', 8, 30, TRUE, 2, '#009CDE', 'Retire seu prêmio no balcão da Antonov.', 12, 0),
-  ('Coqueteleira', 'coqueteleira', 6, 20, TRUE, 3, '#FFC20E', 'Retire seu prêmio no balcão da Antonov.', 16, 0),
-  (
-    '20% off matrícula + 20% off 1ª mensalidade Holística',
-    'desconto-holistica',
-    8,
-    NULL,
-    TRUE,
-    4,
-    '#009CDE',
-    'Apresente este comprovante na Holística para resgatar o desconto.',
-    12,
-    0
-  ),
-  (
-    'Instalação + 1 mês grátis de internet',
-    'internet-gratis',
-    8,
-    NULL,
-    TRUE,
-    5,
-    '#FFC20E',
-    'Fale com a equipe Antonov para ativar sua promoção.',
-    12,
-    0
-  ),
-  (
-    '1 mês grátis na academia',
-    'academia-gratis',
-    8,
-    NULL,
-    TRUE,
-    6,
-    '#009CDE',
-    'Apresente este comprovante na academia parceira.',
-    12,
-    0
-  )
-ON CONFLICT (slug) DO NOTHING;
+-- Prêmios: cadastrar pelo admin (sem seed fixo)

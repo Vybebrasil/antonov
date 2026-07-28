@@ -61,6 +61,98 @@ export function mapPrize(row) {
   };
 }
 
+function slugifyPrizeName(name) {
+  const base = String(name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+  return base || 'premio';
+}
+
+export async function createPrize(input = {}) {
+  const sql = getSql();
+  const name = String(input.name || '').trim();
+  if (name.length < 2) return { error: 'Informe o nome do prêmio (mín. 2 caracteres).' };
+
+  let slug = slugifyPrizeName(name);
+  const slugClash = await sql`SELECT id FROM roleta_premios WHERE slug = ${slug} LIMIT 1`;
+  if (slugClash[0]) {
+    slug = `${slug}-${Date.now().toString(36).slice(-5)}`;
+  }
+
+  const countRows = await sql`SELECT COUNT(*)::int AS n FROM roleta_premios`;
+  const n = Number(countRows[0]?.n) || 0;
+  const sortOrder =
+    input.sort_order != null ? Number(input.sort_order) : n + 1;
+
+  const pityEvery =
+    input.pity_every === null || input.pity_every === '' || input.pity_every === undefined
+      ? 10
+      : Math.max(1, Math.round(Number(input.pity_every)));
+
+  const weight =
+    input.weight != null
+      ? Number(input.weight)
+      : Math.round((100 / pityEvery) * 10) / 10;
+
+  const stock =
+    input.stock === null || input.stock === undefined || input.stock === ''
+      ? null
+      : Math.max(0, Math.round(Number(input.stock)));
+
+  const palette = ['#FFC20E', '#009CDE'];
+  const color = String(input.color || palette[n % 2] || '#FFC20E');
+  const instruction = String(
+    input.instruction || 'Retire seu prêmio no balcão da Antonov.',
+  ).trim();
+  const active = input.active == null ? true : Boolean(input.active);
+
+  const rows = await sql`
+    INSERT INTO roleta_premios (
+      name, slug, weight, stock, active, sort_order, color, instruction, pity_every, pity_counter
+    )
+    VALUES (
+      ${name},
+      ${slug},
+      ${weight},
+      ${stock},
+      ${active},
+      ${sortOrder},
+      ${color},
+      ${instruction},
+      ${pityEvery},
+      0
+    )
+    RETURNING *
+  `;
+  return { prize: mapPrize(rows[0]) };
+}
+
+export async function deletePrize(id) {
+  const sql = getSql();
+  try {
+    const rows = await sql`
+      DELETE FROM roleta_premios
+      WHERE id = ${id}
+      RETURNING id
+    `;
+    if (!rows[0]) return { error: 'Prêmio não encontrado.' };
+    return { ok: true };
+  } catch (err) {
+    const msg = String(err?.message || '');
+    if (err?.code === '23503' || msg.includes('foreign key') || msg.includes('roleta_spins')) {
+      return {
+        error:
+          'Não é possível excluir: já existem giros com este prêmio. Desative-o em vez de excluir.',
+      };
+    }
+    throw err;
+  }
+}
+
 export async function listActivePrizesPublic() {
   const sql = getSql();
   const rows = await sql`
@@ -86,7 +178,18 @@ export async function listAllPrizesAdmin() {
 
 export async function getSettings() {
   const sql = getSql();
-  const rows = await sql`SELECT * FROM roleta_settings WHERE id = 1`;
+  const rows = await sql`
+    SELECT
+      id,
+      whatsapp_cooldown_hours,
+      result_timeout_seconds,
+      allow_repeat_spin,
+      layout_name,
+      layout_type,
+      (layout_data IS NOT NULL AND length(layout_data) > 0) AS has_layout
+    FROM roleta_settings
+    WHERE id = 1
+  `;
   const row = rows[0];
   if (!row) {
     return {
@@ -94,6 +197,8 @@ export async function getSettings() {
       whatsapp_cooldown_hours: 24,
       result_timeout_seconds: 15,
       allow_repeat_spin: false,
+      has_layout: false,
+      layout_name: null,
     };
   }
   return {
@@ -101,6 +206,24 @@ export async function getSettings() {
     whatsapp_cooldown_hours: Number(row.whatsapp_cooldown_hours),
     result_timeout_seconds: Number(row.result_timeout_seconds),
     allow_repeat_spin: Boolean(row.allow_repeat_spin),
+    has_layout: Boolean(row.has_layout),
+    layout_name: row.layout_name || null,
+  };
+}
+
+export async function getLayoutPublic() {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT layout_name, layout_type, layout_data
+    FROM roleta_settings
+    WHERE id = 1
+  `;
+  const row = rows[0];
+  if (!row?.layout_data) return { layout_url: null };
+  const type = row.layout_type || 'image/png';
+  return {
+    layout_url: `data:${type};base64,${row.layout_data}`,
+    layout_name: row.layout_name || null,
   };
 }
 
@@ -130,6 +253,26 @@ export async function updateSettings(patch) {
       result_timeout_seconds = EXCLUDED.result_timeout_seconds,
       allow_repeat_spin = EXCLUDED.allow_repeat_spin
   `;
+
+  if (patch.layout !== undefined) {
+    if (patch.layout === null) {
+      await sql`
+        UPDATE roleta_settings
+        SET layout_name = NULL, layout_type = NULL, layout_data = NULL
+        WHERE id = 1
+      `;
+    } else if (patch.layout?.data) {
+      await sql`
+        UPDATE roleta_settings
+        SET
+          layout_name = ${patch.layout.name || 'layout.png'},
+          layout_type = ${patch.layout.type || 'image/png'},
+          layout_data = ${patch.layout.data}
+        WHERE id = 1
+      `;
+    }
+  }
+
   return getSettings();
 }
 

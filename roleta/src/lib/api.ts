@@ -61,6 +61,15 @@ export async function fetchSettings(): Promise<AdminSettings> {
   }
 }
 
+export async function fetchLayout(): Promise<string | null> {
+  try {
+    const data = await request<{ layout_url?: string | null }>('/api/roleta/layout')
+    return data.layout_url || null
+  } catch {
+    return null
+  }
+}
+
 export async function createLead(name: string, whatsapp: string): Promise<Lead> {
   const data = await request<{ lead: Lead }>('/api/roleta/lead', {
     method: 'POST',

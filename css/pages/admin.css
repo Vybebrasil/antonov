@@ -118,7 +118,7 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
 
 .roleta-prize-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 100px 90px 70px auto auto;
+  grid-template-columns: minmax(0, 1.6fr) 100px 90px 70px auto auto auto;
   gap: 0.65rem;
   align-items: center;
   padding: 0.65rem 0.75rem;
@@ -191,6 +191,60 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
   border-radius: 8px;
 }
 
+.roleta-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.roleta-btn-danger {
+  color: #ff8a8a !important;
+}
+
+.roleta-add-form {
+  margin: 0.85rem 0 1rem;
+  padding: 0.85rem;
+  border: 1px dashed rgba(255, 194, 14, 0.35);
+  border-radius: 10px;
+  background: rgba(255, 194, 14, 0.04);
+}
+
+.roleta-add-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.roleta-add-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) 88px 100px 100px minmax(0, 1.6fr) auto;
+  gap: 0.65rem;
+  align-items: end;
+}
+
+.roleta-add-grid label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.roleta-add-grid input[type="text"],
+.roleta-add-grid input[type="number"],
+.roleta-add-grid input[type="color"] {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: #111;
+  color: #fff;
+  padding: 0.45rem 0.55rem;
+  min-height: 2.25rem;
+}
+
+.roleta-add-grid input[type="color"] {
+  padding: 0.2rem;
+  height: 2.25rem;
+}
+
 .roleta-detail label,
 .roleta-settings-row label {
   display: grid;
@@ -205,9 +259,90 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
   align-items: end;
 }
 
+.roleta-layout-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+  gap: 1.25rem;
+  align-items: start;
+  margin-top: 0.85rem;
+}
+
+.roleta-layout-upload {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.roleta-totem-preview__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1080 / 1920;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #050505;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.roleta-totem-preview__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  opacity: 0.95;
+}
+
+.roleta-totem-preview__wheel {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 72%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  border: 3px solid rgba(255, 194, 14, 0.65);
+}
+
+.roleta-totem-preview__wheel::after {
+  content: '';
+  position: absolute;
+  inset: 38%;
+  border-radius: 50%;
+  background: #111;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.roleta-totem-preview__label {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
 @media (max-width: 900px) {
   .roleta-prize-row {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .roleta-add-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .roleta-add-instruction {
+    grid-column: 1 / -1;
+  }
+
+  .roleta-layout-grid {
+    grid-template-columns: 1fr;
+    max-width: 240px;
   }
 }
 

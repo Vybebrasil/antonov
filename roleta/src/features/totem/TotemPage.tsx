@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { confirmSpinCpf, createLead, fetchActivePrizes, fetchSettings, spinPrize } from '@/lib/api'
+import {
+  confirmSpinCpf,
+  createLead,
+  fetchActivePrizes,
+  fetchLayout,
+  fetchSettings,
+  spinPrize,
+} from '@/lib/api'
 import type { AdminSettings, Lead, Prize } from '@/lib/types'
 import { DEFAULT_SETTINGS } from '@/lib/types'
 import { CpfModal } from './CpfModal'
@@ -14,6 +21,7 @@ type Step = 'idle' | 'lead' | 'ready' | 'spinning' | 'cpf' | 'result'
 export function TotemPage() {
   const [prizes, setPrizes] = useState<Prize[]>([])
   const [settings, setSettings] = useState<AdminSettings>(DEFAULT_SETTINGS)
+  const [layoutUrl, setLayoutUrl] = useState<string | null>(null)
   const [step, setStep] = useState<Step>('idle')
   const [lead, setLead] = useState<Lead | null>(null)
   const [targetPrizeId, setTargetPrizeId] = useState<string | null>(null)
@@ -26,13 +34,15 @@ export function TotemPage() {
     let cancelled = false
     async function load() {
       try {
-        const [prizeList, adminSettings] = await Promise.all([
+        const [prizeList, adminSettings, layout] = await Promise.all([
           fetchActivePrizes(),
           fetchSettings(),
+          fetchLayout(),
         ])
         if (cancelled) return
         setPrizes(prizeList)
         setSettings(adminSettings)
+        setLayoutUrl(layout)
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Erro ao carregar prêmios.')
@@ -94,63 +104,84 @@ export function TotemPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.atmosphere} aria-hidden />
-      <header className={styles.header}>
-        <img src={`${import.meta.env.BASE_URL}brand/logo-horizontal.png`} alt="Antonov" className={styles.logo} />
-      </header>
-
-      <main className={styles.main}>
-        {loadingPrizes ? (
-          <p className={styles.status}>Carregando roleta…</p>
+      <div className={styles.stage}>
+        {layoutUrl ? (
+          <div
+            className={styles.layoutBg}
+            style={{ backgroundImage: `url(${layoutUrl})` }}
+            aria-hidden
+          />
         ) : (
-          <>
-            {(step === 'idle' || step === 'ready' || step === 'spinning') && (
-              <div className={styles.wheelStage}>
-                <PrizeWheel
-                  prizes={prizes}
-                  idle={step === 'idle'}
-                  spinning={step === 'spinning'}
-                  targetPrizeId={targetPrizeId}
-                  onSpinEnd={handleSpinEnd}
-                />
-              </div>
-            )}
-
-            {step === 'idle' && <IdleScreen onStart={() => setStep('lead')} />}
-
-            {step === 'lead' && (
-              <div className={styles.overlay}>
-                <LeadForm onSubmit={handleLeadSubmit} onCancel={() => setStep('idle')} />
-              </div>
-            )}
-
-            {step === 'ready' && (
-              <div className={styles.ctaBar}>
-                <p className={styles.ctaName}>Boa sorte, {lead?.name.split(' ')[0]}!</p>
-                <button type="button" className={styles.spinBtn} onClick={() => void handleSpin()}>
-                  Girar
-                </button>
-              </div>
-            )}
-
-            {step === 'spinning' && <p className={styles.status}>Girando…</p>}
-
-            {step === 'cpf' && wonPrize && (
-              <div className={styles.overlay}>
-                <CpfModal prizeName={wonPrize.name} onSubmit={handleCpfSubmit} />
-              </div>
-            )}
-
-            {step === 'result' && wonPrize && (
-              <div className={styles.overlay}>
-                <ResultScreen prize={wonPrize} onDone={reset} />
-              </div>
-            )}
-
-            {error ? <p className={styles.error}>{error}</p> : null}
-          </>
+          <div className={styles.atmosphere} aria-hidden />
         )}
-      </main>
+
+        {!layoutUrl ? (
+          <header className={styles.header}>
+            <img
+              src={`${import.meta.env.BASE_URL}brand/logo-horizontal.png`}
+              alt="Antonov"
+              className={styles.logo}
+            />
+          </header>
+        ) : null}
+
+        <main className={styles.main}>
+          {loadingPrizes ? (
+            <p className={styles.status}>Carregando roleta…</p>
+          ) : (
+            <>
+              {(step === 'idle' || step === 'ready' || step === 'spinning') && prizes.length > 0 && (
+                <div className={styles.wheelStage}>
+                  <PrizeWheel
+                    prizes={prizes}
+                    idle={step === 'idle'}
+                    spinning={step === 'spinning'}
+                    targetPrizeId={targetPrizeId}
+                    onSpinEnd={handleSpinEnd}
+                  />
+                </div>
+              )}
+
+              {!loadingPrizes && prizes.length === 0 && (
+                <p className={styles.status}>Nenhum prêmio cadastrado no momento.</p>
+              )}
+
+              {step === 'idle' && prizes.length > 0 && <IdleScreen onStart={() => setStep('lead')} />}
+
+              {step === 'lead' && (
+                <div className={styles.overlay}>
+                  <LeadForm onSubmit={handleLeadSubmit} onCancel={() => setStep('idle')} />
+                </div>
+              )}
+
+              {step === 'ready' && (
+                <div className={styles.ctaBar}>
+                  <p className={styles.ctaName}>Boa sorte, {lead?.name.split(' ')[0]}!</p>
+                  <button type="button" className={styles.spinBtn} onClick={() => void handleSpin()}>
+                    Girar
+                  </button>
+                </div>
+              )}
+
+              {step === 'spinning' && <p className={styles.statusSpin}>Girando…</p>}
+
+              {step === 'cpf' && wonPrize && (
+                <div className={styles.overlay}>
+                  <CpfModal prizeName={wonPrize.name} onSubmit={handleCpfSubmit} />
+                </div>
+              )}
+
+              {step === 'result' && wonPrize && (
+                <div className={styles.overlay}>
+                  <ResultScreen prize={wonPrize} onDone={reset} />
+                </div>
+              )}
+
+              {error ? <p className={styles.error}>{error}</p> : null}
+            </>
+          )}
+        </main>
+      </div>
     </div>
   )
 }

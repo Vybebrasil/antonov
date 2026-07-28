@@ -5,6 +5,9 @@ const roletaState = {
   settings: null,
   spins: [],
   stats: null,
+  layoutUrl: null,
+  layoutPreviewUrl: null,
+  pendingLayout: null,
 };
 
 function roletaEsc(s) {
@@ -30,6 +33,67 @@ function roletaFmtChance(c) {
 
 async function roletaApi(path = '', opts = {}) {
   return api(`/roleta${path}`, opts);
+}
+
+function roletaPreviewWheelBg(premios) {
+  const colors = (premios || []).slice(0, 8).map((p) => p.color || '#FFC20E');
+  if (!colors.length) colors.push('#FFC20E', '#009CDE');
+  const step = 100 / colors.length;
+  const stops = colors
+    .map((c, i) => `${c} ${i * step}% ${(i + 1) * step}%`)
+    .join(', ');
+  return `conic-gradient(from -90deg, ${stops})`;
+}
+
+function roletaCompressLayout(file, { maxW = 1080, maxH = 1920, quality = 0.85 } = {}) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      const scale = Math.min(1, maxW / width, maxH / height);
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Não foi possível processar a imagem.'));
+        return;
+      }
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Falha ao compactar PNG.'));
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = String(reader.result || '');
+            const base64 = result.includes(',') ? result.split(',')[1] : result;
+            resolve({
+              name: (file.name || 'layout.png').replace(/\.\w+$/, '') + '.png',
+              type: 'image/png',
+              size: blob.size,
+              data: base64,
+            });
+          };
+          reader.onerror = () => reject(new Error('Falha ao ler layout.'));
+          reader.readAsDataURL(blob);
+        },
+        'image/png',
+        quality,
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Arquivo de imagem inválido.'));
+    };
+    img.src = url;
+  });
 }
 
 function roletaShowError(msg) {
@@ -81,8 +145,8 @@ function renderRoletaAdmin() {
     <div class="card roleta-card" style="margin-top:1rem">
       <header class="dash-card__head" style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:space-between;align-items:center">
         <div>
-          <h3>1 a cada X giros (escalonado)</h3>
-          <p class="dash-card__meta">Ex.: 1 a cada 10 → 10%, 50%, … 100% no 10º giro sem cair</p>
+          <h3>Prêmios da roleta</h3>
+          <p class="dash-card__meta">Cadastre os itens que aparecem na roleta. Ex.: 1 a cada 10 → chance sobe até 100% no 10º giro</p>
         </div>
         <div class="dash-toolbar">
           <button type="button" class="btn btn-secondary btn-sm" id="roleta-preset">Preset por estoque</button>
@@ -90,6 +154,29 @@ function renderRoletaAdmin() {
           <button type="button" class="btn btn-primary btn-sm" id="roleta-save-all">Salvar todas as taxas</button>
         </div>
       </header>
+
+      <div class="roleta-add-form" id="roleta-add-form">
+        <h4 class="roleta-add-title">Adicionar prêmio</h4>
+        <div class="roleta-add-grid">
+          <label>Nome
+            <input type="text" id="roleta-new-name" placeholder="Ex.: Copo Antonov" maxlength="120" />
+          </label>
+          <label>Cor
+            <input type="color" id="roleta-new-color" value="${premios.length % 2 === 0 ? '#FFC20E' : '#009CDE'}" />
+          </label>
+          <label>1 a cada
+            <input type="number" id="roleta-new-pity" min="1" step="1" value="10" />
+          </label>
+          <label>Estoque
+            <input type="number" id="roleta-new-stock" min="0" placeholder="∞" />
+          </label>
+          <label class="roleta-add-instruction">Instrução
+            <input type="text" id="roleta-new-instruction" placeholder="Retire seu prêmio no balcão da Antonov." />
+          </label>
+          <button type="button" class="btn btn-primary btn-sm" id="roleta-add-prize">Adicionar</button>
+        </div>
+      </div>
+
       <div class="roleta-drop-bars" aria-hidden="true">
         ${premios
           .map((p) => {
@@ -99,10 +186,12 @@ function renderRoletaAdmin() {
           .join('')}
       </div>
       <div class="roleta-prize-list">
-        ${premios
-          .map((p) => {
-            const chance = roletaPityChance(p);
-            return `
+        ${
+          premios.length
+            ? premios
+                .map((p) => {
+                  const chance = roletaPityChance(p);
+                  return `
             <article class="roleta-prize-row" data-id="${roletaEsc(p.id)}">
               <div class="roleta-prize-name">
                 <span class="roleta-swatch" style="background:${roletaEsc(p.color)}"></span>
@@ -120,26 +209,59 @@ function renderRoletaAdmin() {
               <div class="roleta-chance">${roletaFmtChance(chance)}</div>
               <button type="button" class="btn btn-ghost btn-sm" data-action="zerar">Zerar</button>
               <label class="roleta-check"><input type="checkbox" data-field="active" ${p.active ? 'checked' : ''}/> Ativo</label>
+              <button type="button" class="btn btn-ghost btn-sm roleta-btn-danger" data-action="delete" title="Excluir prêmio">Excluir</button>
             </article>`;
-          })
-          .join('')}
+                })
+                .join('')
+            : '<p class="dash-card__meta">Nenhum prêmio cadastrado. Use o formulário acima para adicionar os itens da roleta.</p>'
+        }
       </div>
     </div>
 
     <div class="card roleta-card" style="margin-top:1rem">
       <h3>Detalhes dos prêmios</h3>
       <div class="roleta-detail-list">
-        ${premios
-          .map(
-            (p) => `
+        ${
+          premios.length
+            ? premios
+                .map(
+                  (p) => `
           <article class="roleta-detail" data-id="${roletaEsc(p.id)}">
             <label>Nome <input data-field="name" value="${roletaEsc(p.name)}" /></label>
             <label>Cor <input type="color" data-field="color" value="${roletaEsc(p.color)}" /></label>
             <label>Instrução <textarea rows="2" data-field="instruction">${roletaEsc(p.instruction)}</textarea></label>
-            <button type="button" class="btn btn-secondary btn-sm" data-action="save-one">Salvar prêmio</button>
+            <div class="roleta-detail-actions">
+              <button type="button" class="btn btn-secondary btn-sm" data-action="save-one">Salvar prêmio</button>
+              <button type="button" class="btn btn-ghost btn-sm roleta-btn-danger" data-action="delete">Excluir</button>
+            </div>
           </article>`,
-          )
-          .join('')}
+                )
+                .join('')
+            : '<p class="dash-card__meta">Cadastre pelo menos um prêmio para editar detalhes.</p>'
+        }
+      </div>
+    </div>
+
+    <div class="card roleta-card" style="margin-top:1rem">
+      <h3>Layout do totem (1080×1920)</h3>
+      <p class="dash-card__meta">Envie um PNG de fundo/design. A prévia mostra Roleta + design na proporção do totem.</p>
+      <div class="roleta-layout-grid">
+        <div class="roleta-layout-upload">
+          <label class="btn btn-secondary btn-sm" style="display:inline-flex;cursor:pointer">
+            Escolher PNG
+            <input type="file" id="roleta-layout-file" accept="image/png,image/*" hidden />
+          </label>
+          <button type="button" class="btn btn-primary btn-sm" id="roleta-layout-save" ${roletaState.pendingLayout ? '' : 'disabled'}>Salvar layout</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="roleta-layout-clear">Remover</button>
+          <p class="dash-card__meta" id="roleta-layout-filename">${roletaEsc(roletaState.pendingLayout?.name || settings?.layout_name || 'Nenhum layout')}</p>
+        </div>
+        <div class="roleta-totem-preview" aria-label="Prévia 1080x1920">
+          <div class="roleta-totem-preview__frame">
+            <div class="roleta-totem-preview__bg" id="roleta-preview-bg" style="${roletaState.layoutPreviewUrl ? `background-image:url('${roletaState.layoutPreviewUrl}')` : ''}"></div>
+            <div class="roleta-totem-preview__wheel" aria-hidden="true" style="background:${roletaPreviewWheelBg(premios)}"></div>
+            <p class="roleta-totem-preview__label">Prévia · Roleta + design · 1080×1920</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -246,6 +368,50 @@ function syncRoletaStateFromDom() {
 }
 
 function bindRoletaEvents() {
+  document.getElementById('roleta-add-prize')?.addEventListener('click', async () => {
+    const name = String(document.getElementById('roleta-new-name')?.value || '').trim();
+    const color = document.getElementById('roleta-new-color')?.value || '#FFC20E';
+    const pityRaw = document.getElementById('roleta-new-pity')?.value;
+    const stockRaw = document.getElementById('roleta-new-stock')?.value;
+    const instruction = String(
+      document.getElementById('roleta-new-instruction')?.value || '',
+    ).trim();
+    if (name.length < 2) {
+      roletaShowError('Informe o nome do prêmio.');
+      return;
+    }
+    try {
+      roletaShowError('');
+      const result = await roletaApi('/premios', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          color,
+          pity_every: pityRaw === '' ? 10 : Number(pityRaw),
+          stock: stockRaw === '' ? null : Number(stockRaw),
+          instruction: instruction || 'Retire seu prêmio no balcão da Antonov.',
+          active: true,
+        }),
+      });
+      roletaState.premios = [...roletaState.premios, result.prize];
+      roletaState.stats = {
+        ...roletaState.stats,
+        active_prizes: roletaState.premios.filter((p) => p.active).length,
+      };
+      renderRoletaAdmin();
+      roletaShowSuccess(`Prêmio adicionado: ${result.prize.name}`);
+    } catch (err) {
+      roletaShowError(err.message || 'Falha ao adicionar prêmio.');
+    }
+  });
+
+  document.getElementById('roleta-new-name')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      document.getElementById('roleta-add-prize')?.click();
+    }
+  });
+
   document.getElementById('roleta-preset')?.addEventListener('click', async () => {
     try {
       roletaShowError('');
@@ -310,6 +476,65 @@ function bindRoletaEvents() {
     }
   });
 
+  document.getElementById('roleta-layout-file')?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      roletaShowError('');
+      const compressed = await roletaCompressLayout(file);
+      roletaState.pendingLayout = compressed;
+      roletaState.layoutPreviewUrl = `data:${compressed.type};base64,${compressed.data}`;
+      const bg = document.getElementById('roleta-preview-bg');
+      if (bg) bg.style.backgroundImage = `url('${roletaState.layoutPreviewUrl}')`;
+      const nameEl = document.getElementById('roleta-layout-filename');
+      if (nameEl) nameEl.textContent = compressed.name;
+      const saveBtn = document.getElementById('roleta-layout-save');
+      if (saveBtn) saveBtn.disabled = false;
+      roletaShowSuccess('Prévia atualizada. Clique em “Salvar layout” para aplicar no totem.');
+    } catch (err) {
+      roletaShowError(err.message || 'Falha ao ler o PNG.');
+    }
+  });
+
+  document.getElementById('roleta-layout-save')?.addEventListener('click', async () => {
+    if (!roletaState.pendingLayout) {
+      roletaShowError('Selecione um PNG antes de salvar.');
+      return;
+    }
+    try {
+      const data = await roletaApi('/settings', {
+        method: 'PATCH',
+        body: JSON.stringify({ layout: roletaState.pendingLayout }),
+      });
+      roletaState.settings = data.settings;
+      roletaState.layoutUrl = data.layout_url || roletaState.layoutPreviewUrl;
+      roletaState.pendingLayout = null;
+      roletaShowSuccess('Layout salvo no totem.');
+    } catch (err) {
+      roletaShowError(err.message || 'Falha ao salvar layout.');
+    }
+  });
+
+  document.getElementById('roleta-layout-clear')?.addEventListener('click', async () => {
+    try {
+      const data = await roletaApi('/settings', {
+        method: 'PATCH',
+        body: JSON.stringify({ layout: null }),
+      });
+      roletaState.settings = data.settings;
+      roletaState.layoutUrl = null;
+      roletaState.layoutPreviewUrl = null;
+      roletaState.pendingLayout = null;
+      const bg = document.getElementById('roleta-preview-bg');
+      if (bg) bg.style.backgroundImage = '';
+      const nameEl = document.getElementById('roleta-layout-filename');
+      if (nameEl) nameEl.textContent = 'Nenhum layout';
+      roletaShowSuccess('Layout removido.');
+    } catch (err) {
+      roletaShowError(err.message || 'Falha ao remover layout.');
+    }
+  });
+
   document.getElementById('roleta-export')?.addEventListener('click', () => {
     const rows = [
       ['data', 'nome', 'whatsapp', 'cpf', 'status', 'premio'],
@@ -332,6 +557,29 @@ function bindRoletaEvents() {
     a.download = `roleta-antonov-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+  });
+
+  document.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const row = btn.closest('[data-id]');
+      const id = row?.dataset.id;
+      if (!id) return;
+      const prize = roletaState.premios.find((p) => p.id === id);
+      const label = prize?.name || 'este prêmio';
+      if (!window.confirm(`Excluir “${label}” da roleta?`)) return;
+      try {
+        await roletaApi(`/premios/${id}`, { method: 'DELETE' });
+        roletaState.premios = roletaState.premios.filter((p) => p.id !== id);
+        roletaState.stats = {
+          ...roletaState.stats,
+          active_prizes: roletaState.premios.filter((p) => p.active).length,
+        };
+        renderRoletaAdmin();
+        roletaShowSuccess('Prêmio excluído.');
+      } catch (err) {
+        roletaShowError(err.message || 'Falha ao excluir prêmio.');
+      }
+    });
   });
 
   document.querySelectorAll('[data-action="zerar"]').forEach((btn) => {
@@ -398,14 +646,18 @@ async function loadRoletaAdmin() {
   if (loading) loading.hidden = false;
   roletaShowError('');
   try {
-    const [dash, spinsData] = await Promise.all([
+    const [dash, spinsData, layoutData] = await Promise.all([
       roletaApi(''),
       roletaApi('/spins?limit=200'),
+      roletaApi('/layout'),
     ]);
     roletaState.premios = dash.premios || [];
     roletaState.settings = dash.settings || null;
     roletaState.stats = dash.stats || null;
     roletaState.spins = spinsData.spins || [];
+    roletaState.layoutUrl = layoutData.layout_url || null;
+    roletaState.layoutPreviewUrl = layoutData.layout_url || null;
+    roletaState.pendingLayout = null;
     renderRoletaAdmin();
   } catch (err) {
     roletaShowError(err.message || 'Erro ao carregar roleta.');

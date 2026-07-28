@@ -2,14 +2,17 @@ import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
 import { requireAdmin } from '../../api/_lib/admin-auth.js';
 import {
   listAllPrizesAdmin,
+  createPrize,
   updatePrize,
+  deletePrize,
   getSettings,
   updateSettings,
+  getLayoutPublic,
   listSpins,
   suggestPityFromStock,
   equalizePity,
 } from '../../api/_lib/roleta.js';
-
+import { parseFilePayload } from '../../api/_lib/forms.js';
 function segments(req) {
   const raw = req.query?.path;
   if (typeof raw === 'string') return raw.split('/').filter(Boolean);
@@ -57,10 +60,22 @@ export default async function handler(req, res) {
       return json(res, 200, { premios });
     }
 
+    if (parts[0] === 'premios' && parts.length === 1 && req.method === 'POST') {
+      const result = await createPrize(body);
+      if (result.error) return json(res, 400, { error: result.error });
+      return json(res, 201, { prize: result.prize });
+    }
+
     if (parts[0] === 'premios' && parts.length === 2 && req.method === 'PATCH') {
       const result = await updatePrize(parts[1], body);
       if (result.error) return json(res, 400, { error: result.error });
       return json(res, 200, { prize: result.prize });
+    }
+
+    if (parts[0] === 'premios' && parts.length === 2 && req.method === 'DELETE') {
+      const result = await deletePrize(parts[1]);
+      if (result.error) return json(res, 400, { error: result.error });
+      return json(res, 200, { ok: true });
     }
 
     if (parts[0] === 'premios' && parts.length === 1 && req.method === 'PUT') {
@@ -80,8 +95,27 @@ export default async function handler(req, res) {
     }
 
     if (parts[0] === 'settings' && parts.length === 1 && req.method === 'PATCH') {
-      const settings = await updateSettings(body);
-      return json(res, 200, { settings });
+      const patch = { ...body };
+      if (body.layout !== undefined) {
+        if (body.layout === null) {
+          patch.layout = null;
+        } else {
+          const parsed = parseFilePayload(body.layout, 'Layout PNG');
+          if (parsed.error) return json(res, 400, { error: parsed.error });
+          if (parsed.value && !String(parsed.value.type || '').includes('png') && !String(parsed.value.type || '').includes('image/')) {
+            return json(res, 400, { error: 'Envie um arquivo PNG de layout.' });
+          }
+          patch.layout = parsed.value;
+        }
+      }
+      const settings = await updateSettings(patch);
+      const layout = await getLayoutPublic();
+      return json(res, 200, { settings, layout_url: layout.layout_url });
+    }
+
+    if (parts[0] === 'layout' && parts.length === 1 && req.method === 'GET') {
+      const layout = await getLayoutPublic();
+      return json(res, 200, layout);
     }
 
     if (parts[0] === 'spins' && parts.length === 1 && req.method === 'GET') {
