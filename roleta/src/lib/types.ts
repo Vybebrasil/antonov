@@ -18,6 +18,7 @@ export type Lead = {
   id: string
   name: string
   whatsapp: string
+  cpf?: string | null
   created_at: string
 }
 
@@ -27,6 +28,8 @@ export type Spin = {
   prize_id: string
   created_at: string
   device_id: string | null
+  status?: string
+  confirmed_at?: string | null
   prize?: Prize
   lead?: Lead
 }

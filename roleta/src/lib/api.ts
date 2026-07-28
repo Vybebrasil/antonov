@@ -69,10 +69,34 @@ export async function createLead(name: string, whatsapp: string): Promise<Lead> 
   return data.lead
 }
 
-export async function spinPrize(leadId: string): Promise<Prize> {
-  const data = await request<{ prize: Record<string, unknown> }>('/api/roleta/spin', {
+export async function spinPrize(leadId: string): Promise<{ prize: Prize; spin_id: string }> {
+  const data = await request<{
+    prize: Record<string, unknown>
+    spin_id: string
+  }>('/api/roleta/spin', {
     method: 'POST',
     body: JSON.stringify({ lead_id: leadId, device_id: getDeviceId() }),
   })
-  return mapPrize(data.prize)
+  return {
+    prize: mapPrize(data.prize),
+    spin_id: String(data.spin_id),
+  }
+}
+
+export async function confirmSpinCpf(
+  spinId: string,
+  cpf: string,
+): Promise<{ prize?: Prize; cancelled?: boolean }> {
+  const data = await request<{
+    prize?: Record<string, unknown>
+    cancelled?: boolean
+    error?: string
+  }>('/api/roleta/confirm-cpf', {
+    method: 'POST',
+    body: JSON.stringify({ spin_id: spinId, cpf }),
+  })
+  return {
+    prize: data.prize ? mapPrize(data.prize) : undefined,
+    cancelled: data.cancelled,
+  }
 }

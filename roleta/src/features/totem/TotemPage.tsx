@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { createLead, fetchActivePrizes, fetchSettings, spinPrize } from '@/lib/api'
+import { confirmSpinCpf, createLead, fetchActivePrizes, fetchSettings, spinPrize } from '@/lib/api'
 import type { AdminSettings, Lead, Prize } from '@/lib/types'
 import { DEFAULT_SETTINGS } from '@/lib/types'
+import { CpfModal } from './CpfModal'
 import { IdleScreen } from './IdleScreen'
 import { LeadForm } from './LeadForm'
 import { PrizeWheel } from './PrizeWheel'
 import { ResultScreen } from './ResultScreen'
 import styles from './TotemPage.module.css'
 
-type Step = 'idle' | 'lead' | 'ready' | 'spinning' | 'result'
+type Step = 'idle' | 'lead' | 'ready' | 'spinning' | 'cpf' | 'result'
 
 export function TotemPage() {
   const [prizes, setPrizes] = useState<Prize[]>([])
@@ -17,6 +18,7 @@ export function TotemPage() {
   const [lead, setLead] = useState<Lead | null>(null)
   const [targetPrizeId, setTargetPrizeId] = useState<string | null>(null)
   const [wonPrize, setWonPrize] = useState<Prize | null>(null)
+  const [spinId, setSpinId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loadingPrizes, setLoadingPrizes] = useState(true)
 
@@ -50,6 +52,7 @@ export function TotemPage() {
     setLead(null)
     setTargetPrizeId(null)
     setWonPrize(null)
+    setSpinId(null)
     setError(null)
     void fetchActivePrizes().then(setPrizes).catch(() => undefined)
   }, [])
@@ -64,9 +67,10 @@ export function TotemPage() {
     if (!lead || step === 'spinning') return
     setError(null)
     try {
-      const prize = await spinPrize(lead.id)
+      const { prize, spin_id } = await spinPrize(lead.id)
       setTargetPrizeId(prize.id)
       setWonPrize(prize)
+      setSpinId(spin_id)
       setStep('spinning')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha no sorteio.')
@@ -75,7 +79,17 @@ export function TotemPage() {
 
   function handleSpinEnd(prize: Prize) {
     setWonPrize(prize)
+    setStep('cpf')
+  }
+
+  async function handleCpfSubmit(cpf: string) {
+    if (!spinId) throw new Error('Giro inválido.')
+    const result = await confirmSpinCpf(spinId, cpf)
+    if (result.prize) setWonPrize(result.prize)
     setStep('result')
+    window.setTimeout(() => {
+      reset()
+    }, (settings.result_timeout_seconds || 15) * 1000)
   }
 
   return (
@@ -121,13 +135,15 @@ export function TotemPage() {
 
             {step === 'spinning' && <p className={styles.status}>Girando…</p>}
 
+            {step === 'cpf' && wonPrize && (
+              <div className={styles.overlay}>
+                <CpfModal prizeName={wonPrize.name} onSubmit={handleCpfSubmit} />
+              </div>
+            )}
+
             {step === 'result' && wonPrize && (
               <div className={styles.overlay}>
-                <ResultScreen
-                  prize={wonPrize}
-                  timeoutSeconds={settings.result_timeout_seconds}
-                  onDone={reset}
-                />
+                <ResultScreen prize={wonPrize} onDone={reset} />
               </div>
             )}
 

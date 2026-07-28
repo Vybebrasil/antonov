@@ -1,5 +1,5 @@
 import { parseBody } from '../_lib/db.js';
-import { spinPrize } from '../_lib/roleta.js';
+import { confirmSpinCpf } from '../_lib/roleta.js';
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -26,18 +26,14 @@ export default async function handler(req, res) {
 
   try {
     const body = parseBody(req) || {};
-    const leadId = String(body.lead_id || '').trim();
-    if (!leadId) return json(res, 400, { error: 'lead_id é obrigatório.' });
+    const spinId = String(body.spin_id || '').trim();
+    if (!spinId) return json(res, 400, { error: 'spin_id é obrigatório.' });
 
-    const result = await spinPrize(leadId, body.device_id ? String(body.device_id) : null);
-    if (result.error) return json(res, 400, { error: result.error });
-    return json(res, 200, {
-      prize: result.prize,
-      spin_id: result.spin_id,
-      needs_cpf: Boolean(result.needs_cpf),
-    });
+    const result = await confirmSpinCpf(spinId, body.cpf);
+    if (result.error) return json(res, 400, result);
+    return json(res, 200, result);
   } catch (err) {
-    console.error('roleta/spin', err);
-    return json(res, 500, { error: 'Erro ao sortear prêmio.' });
+    console.error('roleta/confirm-cpf', err);
+    return json(res, 500, { error: 'Erro ao confirmar CPF.' });
   }
 }

@@ -195,58 +195,58 @@ export async function createLead(name, whatsappRaw) {
     return { error: 'Informe um WhatsApp válido com DDD.' };
   }
 
-  const settings = await getSettings();
   const existing = await sql`
-    SELECT * FROM roleta_leads
+    SELECT id FROM roleta_leads
     WHERE whatsapp = ${whatsapp}
-    ORDER BY created_at DESC
     LIMIT 1
   `;
-
   if (existing[0]) {
-    const lastSpin = await sql`
-      SELECT MAX(s.created_at) AS last_at
-      FROM roleta_spins s
-      JOIN roleta_leads l ON l.id = s.lead_id
-      WHERE l.whatsapp = ${whatsapp}
-    `;
-    const lastAt = lastSpin[0]?.last_at;
-    if (lastAt) {
-      if (!settings.allow_repeat_spin) {
-        return { error: 'Este WhatsApp já participou. Aguarde para girar novamente.' };
-      }
-      const hours =
-        (Date.now() - new Date(lastAt).getTime()) / (1000 * 60 * 60);
-      if (hours < settings.whatsapp_cooldown_hours) {
-        return {
-          error: `Este WhatsApp já girou recentemente. Tente em ${Math.ceil(settings.whatsapp_cooldown_hours - hours)}h.`,
-        };
-      }
-    } else {
-      return {
-        lead: {
-          id: existing[0].id,
-          name: existing[0].name,
-          whatsapp: existing[0].whatsapp,
-          created_at: existing[0].created_at,
-        },
-      };
-    }
+    return { error: 'Este WhatsApp já está cadastrado. Cada número pode participar apenas uma vez.' };
   }
 
-  const rows = await sql`
-    INSERT INTO roleta_leads (name, whatsapp)
-    VALUES (${nameClean}, ${whatsapp})
-    RETURNING *
-  `;
-  return {
-    lead: {
-      id: rows[0].id,
-      name: rows[0].name,
-      whatsapp: rows[0].whatsapp,
-      created_at: rows[0].created_at,
-    },
-  };
+  try {
+    const rows = await sql`
+      INSERT INTO roleta_leads (name, whatsapp)
+      VALUES (${nameClean}, ${whatsapp})
+      RETURNING *
+    `;
+    return {
+      lead: {
+        id: rows[0].id,
+        name: rows[0].name,
+        whatsapp: rows[0].whatsapp,
+        cpf: rows[0].cpf || null,
+        created_at: rows[0].created_at,
+      },
+    };
+  } catch (err) {
+    if (String(err?.message || '').includes('roleta_leads_whatsapp')) {
+      return { error: 'Este WhatsApp já está cadastrado. Cada número pode participar apenas uma vez.' };
+    }
+    throw err;
+  }
+}
+
+function normalizeCpf(input) {
+  return String(input || '').replace(/\D/g, '');
+}
+
+export function isValidCpf(input) {
+  const cpf = normalizeCpf(input);
+  if (!/^\d{11}$/.test(cpf)) return false;
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+  let sum = 0;
+  for (let i = 0; i < 9; i += 1) sum += Number(cpf[i]) * (10 - i);
+  let dig = (sum * 10) % 11;
+  if (dig === 10) dig = 0;
+  if (dig !== Number(cpf[9])) return false;
+
+  sum = 0;
+  for (let i = 0; i < 10; i += 1) sum += Number(cpf[i]) * (11 - i);
+  dig = (sum * 10) % 11;
+  if (dig === 10) dig = 0;
+  return dig === Number(cpf[10]);
 }
 
 export async function spinPrize(leadId, deviceId = null) {
@@ -255,22 +255,28 @@ export async function spinPrize(leadId, deviceId = null) {
   const lead = leads[0];
   if (!lead) return { error: 'Lead não encontrado.' };
 
-  const settings = await getSettings();
-  const lastSpin = await sql`
-    SELECT MAX(s.created_at) AS last_at
-    FROM roleta_spins s
-    JOIN roleta_leads l ON l.id = s.lead_id
-    WHERE l.whatsapp = ${lead.whatsapp}
+  if (lead.cpf) {
+    return { error: 'Este participante já confirmou um prêmio com CPF.' };
+  }
+
+  const prior = await sql`
+    SELECT id, status, prize_id
+    FROM roleta_spins
+    WHERE lead_id = ${leadId}
+      AND status IN ('pending_cpf', 'confirmed')
+    ORDER BY created_at DESC
+    LIMIT 1
   `;
-  const lastAt = lastSpin[0]?.last_at;
-  if (lastAt) {
-    if (!settings.allow_repeat_spin) {
-      return { error: 'Este WhatsApp já participou.' };
-    }
-    const hours = (Date.now() - new Date(lastAt).getTime()) / (1000 * 60 * 60);
-    if (hours < settings.whatsapp_cooldown_hours) {
-      return { error: 'Cooldown ativo para este WhatsApp.' };
-    }
+  if (prior[0]?.status === 'confirmed') {
+    return { error: 'Este WhatsApp já participou.' };
+  }
+  if (prior[0]?.status === 'pending_cpf') {
+    const prizeRows = await sql`SELECT * FROM roleta_premios WHERE id = ${prior[0].prize_id}`;
+    return {
+      prize: mapPrize(prizeRows[0]),
+      spin_id: prior[0].id,
+      needs_cpf: true,
+    };
   }
 
   const all = (await sql`SELECT * FROM roleta_premios ORDER BY sort_order, name`).map(mapPrize);
@@ -306,13 +312,100 @@ export async function spinPrize(leadId, deviceId = null) {
     }
   }
 
-  await sql`
-    INSERT INTO roleta_spins (lead_id, prize_id, device_id)
-    VALUES (${leadId}, ${winner.id}, ${deviceId})
+  const spinRows = await sql`
+    INSERT INTO roleta_spins (lead_id, prize_id, device_id, status)
+    VALUES (${leadId}, ${winner.id}, ${deviceId}, 'pending_cpf')
+    RETURNING id
   `;
 
   const refreshed = await sql`SELECT * FROM roleta_premios WHERE id = ${winner.id}`;
-  return { prize: mapPrize(refreshed[0]) };
+  return {
+    prize: mapPrize(refreshed[0]),
+    spin_id: spinRows[0].id,
+    needs_cpf: true,
+  };
+}
+
+export async function confirmSpinCpf(spinId, cpfRaw) {
+  const sql = getSql();
+  const cpf = normalizeCpf(cpfRaw);
+  if (!isValidCpf(cpf)) {
+    return { error: 'CPF inválido. Confira os dígitos e tente novamente.' };
+  }
+
+  const spins = await sql`
+    SELECT s.*, l.cpf AS lead_cpf
+    FROM roleta_spins s
+    JOIN roleta_leads l ON l.id = s.lead_id
+    WHERE s.id = ${spinId}
+  `;
+  const spin = spins[0];
+  if (!spin) return { error: 'Giro não encontrado.' };
+  if (spin.status === 'confirmed') {
+    return { ok: true, already: true };
+  }
+  if (spin.status === 'cancelled') {
+    return { error: 'Este giro foi cancelado. Tente novamente com outro cadastro.' };
+  }
+  if (spin.status !== 'pending_cpf') {
+    return { error: 'Este giro não está aguardando CPF.' };
+  }
+
+  const cpfTaken = await sql`
+    SELECT id FROM roleta_leads
+    WHERE cpf = ${cpf}
+      AND id <> ${spin.lead_id}
+    LIMIT 1
+  `;
+  if (cpfTaken[0]) {
+    await cancelPendingSpin(spin);
+    return {
+      error: 'Este CPF já resgatou um prêmio. Cada CPF pode girar a roleta apenas uma vez.',
+      cancelled: true,
+    };
+  }
+
+  try {
+    await sql`
+      UPDATE roleta_leads
+      SET cpf = ${cpf}
+      WHERE id = ${spin.lead_id}
+    `;
+    await sql`
+      UPDATE roleta_spins
+      SET status = 'confirmed', confirmed_at = NOW()
+      WHERE id = ${spinId}
+    `;
+  } catch (err) {
+    if (String(err?.message || '').includes('roleta_leads_cpf')) {
+      await cancelPendingSpin(spin);
+      return {
+        error: 'Este CPF já resgatou um prêmio. Cada CPF pode girar a roleta apenas uma vez.',
+        cancelled: true,
+      };
+    }
+    throw err;
+  }
+
+  const prizeRows = await sql`SELECT * FROM roleta_premios WHERE id = ${spin.prize_id}`;
+  return { ok: true, prize: mapPrize(prizeRows[0]), cpf };
+}
+
+async function cancelPendingSpin(spin) {
+  const sql = getSql();
+  await sql`
+    UPDATE roleta_spins
+    SET status = 'cancelled'
+    WHERE id = ${spin.id} AND status = 'pending_cpf'
+  `;
+  const prizes = await sql`SELECT stock FROM roleta_premios WHERE id = ${spin.prize_id}`;
+  if (prizes[0] && prizes[0].stock != null) {
+    await sql`
+      UPDATE roleta_premios
+      SET stock = stock + 1
+      WHERE id = ${spin.prize_id}
+    `;
+  }
 }
 
 export async function listSpins(limit = 200) {
@@ -324,8 +417,11 @@ export async function listSpins(limit = 200) {
       s.prize_id,
       s.device_id,
       s.created_at,
+      s.status,
+      s.confirmed_at,
       l.name AS lead_name,
       l.whatsapp AS lead_whatsapp,
+      l.cpf AS lead_cpf,
       p.name AS prize_name
     FROM roleta_spins s
     JOIN roleta_leads l ON l.id = s.lead_id
@@ -339,7 +435,9 @@ export async function listSpins(limit = 200) {
     prize_id: r.prize_id,
     device_id: r.device_id,
     created_at: r.created_at,
-    lead: { name: r.lead_name, whatsapp: r.lead_whatsapp },
+    status: r.status,
+    confirmed_at: r.confirmed_at,
+    lead: { name: r.lead_name, whatsapp: r.lead_whatsapp, cpf: r.lead_cpf },
     prize: { name: r.prize_name },
   }));
 }

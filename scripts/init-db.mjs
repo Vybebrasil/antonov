@@ -375,10 +375,13 @@ await sql`
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL,
     whatsapp TEXT NOT NULL,
+    cpf TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 `;
 
+await sql`CREATE UNIQUE INDEX IF NOT EXISTS roleta_leads_whatsapp_unique_idx ON roleta_leads (whatsapp);`;
+await sql`CREATE UNIQUE INDEX IF NOT EXISTS roleta_leads_cpf_unique_idx ON roleta_leads (cpf) WHERE cpf IS NOT NULL;`;
 await sql`CREATE INDEX IF NOT EXISTS roleta_leads_whatsapp_idx ON roleta_leads (whatsapp);`;
 
 await sql`
@@ -387,6 +390,8 @@ await sql`
     lead_id UUID NOT NULL REFERENCES roleta_leads (id) ON DELETE CASCADE,
     prize_id UUID NOT NULL REFERENCES roleta_premios (id),
     device_id TEXT,
+    status TEXT NOT NULL DEFAULT 'confirmed',
+    confirmed_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
 `;

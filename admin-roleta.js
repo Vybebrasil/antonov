@@ -168,7 +168,7 @@ function renderRoletaAdmin() {
       <div class="table-wrap">
         <table class="data-table">
           <thead>
-            <tr><th>Data</th><th>Nome</th><th>WhatsApp</th><th>Prêmio</th></tr>
+            <tr><th>Data</th><th>Nome</th><th>WhatsApp</th><th>CPF</th><th>Status</th><th>Prêmio</th></tr>
           </thead>
           <tbody>
             ${
@@ -180,11 +180,13 @@ function renderRoletaAdmin() {
                 <td>${roletaEsc(new Date(s.created_at).toLocaleString('pt-BR'))}</td>
                 <td>${roletaEsc(s.lead?.name)}</td>
                 <td>${roletaEsc(s.lead?.whatsapp)}</td>
+                <td>${roletaEsc(s.lead?.cpf || '—')}</td>
+                <td>${roletaEsc(s.status || 'confirmed')}</td>
                 <td>${roletaEsc(s.prize?.name)}</td>
               </tr>`,
                     )
                     .join('')
-                : '<tr><td colspan="4">Nenhum giro registrado ainda.</td></tr>'
+                : '<tr><td colspan="6">Nenhum giro registrado ainda.</td></tr>'
             }
           </tbody>
         </table>
@@ -310,11 +312,13 @@ function bindRoletaEvents() {
 
   document.getElementById('roleta-export')?.addEventListener('click', () => {
     const rows = [
-      ['data', 'nome', 'whatsapp', 'premio'],
+      ['data', 'nome', 'whatsapp', 'cpf', 'status', 'premio'],
       ...roletaState.spins.map((s) => [
         s.created_at,
         s.lead?.name || '',
         s.lead?.whatsapp || '',
+        s.lead?.cpf || '',
+        s.status || '',
         s.prize?.name || '',
       ]),
     ];
