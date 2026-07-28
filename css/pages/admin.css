@@ -261,10 +261,16 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
 
 .roleta-layout-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
   gap: 1.25rem;
   align-items: start;
   margin-top: 0.85rem;
+}
+
+.roleta-layout-controls {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
 }
 
 .roleta-layout-upload {
@@ -272,6 +278,52 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
   flex-wrap: wrap;
   gap: 0.65rem;
   align-items: center;
+}
+
+.roleta-guides-toggle {
+  margin-top: 0.15rem;
+}
+
+.roleta-guide-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  color: var(--muted, rgba(255, 255, 255, 0.7));
+}
+
+.roleta-guide-legend li {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+}
+
+.roleta-guide-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.roleta-guide-swatch--wheel {
+  background: rgba(255, 194, 14, 0.85);
+}
+
+.roleta-guide-swatch--cta {
+  background: rgba(0, 156, 222, 0.85);
+}
+
+.roleta-guide-swatch--safe {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px rgba(0, 156, 222, 0.9);
+}
+
+.roleta-guide-swatch--thirds {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.5) 50%, transparent 50%);
 }
 
 .roleta-totem-preview__frame {
@@ -294,16 +346,101 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
   opacity: 0.95;
 }
 
+.roleta-totem-preview__guides {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.roleta-guide-safe {
+  position: absolute;
+  inset: calc(100% * 40 / 1920) calc(100% * 40 / 1080);
+  border: 1.5px dashed rgba(0, 156, 222, 0.85);
+}
+
+.roleta-guide-thirds {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)) center / 1px 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) left 33.333% top 0 / 1px 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) left 66.666% top 0 / 1px 100% no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) left 0 top 33.333% / 100% 1px no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12)) left 0 top 66.666% / 100% 1px no-repeat;
+}
+
+.roleta-guide-center {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed rgba(255, 194, 14, 0.55);
+  transform: translateX(-50%);
+}
+
+.roleta-guide-brand {
+  position: absolute;
+  left: calc(100% * 180 / 1080);
+  top: calc(100% * 40 / 1920);
+  width: calc(100% * 720 / 1080);
+  height: calc(100% * 48 / 1920);
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  display: grid;
+  place-items: center;
+}
+
+.roleta-guide-brand span,
+.roleta-guide-cta span {
+  font-size: 0.55rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.55);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+.roleta-guide-wheel-ring {
+  position: absolute;
+  left: calc(100% * 180 / 1080);
+  top: calc(100% * 96 / 1920);
+  width: calc(100% * 720 / 1080);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 194, 14, 0.9);
+  box-shadow: 0 0 0 8px rgba(255, 194, 14, 0.12);
+}
+
+.roleta-guide-cta {
+  position: absolute;
+  left: calc(100% * 140 / 1080);
+  top: calc(100% * 1520 / 1920);
+  width: calc(100% * 800 / 1080);
+  height: calc(100% * 280 / 1920);
+  border: 2px solid rgba(0, 156, 222, 0.9);
+  background: rgba(0, 156, 222, 0.12);
+  display: grid;
+  place-items: center;
+}
+
 .roleta-totem-preview__wheel {
   position: absolute;
-  top: 8%;
+  z-index: 2;
+  top: calc(100% * 96 / 1920);
   left: 50%;
   transform: translateX(-50%);
-  width: 72%;
+  width: calc(100% * 720 / 1080);
   aspect-ratio: 1;
   border-radius: 50%;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   border: 3px solid rgba(255, 194, 14, 0.65);
+  opacity: 0.92;
+}
+
+.roleta-totem-preview__frame.is-guides .roleta-totem-preview__wheel {
+  opacity: 0.72;
 }
 
 .roleta-totem-preview__wheel::after {
@@ -317,6 +454,7 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
 
 .roleta-totem-preview__label {
   position: absolute;
+  z-index: 4;
   bottom: 4%;
   left: 0;
   right: 0;
@@ -342,7 +480,7 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
 
   .roleta-layout-grid {
     grid-template-columns: 1fr;
-    max-width: 240px;
+    max-width: 280px;
   }
 }
 

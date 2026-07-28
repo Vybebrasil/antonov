@@ -8,6 +8,7 @@ const roletaState = {
   layoutUrl: null,
   layoutPreviewUrl: null,
   pendingLayout: null,
+  showGuides: true,
 };
 
 function roletaEsc(s) {
@@ -43,6 +44,115 @@ function roletaPreviewWheelBg(premios) {
     .map((c, i) => `${c} ${i * step}% ${(i + 1) * step}%`)
     .join(', ');
   return `conic-gradient(from -90deg, ${stops})`;
+}
+
+/** Zonas do totem em px (canvas 1080×1920) — espelha o layout real. */
+const ROLETA_GUIDE = {
+  canvasW: 1080,
+  canvasH: 1920,
+  margin: 40,
+  wheel: { x: 180, y: 96, size: 720 },
+  cta: { x: 140, y: 1520, w: 800, h: 280 },
+  brand: { x: 180, y: 40, w: 720, h: 48 },
+};
+
+function roletaDownloadGuidePng() {
+  const { canvasW: W, canvasH: H, margin: M, wheel, cta, brand } = ROLETA_GUIDE;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, 0, W, H);
+
+  // safe margin
+  ctx.strokeStyle = 'rgba(0, 156, 222, 0.85)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([12, 10]);
+  ctx.strokeRect(M, M, W - M * 2, H - M * 2);
+
+  // thirds
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([6, 8]);
+  for (let i = 1; i <= 2; i += 1) {
+    const x = (W / 3) * i;
+    const y = (H / 3) * i;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+
+  // center
+  ctx.strokeStyle = 'rgba(255, 194, 14, 0.45)';
+  ctx.setLineDash([4, 6]);
+  ctx.beginPath();
+  ctx.moveTo(W / 2, 0);
+  ctx.lineTo(W / 2, H);
+  ctx.stroke();
+
+  // brand hint
+  ctx.setLineDash([8, 6]);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+  ctx.strokeRect(brand.x, brand.y, brand.w, brand.h);
+
+  // wheel zone
+  const cx = wheel.x + wheel.diameter / 2;
+  const cy = wheel.y + wheel.diameter / 2;
+  const r = wheel.diameter / 2;
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(255, 194, 14, 0.12)';
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255, 194, 14, 0.95)';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255, 194, 14, 0.4)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([10, 8]);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + 24, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // CTA zone
+  ctx.setLineDash([]);
+  ctx.fillStyle = 'rgba(0, 156, 222, 0.14)';
+  ctx.fillRect(cta.x, cta.y, cta.w, cta.h);
+  ctx.strokeStyle = 'rgba(0, 156, 222, 0.95)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(cta.x, cta.y, cta.w, cta.h);
+
+  const label = (text, x, y, color = '#fff') => {
+    ctx.font = '600 28px sans-serif';
+    const w = ctx.measureText(text).width;
+    ctx.fillStyle = 'rgba(0,0,0,0.72)';
+    ctx.fillRect(x - 8, y - 28, w + 16, 36);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+  };
+
+  label('Área da ROLETA (720×720) — deixe livre', wheel.x + 24, wheel.y + 48, '#FFC20E');
+  label('Zona de UI / CTA (botões e textos)', cta.x + 24, cta.y + 48, '#009CDE');
+  label('Margem segura 40px', M + 16, M + 40, '#009CDE');
+  label('Canvas 1080 × 1920 px', M + 16, H - M - 16, '#fff');
+
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'roleta-totem-guia-1080x1920.png';
+    a.click();
+    URL.revokeObjectURL(url);
+  }, 'image/png');
 }
 
 function roletaCompressLayout(file, { maxW = 1080, maxH = 1920, quality = 0.85 } = {}) {
@@ -244,22 +354,44 @@ function renderRoletaAdmin() {
 
     <div class="card roleta-card" style="margin-top:1rem">
       <h3>Layout do totem (1080×1920)</h3>
-      <p class="dash-card__meta">Envie um PNG de fundo/design. A prévia mostra Roleta + design na proporção do totem.</p>
+      <p class="dash-card__meta">Envie um PNG de fundo/design. Use as guias para alinhar arte com a roleta e a área de botões.</p>
       <div class="roleta-layout-grid">
-        <div class="roleta-layout-upload">
-          <label class="btn btn-secondary btn-sm" style="display:inline-flex;cursor:pointer">
-            Escolher PNG
-            <input type="file" id="roleta-layout-file" accept="image/png,image/*" hidden />
-          </label>
-          <button type="button" class="btn btn-primary btn-sm" id="roleta-layout-save" ${roletaState.pendingLayout ? '' : 'disabled'}>Salvar layout</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="roleta-layout-clear">Remover</button>
+        <div class="roleta-layout-controls">
+          <div class="roleta-layout-upload">
+            <label class="btn btn-secondary btn-sm" style="display:inline-flex;cursor:pointer">
+              Escolher PNG
+              <input type="file" id="roleta-layout-file" accept="image/png,image/*" hidden />
+            </label>
+            <button type="button" class="btn btn-primary btn-sm" id="roleta-layout-save" ${roletaState.pendingLayout ? '' : 'disabled'}>Salvar layout</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="roleta-layout-clear">Remover</button>
+            <button type="button" class="btn btn-secondary btn-sm" id="roleta-layout-guide-dl">Baixar guia PNG</button>
+          </div>
           <p class="dash-card__meta" id="roleta-layout-filename">${roletaEsc(roletaState.pendingLayout?.name || settings?.layout_name || 'Nenhum layout')}</p>
+          <label class="roleta-check roleta-guides-toggle">
+            <input type="checkbox" id="roleta-show-guides" ${roletaState.showGuides ? 'checked' : ''}/>
+            Mostrar guias de design na prévia
+          </label>
+          <ul class="roleta-guide-legend">
+            <li><span class="roleta-guide-swatch roleta-guide-swatch--wheel"></span> Roleta · 720×720 px · topo centrado (x 180, y 96)</li>
+            <li><span class="roleta-guide-swatch roleta-guide-swatch--cta"></span> UI / CTA · 800×280 px · base (y 1520)</li>
+            <li><span class="roleta-guide-swatch roleta-guide-swatch--safe"></span> Margem segura · 40 px nas bordas</li>
+            <li><span class="roleta-guide-swatch roleta-guide-swatch--thirds"></span> Terços e eixo central · alinhamento</li>
+          </ul>
+          <p class="dash-card__meta">Arquivo recomendado: PNG 1080×1920. Deixe a área da roleta sem elementos críticos (a roda fica por cima).</p>
         </div>
         <div class="roleta-totem-preview" aria-label="Prévia 1080x1920">
-          <div class="roleta-totem-preview__frame">
+          <div class="roleta-totem-preview__frame ${roletaState.showGuides ? 'is-guides' : ''}">
             <div class="roleta-totem-preview__bg" id="roleta-preview-bg" style="${roletaState.layoutPreviewUrl ? `background-image:url('${roletaState.layoutPreviewUrl}')` : ''}"></div>
+            <div class="roleta-totem-preview__guides" id="roleta-preview-guides" ${roletaState.showGuides ? '' : 'hidden'} aria-hidden="true">
+              <div class="roleta-guide-safe"></div>
+              <div class="roleta-guide-thirds"></div>
+              <div class="roleta-guide-center"></div>
+              <div class="roleta-guide-brand"><span>Marca / topo</span></div>
+              <div class="roleta-guide-wheel-ring"></div>
+              <div class="roleta-guide-cta"><span>UI · Toque / Girar</span></div>
+            </div>
             <div class="roleta-totem-preview__wheel" aria-hidden="true" style="background:${roletaPreviewWheelBg(premios)}"></div>
-            <p class="roleta-totem-preview__label">Prévia · Roleta + design · 1080×1920</p>
+            <p class="roleta-totem-preview__label">Prévia · 1080×1920</p>
           </div>
         </div>
       </div>
@@ -493,6 +625,23 @@ function bindRoletaEvents() {
       roletaShowSuccess('Prévia atualizada. Clique em “Salvar layout” para aplicar no totem.');
     } catch (err) {
       roletaShowError(err.message || 'Falha ao ler o PNG.');
+    }
+  });
+
+  document.getElementById('roleta-show-guides')?.addEventListener('change', (e) => {
+    roletaState.showGuides = Boolean(e.target.checked);
+    const frame = document.querySelector('.roleta-totem-preview__frame');
+    const guides = document.getElementById('roleta-preview-guides');
+    if (frame) frame.classList.toggle('is-guides', roletaState.showGuides);
+    if (guides) guides.hidden = !roletaState.showGuides;
+  });
+
+  document.getElementById('roleta-layout-guide-dl')?.addEventListener('click', () => {
+    try {
+      roletaDownloadGuidePng();
+      roletaShowSuccess('Guia 1080×1920 baixado. Importe como camada no Figma/Photoshop.');
+    } catch (err) {
+      roletaShowError(err.message || 'Falha ao gerar guia.');
     }
   });
 

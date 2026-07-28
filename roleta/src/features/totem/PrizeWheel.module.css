@@ -1,6 +1,6 @@
 .wrap {
   position: relative;
-  width: min(78%, 720px);
+  width: 100%;
   aspect-ratio: 1;
   margin-inline: auto;
 }
@@ -94,11 +94,5 @@
   }
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-height: 800px) {
-  .wrap {
-    width: min(72%, 520px);
   }
 }
