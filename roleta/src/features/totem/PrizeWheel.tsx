@@ -124,7 +124,7 @@ export function PrizeWheel({
         </svg>
         <img
           className={styles.hub}
-          src="/brand/imagotipo.png"
+          src={`${import.meta.env.BASE_URL}brand/imagotipo.png`}
           alt=""
           draggable={false}
         />

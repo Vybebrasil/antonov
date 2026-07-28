@@ -21,7 +21,7 @@
       "destination": "/roleta/index.html"
     },
     {
-      "source": "/roleta/(.*)",
+      "source": "/roleta/",
       "destination": "/roleta/index.html"
     }
   ],

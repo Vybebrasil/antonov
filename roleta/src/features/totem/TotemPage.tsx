@@ -82,7 +82,7 @@ export function TotemPage() {
     <div className={styles.page}>
       <div className={styles.atmosphere} aria-hidden />
       <header className={styles.header}>
-        <img src="/brand/logo-horizontal.png" alt="Antonov" className={styles.logo} />
+        <img src={`${import.meta.env.BASE_URL}brand/logo-horizontal.png`} alt="Antonov" className={styles.logo} />
       </header>
 
       <main className={styles.main}>
