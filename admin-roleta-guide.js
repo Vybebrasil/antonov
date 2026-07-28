@@ -4,9 +4,10 @@ const ROLETA_GUIDE = {
   canvasH: 1920,
   margin: 40,
   wheel: { x: 180, y: 96, diameter: 720 },
-  cta: { x: 140, y: 1520, w: 800, h: 280 },
-  /** Faixa entre roleta e CTA — arte livre */
-  free: { x: 120, y: 860, w: 840, h: 520 },
+  /** Logo abaixo da roleta */
+  cta: { x: 140, y: 840, w: 800, h: 280 },
+  /** Parte inferior — arte livre */
+  free: { x: 120, y: 1200, w: 840, h: 640 },
 };
 
 function roletaGuideRoundRect(ctx, x, y, w, h, r) {
@@ -249,32 +250,13 @@ function roletaDownloadGuidePng() {
     `Centro   ${cx} , ${cy}`,
   ]);
 
-  // === B — Arte livre ===
-  ctx.fillStyle = 'rgba(46, 204, 113, 0.11)';
-  ctx.fillRect(free.x, free.y, free.w, free.h);
-  ctx.setLineDash([10, 8]);
-  ctx.strokeStyle = GREEN;
-  ctx.lineWidth = 3;
-  ctx.strokeRect(free.x + 0.5, free.y + 0.5, free.w - 1, free.h - 1);
-  ctx.setLineDash([]);
-
-  dimH(free.x, free.x + free.w, free.y - 18, `${free.w} px`, GREEN);
-  dimV(free.x - 18, free.y, free.y + free.h, `${free.h} px`, GREEN);
-
-  badge('B', free.x + 40, free.y + 48, GREEN, 'ARTE LIVRE', [
-    'Logo, título, patrocínios, texto',
-    `Área  ${free.w} × ${free.h} px`,
-    `Faixa  y ${free.y} → ${free.y + free.h}`,
-  ]);
-
-  // === C — CTA ===
+  // === B — CTA (logo abaixo da roleta) ===
   ctx.fillStyle = 'rgba(0, 156, 222, 0.15)';
   ctx.fillRect(cta.x, cta.y, cta.w, cta.h);
   ctx.strokeStyle = BLUE;
   ctx.lineWidth = 4;
   ctx.strokeRect(cta.x + 0.5, cta.y + 0.5, cta.w - 1, cta.h - 1);
 
-  // Placeholder de UI
   ctx.fillStyle = 'rgba(255,255,255,0.14)';
   ctx.fillRect(cta.x + 170, cta.y + 48, 460, 34);
   ctx.fillStyle = 'rgba(255,194,14,0.9)';
@@ -286,25 +268,43 @@ function roletaDownloadGuidePng() {
 
   dimH(cta.x, cta.x + cta.w, cta.y - 20, `${cta.w} px`, BLUE);
 
-  badge('C', cta.x + 40, cta.y + 44, BLUE, 'UI / CTA · RESERVADA', [
-    'Botões e textos do app ficam aqui',
-    'Evite elementos críticos nesta faixa',
+  badge('B', cta.x + 40, cta.y + 44, BLUE, 'UI / CTA · RESERVADA', [
+    'Botão Girar e textos do app',
+    'Logo abaixo da roleta',
     `Área  ${cta.w} × ${cta.h} px   ·   y ${cta.y}`,
   ]);
 
-  // Callout margem
+  // === C — Arte livre (inferior) ===
+  ctx.fillStyle = 'rgba(46, 204, 113, 0.11)';
+  ctx.fillRect(free.x, free.y, free.w, free.h);
+  ctx.setLineDash([10, 8]);
+  ctx.strokeStyle = GREEN;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(free.x + 0.5, free.y + 0.5, free.w - 1, free.h - 1);
+  ctx.setLineDash([]);
+
+  dimH(free.x, free.x + free.w, free.y - 18, `${free.w} px`, GREEN);
+  dimV(free.x - 18, free.y, free.y + free.h, `${free.h} px`, GREEN);
+
+  badge('C', free.x + 40, free.y + 48, GREEN, 'ARTE LIVRE · INFERIOR', [
+    'Logo, título, patrocínios, texto',
+    `Área  ${free.w} × ${free.h} px`,
+    `Faixa  y ${free.y} → ${free.y + free.h}`,
+  ]);
+
+  // Callout margem (canto da arte livre)
   ctx.fillStyle = 'rgba(0,0,0,0.84)';
-  ctx.fillRect(M + 10, H - 168, 400, 96);
+  ctx.fillRect(free.x + 16, free.y + free.h - 120, 400, 96);
   ctx.strokeStyle = BLUE;
   ctx.lineWidth = 2;
-  ctx.strokeRect(M + 10.5, H - 167.5, 399, 95);
+  ctx.strokeRect(free.x + 16.5, free.y + free.h - 119.5, 399, 95);
   ctx.fillStyle = BLUE;
   ctx.font = '700 20px "Segoe UI", Arial, sans-serif';
-  ctx.fillText('MARGEM SEGURA', M + 26, H - 134);
+  ctx.fillText('MARGEM SEGURA', free.x + 32, free.y + free.h - 86);
   ctx.fillStyle = WHITE;
   ctx.font = '500 18px "Segoe UI", Arial, sans-serif';
-  ctx.fillText('40 px em todos os lados', M + 26, H - 106);
-  ctx.fillText('Textos e logos dentro da margem', M + 26, H - 80);
+  ctx.fillText('40 px em todos os lados', free.x + 32, free.y + free.h - 58);
+  ctx.fillText('Textos e logos dentro da margem', free.x + 32, free.y + free.h - 32);
 
   // Footer
   ctx.fillStyle = 'rgba(0,0,0,0.88)';
@@ -312,13 +312,13 @@ function roletaDownloadGuidePng() {
   ctx.font = '600 17px "Segoe UI", Arial, sans-serif';
   ctx.fillStyle = YELLOW;
   ctx.fillText('A Roleta', 36, H - 22);
-  ctx.fillStyle = GREEN;
-  ctx.fillText('B Arte livre', 160, H - 22);
   ctx.fillStyle = BLUE;
-  ctx.fillText('C UI/CTA', 310, H - 22);
+  ctx.fillText('B UI/CTA', 160, H - 22);
+  ctx.fillStyle = GREEN;
+  ctx.fillText('C Arte livre', 300, H - 22);
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.font = '500 16px "Segoe UI", Arial, sans-serif';
-  ctx.fillText('Importe como camada superior  ·  oculte ao exportar o layout final', 440, H - 22);
+  ctx.fillText('Importe como camada superior  ·  oculte ao exportar o layout final', 460, H - 22);
 
   canvas.toBlob((blob) => {
     if (!blob) return;

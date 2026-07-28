@@ -264,8 +264,8 @@ function renderRoletaAdmin() {
           </label>
           <ul class="roleta-guide-legend">
             <li><span class="roleta-guide-swatch roleta-guide-swatch--wheel"></span> <strong>A</strong> Roleta · 720×720 · x180 y96 · reservada</li>
-            <li><span class="roleta-guide-swatch roleta-guide-swatch--free"></span> <strong>B</strong> Arte livre · 840×520 · entre roleta e CTA</li>
-            <li><span class="roleta-guide-swatch roleta-guide-swatch--cta"></span> <strong>C</strong> UI/CTA · 800×280 · y1520 · reservada</li>
+            <li><span class="roleta-guide-swatch roleta-guide-swatch--cta"></span> <strong>B</strong> UI/CTA · 800×280 · y840 · logo abaixo da roleta</li>
+            <li><span class="roleta-guide-swatch roleta-guide-swatch--free"></span> <strong>C</strong> Arte livre · 840×640 · inferior (y1200)</li>
             <li><span class="roleta-guide-swatch roleta-guide-swatch--safe"></span> Margem segura · 40 px + terços + eixo</li>
           </ul>
           <p class="dash-card__meta">Baixe o gabarito, importe como camada no Figma/Photoshop e exporte só o layout final em 1080×1920.</p>
@@ -278,8 +278,8 @@ function renderRoletaAdmin() {
               <div class="roleta-guide-thirds"></div>
               <div class="roleta-guide-center"></div>
               <div class="roleta-guide-wheel-ring"><span>A · Roleta</span></div>
-              <div class="roleta-guide-free"><span>B · Arte livre</span></div>
-              <div class="roleta-guide-cta"><span>C · UI / CTA</span></div>
+              <div class="roleta-guide-cta"><span>B · Girar / CTA</span></div>
+              <div class="roleta-guide-free"><span>C · Arte livre</span></div>
             </div>
             <div class="roleta-totem-preview__wheel" aria-hidden="true" style="background:${roletaPreviewWheelBg(premios)}"></div>
             <p class="roleta-totem-preview__label">Prévia · 1080×1920</p>
