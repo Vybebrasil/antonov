@@ -61,12 +61,28 @@ export function formatDropRate(percent: number): string {
   return `${percent < 10 ? percent.toFixed(1) : percent.toFixed(percent % 1 === 0 ? 0 : 1)}%`
 }
 
-export function shortPrizeLabel(name: string): string {
-  if (name.length <= 22) return name
-  if (name.toLowerCase().includes('holística') || name.toLowerCase().includes('holistica')) {
-    return '20% Holística'
+/** Prefer short aliases for known long prize names, then truncate to maxChars. */
+export function shortPrizeLabel(name: string, maxChars = 22): string {
+  const limit = Math.max(4, Math.floor(maxChars))
+  const lower = name.toLowerCase()
+
+  let label = name
+  if (lower.includes('holística') || lower.includes('holistica')) {
+    label = '20% Holística'
+  } else if (lower.includes('internet')) {
+    label = 'Internet grátis'
+  } else if (lower.includes('academia')) {
+    label = 'Academia grátis'
   }
-  if (name.toLowerCase().includes('internet')) return 'Internet grátis'
-  if (name.toLowerCase().includes('academia')) return 'Academia grátis'
-  return `${name.slice(0, 20)}…`
+
+  if (label.length <= limit) return label
+  if (limit <= 1) return '…'
+  return `${label.slice(0, limit - 1)}…`
+}
+
+/** Approx. printable characters that fit in `width` at SVG `fontSize` (viewBox units). */
+export function maxCharsForLabelWidth(width: number, fontSize: number): number {
+  const charWidth = fontSize * 0.58
+  if (charWidth <= 0) return 4
+  return Math.max(4, Math.floor(width / charWidth))
 }

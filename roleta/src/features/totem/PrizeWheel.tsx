@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Prize } from '@/lib/types'
-import { shortPrizeLabel } from '@/lib/utils'
+import { maxCharsForLabelWidth, shortPrizeLabel } from '@/lib/utils'
 import styles from './PrizeWheel.module.css'
 
 type PrizeWheelProps = {
@@ -13,6 +13,7 @@ type PrizeWheelProps = {
 
 const SPIN_DURATION_MS = 5200
 const EXTRA_TURNS = 6
+const LABEL_ARC_PAD = 0.72
 
 function segmentPath(index: number, total: number, radius: number): string {
   const angle = (Math.PI * 2) / total
@@ -25,14 +26,20 @@ function segmentPath(index: number, total: number, radius: number): string {
   return `M 50 50 L ${x1} ${y1} A ${radius} ${radius} 0 0 1 ${x2} ${y2} Z`
 }
 
-function labelPosition(index: number, total: number) {
+function labelLayout(index: number, total: number) {
   const angle = ((index + 0.5) * 360) / total - 90
   const rad = (angle * Math.PI) / 180
-  const r = 32
+  const r = total <= 4 ? 34 : total <= 8 ? 32 : 30
+  const fontSize = Math.min(3.8, Math.max(2.2, 20 / total))
+  const usableWidth = 2 * r * Math.sin(Math.PI / total) * LABEL_ARC_PAD
+  const maxChars = maxCharsForLabelWidth(usableWidth, fontSize)
+
   return {
     x: 50 + r * Math.cos(rad),
     y: 50 + r * Math.sin(rad),
     rotate: angle + 90,
+    fontSize,
+    maxChars,
   }
 }
 
@@ -95,7 +102,8 @@ export function PrizeWheel({
       >
         <svg viewBox="0 0 100 100" className={styles.svg} role="img" aria-label="Roleta de prêmios">
           {prizes.map((prize, index) => {
-            const label = labelPosition(index, total)
+            const label = labelLayout(index, total)
+            const text = shortPrizeLabel(prize.name, label.maxChars)
             return (
               <g key={prize.id}>
                 <path
@@ -108,14 +116,14 @@ export function PrizeWheel({
                   x={label.x}
                   y={label.y}
                   fill="#000"
-                  fontSize="3.4"
+                  fontSize={label.fontSize}
                   fontWeight="700"
                   textAnchor="middle"
                   dominantBaseline="middle"
                   transform={`rotate(${label.rotate} ${label.x} ${label.y})`}
                   className={styles.label}
                 >
-                  {shortPrizeLabel(prize.name)}
+                  {text}
                 </text>
               </g>
             )
