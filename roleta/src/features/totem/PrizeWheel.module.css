@@ -16,6 +16,7 @@
 .pointer {
   position: absolute;
   top: -0.35rem;
+  top: -0.8cqw;
   left: 50%;
   z-index: 5;
   transform: translateX(-50%);
@@ -29,6 +30,9 @@
   border-left: 16px solid transparent;
   border-right: 16px solid transparent;
   border-top: 28px solid var(--color-yellow);
+  border-left-width: 1.7cqw;
+  border-right-width: 1.7cqw;
+  border-top-width: 2.9cqw;
 }
 
 .glow {

@@ -2,22 +2,62 @@
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 100%;
   height: 100%;
+  min-height: 100%;
   overflow: hidden;
   background: #050505;
 }
 
+/*
+ * Portrait totem canvas (1080x1920). Width drives the whole layout, so every
+ * inner size can be expressed as a share of the stage instead of the viewport.
+ */
 .stage {
   position: relative;
-  width: min(100vw, calc(100vh * 1080 / 1920));
-  height: min(100vh, calc(100vw * 1920 / 1080));
+  width: min(100%, calc(100vh * 1080 / 1920));
+  width: min(100%, calc(100svh * 1080 / 1920));
   aspect-ratio: 1080 / 1920;
-  max-width: 100%;
-  max-height: 100%;
   overflow: hidden;
   background: var(--color-bg);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+  container-type: size;
+  container-name: stage;
+  display: grid;
+  grid-template-areas:
+    'brand'
+    '.'
+    'wheel'
+    'cta'
+    '.';
+  /* CTA stays glued under the wheel; the slack splits above and below the group. */
+  grid-template-rows: auto minmax(0, 0.55fr) auto auto minmax(0, 1fr);
+  justify-items: center;
+}
+
+/*
+ * With custom totem art the wheel and CTA must land on the zones reserved by
+ * the 1080x1920 design guide instead of flowing.
+ */
+
+.stageArt .main {
+  position: absolute;
+  top: calc(100% * 96 / 1920);
+  left: calc(100% * 180 / 1080);
+  width: calc(100% * 720 / 1080);
+  aspect-ratio: 1;
+}
+
+.stageArt .ctaArea {
+  position: absolute;
+  top: calc(100% * 840 / 1920);
+  left: calc(100% * 140 / 1080);
+  width: calc(100% * 800 / 1080);
+  margin: 0;
+  align-content: center;
+}
+
+.stageArt .wheelStage {
+  width: 100%;
 }
 
 .layoutBg {
@@ -53,40 +93,50 @@
 }
 
 .header {
-  position: relative;
+  grid-area: brand;
   z-index: 2;
   display: flex;
+  align-items: flex-start;
   justify-content: center;
-  padding: 3% 1.25rem 0;
+  width: 100%;
+  padding: 3.5cqw 5cqw 0;
 }
 
 .logo {
   width: min(56%, 360px);
+  width: 46cqw;
   height: auto;
 }
 
 .main {
-  position: absolute;
-  inset: 0;
+  grid-area: wheel;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
 }
 
 .wheelStage {
-  position: absolute;
-  z-index: 2;
-  top: calc(100% * 168 / 1920);
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% * 720 / 1080);
+  width: min(100%, 80vw);
+  width: min(80cqw, 43cqh);
   aspect-ratio: 1;
   display: grid;
   place-items: center;
+}
+
+.ctaArea {
+  grid-area: cta;
+  z-index: 4;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 2.5cqw;
+  width: 100%;
+  margin-top: 3.5cqw;
+  padding-inline: 5cqw;
+  text-align: center;
 }
 
 .overlay {
@@ -100,61 +150,40 @@
   backdrop-filter: blur(8px);
 }
 
-.ctaBar {
-  position: absolute;
-  top: calc(100% * 910 / 1920);
-  left: 0;
-  right: 0;
-  height: calc(100% * 280 / 1920);
-  z-index: 4;
-  display: grid;
-  justify-items: center;
-  align-content: center;
-  gap: 0.65rem;
-  padding-inline: 1rem;
-  animation: fade-up 0.4s var(--ease-out);
-}
-
 .ctaName {
   margin: 0;
   font-size: 1.15rem;
+  font-size: 3.4cqw;
   color: var(--color-text-muted);
+  animation: fade-up 0.4s var(--ease-out);
 }
 
 .spinBtn {
   min-width: min(70%, 280px);
+  min-width: 62cqw;
   min-height: 3.75rem;
+  min-height: 9cqw;
+  padding-inline: 6cqw;
   border-radius: 999px;
   background: linear-gradient(135deg, var(--color-yellow), #ffe066);
   color: #000;
   font-family: var(--font-display);
   font-size: 2rem;
+  font-size: 6.2cqw;
   letter-spacing: 0.12em;
   box-shadow: 0 10px 30px rgba(255, 194, 14, 0.28);
+  animation: fade-up 0.4s var(--ease-out);
 }
 
-.status {
-  margin: 40% 0 0;
-  color: var(--color-text-muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-}
-
+.status,
 .statusSpin {
-  position: absolute;
-  top: calc(100% * 910 / 1920);
-  left: 0;
-  right: 0;
-  height: calc(100% * 280 / 1920);
   margin: 0;
-  display: grid;
-  place-items: center;
-  text-align: center;
   color: var(--color-text-muted);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 0.9rem;
+  font-size: 3cqw;
+  text-align: center;
 }
 
 .error {

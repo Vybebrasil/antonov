@@ -1,23 +1,25 @@
 .idleHit {
   position: absolute;
   inset: 0;
-  z-index: 4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  /* Wheel ends ~888/1920; sit the CTA copy just under it. */
-  padding-top: calc(100% * 900 / 1920);
-  gap: 0.75rem;
+  z-index: 5;
   border: 0;
   background: transparent;
   cursor: pointer;
 }
 
 .idleHint {
+  display: grid;
+  justify-items: center;
+  gap: 4%;
+  pointer-events: none;
+}
+
+.idleHintText {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 6.5vw, 2.75rem);
+  font-size: 7.6cqw;
+  line-height: 1;
   letter-spacing: 0.08em;
   color: var(--color-yellow);
   text-align: center;
@@ -27,6 +29,8 @@
 .idlePulse {
   width: 14px;
   height: 14px;
+  width: 1.6cqw;
+  height: 1.6cqw;
   border-radius: 50%;
   background: var(--color-blue);
   box-shadow: 0 0 0 0 rgba(0, 156, 222, 0.55);

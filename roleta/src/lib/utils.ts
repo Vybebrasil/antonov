@@ -61,25 +61,6 @@ export function formatDropRate(percent: number): string {
   return `${percent < 10 ? percent.toFixed(1) : percent.toFixed(percent % 1 === 0 ? 0 : 1)}%`
 }
 
-/** Prefer short aliases for known long prize names. */
-export function aliasPrizeLabel(name: string): string {
-  const lower = name.toLowerCase()
-  if (lower.includes('holística') || lower.includes('holistica')) return '20% Holística'
-  if (lower.includes('internet')) return 'Internet grátis'
-  if (lower.includes('academia')) return 'Academia grátis'
-  return name
-}
-
-/** Prefer short aliases for known long prize names, then truncate to maxChars. */
-export function shortPrizeLabel(name: string, maxChars = 22): string {
-  const limit = Math.max(4, Math.floor(maxChars))
-  const label = aliasPrizeLabel(name)
-
-  if (label.length <= limit) return label
-  if (limit <= 1) return '…'
-  return `${label.slice(0, limit - 1)}…`
-}
-
 /** Approx. printable characters that fit in `width` at SVG `fontSize` (viewBox units). */
 export function maxCharsForLabelWidth(width: number, fontSize: number): number {
   const charWidth = fontSize * 0.52
@@ -102,7 +83,7 @@ export function fitPrizeLabelLines(
   maxCharsPerLine: number,
   maxLines = 2,
 ): string[] {
-  const label = aliasPrizeLabel(name)
+  const label = name.trim()
   const limit = Math.max(3, Math.floor(maxCharsPerLine))
   const linesCap = Math.max(1, Math.floor(maxLines))
 

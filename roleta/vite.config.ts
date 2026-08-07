@@ -14,7 +14,11 @@ export default defineConfig({
     host: true,
     port: 5174,
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': {
+        // Set VITE_PROXY_TARGET to preview against a deployed API.
+        target: process.env.VITE_PROXY_TARGET || 'http://localhost:3000',
+        changeOrigin: true,
+      },
     },
   },
   build: {

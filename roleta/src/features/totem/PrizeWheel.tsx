@@ -39,7 +39,7 @@ function labelLayout(index: number, total: number) {
   const maxChars = maxCharsForLabelWidth(usableLength, fontSize)
   const maxLines = Math.max(
     1,
-    Math.min(2, Math.floor((chord * 0.85) / (fontSize * LINE_HEIGHT))),
+    Math.min(3, Math.floor((chord * 0.85) / (fontSize * LINE_HEIGHT))),
   )
 
   // Radial text; flip on the left half so letters stay upright.
