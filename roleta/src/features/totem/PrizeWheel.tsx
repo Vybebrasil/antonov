@@ -34,12 +34,12 @@ function labelLayout(index: number, total: number) {
   const rad = (angle * Math.PI) / 180
   const r = (HUB_CLEAR + OUTER_CLEAR) / 2
   const chord = 2 * r * Math.sin(Math.PI / Math.max(total, 1))
-  const fontSize = Math.min(3.4, Math.max(1.9, Math.min(chord * 0.38, 22 / total)))
+  const fontSize = Math.min(4.8, Math.max(2.6, Math.min(chord * 0.5, 30 / total)))
   const usableLength = (OUTER_CLEAR - HUB_CLEAR) * LABEL_RADIAL_PAD
   const maxChars = maxCharsForLabelWidth(usableLength, fontSize)
   const maxLines = Math.max(
     1,
-    Math.min(2, Math.floor((chord * 0.78) / (fontSize * LINE_HEIGHT))),
+    Math.min(2, Math.floor((chord * 0.85) / (fontSize * LINE_HEIGHT))),
   )
 
   // Radial text; flip on the left half so letters stay upright.

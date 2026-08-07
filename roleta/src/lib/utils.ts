@@ -82,7 +82,7 @@ export function shortPrizeLabel(name: string, maxChars = 22): string {
 
 /** Approx. printable characters that fit in `width` at SVG `fontSize` (viewBox units). */
 export function maxCharsForLabelWidth(width: number, fontSize: number): number {
-  const charWidth = fontSize * 0.55
+  const charWidth = fontSize * 0.52
   if (charWidth <= 0) return 4
   return Math.max(3, Math.floor(width / charWidth))
 }
