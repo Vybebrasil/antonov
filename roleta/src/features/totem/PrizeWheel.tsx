@@ -13,7 +13,9 @@ type PrizeWheelProps = {
 
 const SPIN_DURATION_MS = 5200
 const EXTRA_TURNS = 6
-const LABEL_ARC_PAD = 0.72
+const LABEL_RADIAL_PAD = 0.88
+const HUB_CLEAR = 14
+const OUTER_CLEAR = 45
 
 function segmentPath(index: number, total: number, radius: number): string {
   const angle = (Math.PI * 2) / total
@@ -29,15 +31,20 @@ function segmentPath(index: number, total: number, radius: number): string {
 function labelLayout(index: number, total: number) {
   const angle = ((index + 0.5) * 360) / total - 90
   const rad = (angle * Math.PI) / 180
-  const r = total <= 4 ? 34 : total <= 8 ? 32 : 30
-  const fontSize = Math.min(3.8, Math.max(2.2, 20 / total))
-  const usableWidth = 2 * r * Math.sin(Math.PI / total) * LABEL_ARC_PAD
-  const maxChars = maxCharsForLabelWidth(usableWidth, fontSize)
+  const r = (HUB_CLEAR + OUTER_CLEAR) / 2
+  const chord = 2 * r * Math.sin(Math.PI / Math.max(total, 1))
+  const fontSize = Math.min(3.6, Math.max(2.0, chord * 0.42))
+  const usableLength = (OUTER_CLEAR - HUB_CLEAR) * LABEL_RADIAL_PAD
+  const maxChars = maxCharsForLabelWidth(usableLength, fontSize)
+
+  // Radial text; flip on the left half so letters stay upright.
+  const normalized = ((angle % 360) + 360) % 360
+  const rotate = normalized > 90 && normalized < 270 ? angle + 180 : angle
 
   return {
     x: 50 + r * Math.cos(rad),
     y: 50 + r * Math.sin(rad),
-    rotate: angle + 90,
+    rotate,
     fontSize,
     maxChars,
   }
