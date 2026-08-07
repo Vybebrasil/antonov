@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Prize } from '@/lib/types'
-import { maxCharsForLabelWidth, shortPrizeLabel } from '@/lib/utils'
+import { fitPrizeLabelLines, maxCharsForLabelWidth } from '@/lib/utils'
 import styles from './PrizeWheel.module.css'
 
 type PrizeWheelProps = {
@@ -13,9 +13,10 @@ type PrizeWheelProps = {
 
 const SPIN_DURATION_MS = 5200
 const EXTRA_TURNS = 6
-const LABEL_RADIAL_PAD = 0.88
-const HUB_CLEAR = 14
-const OUTER_CLEAR = 45
+const LABEL_RADIAL_PAD = 0.9
+const HUB_CLEAR = 13.5
+const OUTER_CLEAR = 45.5
+const LINE_HEIGHT = 1.12
 
 function segmentPath(index: number, total: number, radius: number): string {
   const angle = (Math.PI * 2) / total
@@ -33,9 +34,13 @@ function labelLayout(index: number, total: number) {
   const rad = (angle * Math.PI) / 180
   const r = (HUB_CLEAR + OUTER_CLEAR) / 2
   const chord = 2 * r * Math.sin(Math.PI / Math.max(total, 1))
-  const fontSize = Math.min(3.6, Math.max(2.0, chord * 0.42))
+  const fontSize = Math.min(3.4, Math.max(1.9, Math.min(chord * 0.38, 22 / total)))
   const usableLength = (OUTER_CLEAR - HUB_CLEAR) * LABEL_RADIAL_PAD
   const maxChars = maxCharsForLabelWidth(usableLength, fontSize)
+  const maxLines = Math.max(
+    1,
+    Math.min(2, Math.floor((chord * 0.78) / (fontSize * LINE_HEIGHT))),
+  )
 
   // Radial text; flip on the left half so letters stay upright.
   const normalized = ((angle % 360) + 360) % 360
@@ -47,6 +52,8 @@ function labelLayout(index: number, total: number) {
     rotate,
     fontSize,
     maxChars,
+    maxLines,
+    lineHeight: fontSize * LINE_HEIGHT,
   }
 }
 
@@ -110,7 +117,10 @@ export function PrizeWheel({
         <svg viewBox="0 0 100 100" className={styles.svg} role="img" aria-label="Roleta de prêmios">
           {prizes.map((prize, index) => {
             const label = labelLayout(index, total)
-            const text = shortPrizeLabel(prize.name, label.maxChars)
+            const lines = fitPrizeLabelLines(prize.name, label.maxChars, label.maxLines)
+            const startY =
+              label.y - ((lines.length - 1) * label.lineHeight) / 2
+
             return (
               <g key={prize.id}>
                 <path
@@ -120,8 +130,6 @@ export function PrizeWheel({
                   strokeWidth="0.6"
                 />
                 <text
-                  x={label.x}
-                  y={label.y}
                   fill="#000"
                   fontSize={label.fontSize}
                   fontWeight="700"
@@ -130,7 +138,15 @@ export function PrizeWheel({
                   transform={`rotate(${label.rotate} ${label.x} ${label.y})`}
                   className={styles.label}
                 >
-                  {text}
+                  {lines.map((line, lineIndex) => (
+                    <tspan
+                      key={`${prize.id}-${lineIndex}`}
+                      x={label.x}
+                      y={startY + lineIndex * label.lineHeight}
+                    >
+                      {line}
+                    </tspan>
+                  ))}
                 </text>
               </g>
             )

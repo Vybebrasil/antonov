@@ -61,19 +61,19 @@ export function formatDropRate(percent: number): string {
   return `${percent < 10 ? percent.toFixed(1) : percent.toFixed(percent % 1 === 0 ? 0 : 1)}%`
 }
 
+/** Prefer short aliases for known long prize names. */
+export function aliasPrizeLabel(name: string): string {
+  const lower = name.toLowerCase()
+  if (lower.includes('holística') || lower.includes('holistica')) return '20% Holística'
+  if (lower.includes('internet')) return 'Internet grátis'
+  if (lower.includes('academia')) return 'Academia grátis'
+  return name
+}
+
 /** Prefer short aliases for known long prize names, then truncate to maxChars. */
 export function shortPrizeLabel(name: string, maxChars = 22): string {
   const limit = Math.max(4, Math.floor(maxChars))
-  const lower = name.toLowerCase()
-
-  let label = name
-  if (lower.includes('holística') || lower.includes('holistica')) {
-    label = '20% Holística'
-  } else if (lower.includes('internet')) {
-    label = 'Internet grátis'
-  } else if (lower.includes('academia')) {
-    label = 'Academia grátis'
-  }
+  const label = aliasPrizeLabel(name)
 
   if (label.length <= limit) return label
   if (limit <= 1) return '…'
@@ -82,7 +82,84 @@ export function shortPrizeLabel(name: string, maxChars = 22): string {
 
 /** Approx. printable characters that fit in `width` at SVG `fontSize` (viewBox units). */
 export function maxCharsForLabelWidth(width: number, fontSize: number): number {
-  const charWidth = fontSize * 0.58
+  const charWidth = fontSize * 0.55
   if (charWidth <= 0) return 4
-  return Math.max(4, Math.floor(width / charWidth))
+  return Math.max(3, Math.floor(width / charWidth))
+}
+
+function truncateLine(text: string, maxChars: number): string {
+  const limit = Math.max(3, Math.floor(maxChars))
+  if (text.length <= limit) return text
+  return `${text.slice(0, limit - 1)}…`
+}
+
+/**
+ * Wrap a prize name into up to `maxLines` lines that fit `maxCharsPerLine`.
+ * Breaks on spaces; falls back to hard truncate on the last line.
+ */
+export function fitPrizeLabelLines(
+  name: string,
+  maxCharsPerLine: number,
+  maxLines = 2,
+): string[] {
+  const label = aliasPrizeLabel(name)
+  const limit = Math.max(3, Math.floor(maxCharsPerLine))
+  const linesCap = Math.max(1, Math.floor(maxLines))
+
+  if (label.length <= limit) return [label]
+
+  const words = label.split(/\s+/).filter(Boolean)
+  if (words.length === 0) return [truncateLine(label, limit)]
+
+  const lines: string[] = []
+  let current = ''
+
+  for (let i = 0; i < words.length; i += 1) {
+    const word = words[i]
+    const candidate = current ? `${current} ${word}` : word
+    const isLastLineSlot = lines.length >= linesCap - 1
+
+    if (candidate.length <= limit) {
+      current = candidate
+      continue
+    }
+
+    if (!current) {
+      // Single word longer than a line.
+      if (isLastLineSlot) {
+        const rest = words.slice(i).join(' ')
+        lines.push(truncateLine(rest, limit))
+        return lines
+      }
+      lines.push(truncateLine(word, limit))
+      current = ''
+      continue
+    }
+
+    lines.push(current)
+    current = word
+
+    if (lines.length >= linesCap) {
+      // Overflow: fold remaining words into the last line.
+      const rest = [current, ...words.slice(i + 1)].join(' ')
+      lines[lines.length - 1] = truncateLine(
+        `${lines[lines.length - 1]} ${rest}`.trim(),
+        limit,
+      )
+      return lines
+    }
+  }
+
+  if (current) {
+    if (lines.length >= linesCap) {
+      lines[lines.length - 1] = truncateLine(
+        `${lines[lines.length - 1]} ${current}`.trim(),
+        limit,
+      )
+    } else {
+      lines.push(truncateLine(current, limit))
+    }
+  }
+
+  return lines.length > 0 ? lines : [truncateLine(label, limit)]
 }
