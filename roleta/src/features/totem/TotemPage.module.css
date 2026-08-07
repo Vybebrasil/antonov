@@ -146,6 +146,8 @@
   display: grid;
   place-items: center;
   padding: 1.5rem;
+  padding: 5cqw;
+  overflow-y: auto;
   background: rgba(0, 0, 0, 0.82);
   backdrop-filter: blur(8px);
 }
