@@ -32,6 +32,10 @@ export default async function handler(req, res) {
       premios,
       settings: {
         result_timeout_seconds: settings.result_timeout_seconds,
+        /* Lets the totem skip re-downloading the art while it is unchanged. */
+        layout_signature: settings.has_layout
+          ? `${settings.layout_name || ''}:${settings.layout_bytes}`
+          : '',
       },
     });
   } catch (err) {

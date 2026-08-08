@@ -161,10 +161,11 @@ export async function listActivePrizesPublic() {
     WHERE active = TRUE
     ORDER BY sort_order ASC, name ASC
   `;
-  return rows.map((r) => ({
-    ...mapPrize({ ...r, pity_counter: 0 }),
-    pity_counter: undefined,
-  }));
+  /* A slice that pickPrize can never draw would be a lie on the wheel. */
+  return rows
+    .map((r) => mapPrize({ ...r, pity_counter: 0 }))
+    .filter(isEligible)
+    .map((p) => ({ ...p, pity_counter: undefined }));
 }
 
 export async function listAllPrizesAdmin() {
@@ -186,7 +187,7 @@ export async function getSettings() {
       allow_repeat_spin,
       layout_name,
       layout_type,
-      (layout_data IS NOT NULL AND length(layout_data) > 0) AS has_layout
+      COALESCE(length(layout_data), 0) AS layout_bytes
     FROM roleta_settings
     WHERE id = 1
   `;
@@ -199,15 +200,18 @@ export async function getSettings() {
       allow_repeat_spin: false,
       has_layout: false,
       layout_name: null,
+      layout_bytes: 0,
     };
   }
+  const layoutBytes = Number(row.layout_bytes) || 0;
   return {
     id: 1,
     whatsapp_cooldown_hours: Number(row.whatsapp_cooldown_hours),
     result_timeout_seconds: Number(row.result_timeout_seconds),
     allow_repeat_spin: Boolean(row.allow_repeat_spin),
-    has_layout: Boolean(row.has_layout),
+    has_layout: layoutBytes > 0,
     layout_name: row.layout_name || null,
+    layout_bytes: layoutBytes,
   };
 }
 

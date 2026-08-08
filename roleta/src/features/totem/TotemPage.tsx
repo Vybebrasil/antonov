@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   confirmSpinCpf,
   createLead,
-  fetchActivePrizes,
   fetchLayout,
-  fetchSettings,
+  fetchTotemConfig,
   spinPrize,
 } from '@/lib/api'
 import type { AdminSettings, Lead, Prize } from '@/lib/types'
@@ -18,6 +17,14 @@ import styles from './TotemPage.module.css'
 
 type Step = 'idle' | 'lead' | 'ready' | 'spinning' | 'cpf' | 'result'
 
+/** The totem runs for days, so admin edits have to land without a reload. */
+const CONFIG_REFRESH_MS = 30_000
+
+/** Avoids re-rendering the wheel when the poll brings back identical data. */
+function keepIfEqual<T>(prev: T, next: T): T {
+  return JSON.stringify(prev) === JSON.stringify(next) ? prev : next
+}
+
 export function TotemPage() {
   const [prizes, setPrizes] = useState<Prize[]>([])
   const [settings, setSettings] = useState<AdminSettings>(DEFAULT_SETTINGS)
@@ -30,19 +37,27 @@ export function TotemPage() {
   const [error, setError] = useState<string | null>(null)
   const [loadingPrizes, setLoadingPrizes] = useState(true)
 
+  const layoutSignature = useRef<string | null>(null)
+
+  const loadConfig = useCallback(async ({ withLayout = false } = {}) => {
+    const config = await fetchTotemConfig()
+    setPrizes((prev) => keepIfEqual(prev, config.prizes))
+    setSettings((prev) => keepIfEqual(prev, config.settings))
+
+    /* A null signature means the API cannot tell, so leave the art alone. */
+    const changed =
+      config.layoutSignature !== null && config.layoutSignature !== layoutSignature.current
+    if (withLayout || changed) {
+      layoutSignature.current = config.layoutSignature
+      setLayoutUrl(await fetchLayout())
+    }
+  }, [])
+
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
-        const [prizeList, adminSettings, layout] = await Promise.all([
-          fetchActivePrizes(),
-          fetchSettings(),
-          fetchLayout(),
-        ])
-        if (cancelled) return
-        setPrizes(prizeList)
-        setSettings(adminSettings)
-        setLayoutUrl(layout)
+        await loadConfig({ withLayout: true })
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : 'Erro ao carregar prêmios.')
@@ -55,7 +70,22 @@ export function TotemPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [loadConfig])
+
+  /* Only while idle: a running session must never see the wheel change. */
+  useEffect(() => {
+    if (step !== 'idle') return
+    const refresh = () => void loadConfig().catch(() => undefined)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refresh()
+    }
+    const timer = window.setInterval(refresh, CONFIG_REFRESH_MS)
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.clearInterval(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [step, loadConfig])
 
   const reset = useCallback(() => {
     setStep('idle')
@@ -64,8 +94,8 @@ export function TotemPage() {
     setWonPrize(null)
     setSpinId(null)
     setError(null)
-    void fetchActivePrizes().then(setPrizes).catch(() => undefined)
-  }, [])
+    void loadConfig().catch(() => undefined)
+  }, [loadConfig])
 
   async function handleLeadSubmit(name: string, whatsapp: string) {
     const created = await createLead(name, whatsapp)

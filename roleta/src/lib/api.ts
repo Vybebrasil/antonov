@@ -42,22 +42,29 @@ function mapPrize(raw: Record<string, unknown>): Prize {
   }
 }
 
-export async function fetchActivePrizes(): Promise<Prize[]> {
-  const data = await request<{ premios: Record<string, unknown>[] }>('/api/roleta/premios')
-  return (data.premios || []).map(mapPrize)
+export type TotemConfig = {
+  prizes: Prize[]
+  settings: AdminSettings
+  /** Changes whenever the admin uploads different totem art. */
+  layoutSignature: string | null
 }
 
-export async function fetchSettings(): Promise<AdminSettings> {
-  try {
-    const data = await request<{ settings?: { result_timeout_seconds?: number } }>(
-      '/api/roleta/premios',
-    )
-    return {
+export async function fetchTotemConfig(): Promise<TotemConfig> {
+  const data = await request<{
+    premios?: Record<string, unknown>[]
+    settings?: { result_timeout_seconds?: number; layout_signature?: string }
+  }>('/api/roleta/premios')
+  return {
+    prizes: (data.premios || []).map(mapPrize),
+    settings: {
       ...DEFAULT_SETTINGS,
-      result_timeout_seconds: data.settings?.result_timeout_seconds ?? DEFAULT_SETTINGS.result_timeout_seconds,
-    }
-  } catch {
-    return { ...DEFAULT_SETTINGS }
+      result_timeout_seconds:
+        data.settings?.result_timeout_seconds ?? DEFAULT_SETTINGS.result_timeout_seconds,
+    },
+    layoutSignature:
+      typeof data.settings?.layout_signature === 'string'
+        ? data.settings.layout_signature
+        : null,
   }
 }
 
