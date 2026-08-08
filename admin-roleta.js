@@ -46,48 +46,60 @@ function roletaPreviewWheelBg(premios) {
   return `conic-gradient(from -90deg, ${stops})`;
 }
 
-function roletaCompressLayout(file, { maxW = 1080, maxH = 1920, quality = 0.85 } = {}) {
+/* O corpo da requisição precisa caber no limite de 4,5 MB da função serverless. */
+const ROLETA_LAYOUT_MAX_PAYLOAD = 3 * 1024 * 1024;
+const ROLETA_LAYOUT_ENCODINGS = [
+  ['image/webp', 0.9],
+  ['image/webp', 0.75],
+  ['image/webp', 0.6],
+  ['image/webp', 0.45],
+  ['image/jpeg', 0.85],
+  ['image/jpeg', 0.65],
+  ['image/jpeg', 0.5],
+];
+
+function roletaCanvasToBlob(canvas, type, quality) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), type, quality);
+  });
+}
+
+/** base64 infla ~4/3; some a folga do JSON. */
+function roletaPayloadBytes(blobSize) {
+  return Math.ceil((blobSize * 4) / 3) + 512;
+}
+
+/** Reencoda até o corpo caber no limite; PNG só como último recurso. */
+async function roletaEncodeLayout(canvas) {
+  let smallest = null;
+  for (const [type, quality] of ROLETA_LAYOUT_ENCODINGS) {
+    const blob = await roletaCanvasToBlob(canvas, type, quality);
+    if (!blob || blob.type !== type) continue;
+    if (!smallest || blob.size < smallest.size) smallest = blob;
+    if (roletaPayloadBytes(blob.size) <= ROLETA_LAYOUT_MAX_PAYLOAD) return blob;
+  }
+  return smallest || roletaCanvasToBlob(canvas, 'image/png');
+}
+
+function roletaBlobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      resolve(result.includes(',') ? result.split(',')[1] : result);
+    };
+    reader.onerror = () => reject(new Error('Falha ao ler layout.'));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function roletaLoadImage(file) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(url);
-      let { width, height } = img;
-      const scale = Math.min(1, maxW / width, maxH / height);
-      width = Math.round(width * scale);
-      height = Math.round(height * scale);
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        reject(new Error('Não foi possível processar a imagem.'));
-        return;
-      }
-      ctx.drawImage(img, 0, 0, width, height);
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error('Falha ao compactar PNG.'));
-            return;
-          }
-          const reader = new FileReader();
-          reader.onload = () => {
-            const result = String(reader.result || '');
-            const base64 = result.includes(',') ? result.split(',')[1] : result;
-            resolve({
-              name: (file.name || 'layout.png').replace(/\.\w+$/, '') + '.png',
-              type: 'image/png',
-              size: blob.size,
-              data: base64,
-            });
-          };
-          reader.onerror = () => reject(new Error('Falha ao ler layout.'));
-          reader.readAsDataURL(blob);
-        },
-        'image/png',
-        quality,
-      );
+      resolve(img);
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
@@ -95,6 +107,34 @@ function roletaCompressLayout(file, { maxW = 1080, maxH = 1920, quality = 0.85 }
     };
     img.src = url;
   });
+}
+
+async function roletaCompressLayout(file, { maxW = 1080, maxH = 1920 } = {}) {
+  const img = await roletaLoadImage(file);
+  const scale = Math.min(1, maxW / img.width, maxH / img.height);
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(img.width * scale);
+  canvas.height = Math.round(img.height * scale);
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Não foi possível processar a imagem.');
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+  const blob = await roletaEncodeLayout(canvas);
+  if (!blob) throw new Error('Falha ao compactar a imagem.');
+  if (roletaPayloadBytes(blob.size) > ROLETA_LAYOUT_MAX_PAYLOAD) {
+    throw new Error(
+      `Imagem muito pesada (${(blob.size / 1048576).toFixed(1)} MB após compressão). Exporte em 1080×1920 com menos peso.`,
+    );
+  }
+
+  const ext = blob.type === 'image/jpeg' ? 'jpg' : blob.type === 'image/webp' ? 'webp' : 'png';
+  return {
+    name: `${(file.name || 'layout').replace(/\.\w+$/, '')}.${ext}`,
+    type: blob.type,
+    size: blob.size,
+    data: await roletaBlobToBase64(blob),
+  };
 }
 
 function roletaShowError(msg) {
@@ -513,7 +553,10 @@ function bindRoletaEvents() {
       if (nameEl) nameEl.textContent = compressed.name;
       const saveBtn = document.getElementById('roleta-layout-save');
       if (saveBtn) saveBtn.disabled = false;
-      roletaShowSuccess('Prévia atualizada. Clique em “Salvar layout” para aplicar no totem.');
+      const kb = Math.max(1, Math.round(compressed.size / 1024));
+      roletaShowSuccess(
+        `Prévia atualizada (${kb} KB). Clique em “Salvar layout” para aplicar no totem.`,
+      );
     } catch (err) {
       roletaShowError(err.message || 'Falha ao ler o PNG.');
     }
