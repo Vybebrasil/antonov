@@ -285,13 +285,13 @@ function renderRoletaAdmin() {
 
     <div class="card roleta-card" style="margin-top:1rem">
       <h3>Layout do totem (1080×1920)</h3>
-      <p class="dash-card__meta">Envie um PNG de fundo/design. Use as guias para alinhar arte com a roleta e a área de botões.</p>
+      <p class="dash-card__meta">Envie a arte de fundo em PNG, JPG ou WebP. Use as guias para alinhar arte com a roleta e a área de botões.</p>
       <div class="roleta-layout-grid">
         <div class="roleta-layout-controls">
           <div class="roleta-layout-upload">
             <label class="btn btn-secondary btn-sm" style="display:inline-flex;cursor:pointer">
-              Escolher PNG
-              <input type="file" id="roleta-layout-file" accept="image/png,image/*" hidden />
+              Escolher imagem
+              <input type="file" id="roleta-layout-file" accept="image/png,image/jpeg,image/webp,image/*" hidden />
             </label>
             <button type="button" class="btn btn-primary btn-sm" id="roleta-layout-save" ${roletaState.pendingLayout ? '' : 'disabled'}>Salvar layout</button>
             <button type="button" class="btn btn-ghost btn-sm" id="roleta-layout-clear">Remover</button>
@@ -558,7 +558,7 @@ function bindRoletaEvents() {
         `Prévia atualizada (${kb} KB). Clique em “Salvar layout” para aplicar no totem.`,
       );
     } catch (err) {
-      roletaShowError(err.message || 'Falha ao ler o PNG.');
+      roletaShowError(err.message || 'Falha ao ler a imagem.');
     }
   });
 
@@ -581,7 +581,7 @@ function bindRoletaEvents() {
 
   document.getElementById('roleta-layout-save')?.addEventListener('click', async () => {
     if (!roletaState.pendingLayout) {
-      roletaShowError('Selecione um PNG antes de salvar.');
+      roletaShowError('Selecione uma imagem antes de salvar.');
       return;
     }
     try {
