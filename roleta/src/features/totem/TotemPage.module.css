@@ -36,8 +36,13 @@
 
 /*
  * With custom totem art the wheel and CTA must land on the zones reserved by
- * the 1080x1920 design guide instead of flowing.
+ * the 1080x1920 design guide instead of flowing. Dropping the grid is required:
+ * an absolute grid item resolves its offsets against its own grid area, which
+ * collapses to zero height once nothing is left in flow.
  */
+.stageArt {
+  display: block;
+}
 
 .stageArt .main {
   position: absolute;
@@ -47,11 +52,13 @@
   aspect-ratio: 1;
 }
 
+/* Centred inside the 800x280 CTA zone of the guide, between wheel and artwork. */
 .stageArt .ctaArea {
   position: absolute;
   top: calc(100% * 840 / 1920);
   left: calc(100% * 140 / 1080);
   width: calc(100% * 800 / 1080);
+  height: calc(100% * 280 / 1920);
   margin: 0;
   align-content: center;
 }
