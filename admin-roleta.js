@@ -250,6 +250,7 @@ function renderRoletaAdmin() {
               <div class="roleta-chance">${roletaFmtChance(chance)}</div>
               <button type="button" class="btn btn-ghost btn-sm" data-action="zerar">Zerar</button>
               <label class="roleta-check"><input type="checkbox" data-field="active" ${p.active ? 'checked' : ''}/> Ativo</label>
+              <button type="button" class="btn btn-secondary btn-sm" data-action="save-row">Salvar alterações</button>
               <button type="button" class="btn btn-ghost btn-sm roleta-btn-danger" data-action="delete" title="Excluir prêmio">Excluir</button>
             </article>`;
                 })
@@ -428,6 +429,28 @@ function syncRoletaStateFromDom() {
       p.id === patch.id ? { ...p, ...patch } : p,
     );
   });
+}
+
+/* Rate/stock live in the compact row, name/colour/instruction in the detail card. */
+async function roletaSavePrize(id) {
+  syncRoletaStateFromDom();
+  const row = document.querySelector(`.roleta-prize-row[data-id="${id}"]`);
+  const detail = document.querySelector(`.roleta-detail[data-id="${id}"]`);
+  const patch = {
+    ...(row ? readPrizePatchFromRow(row) : null),
+    ...(detail ? readPrizePatchFromRow(detail) : null),
+  };
+  if (!patch.id) return;
+
+  const result = await roletaApi(`/premios/${patch.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
+  roletaState.premios = roletaState.premios.map((p) =>
+    p.id === patch.id ? result.prize : p,
+  );
+  renderRoletaAdmin();
+  roletaShowSuccess(`Salvo: ${result.prize.name}`);
 }
 
 function bindRoletaEvents() {
@@ -686,25 +709,15 @@ function bindRoletaEvents() {
     });
   });
 
-  document.querySelectorAll('[data-action="save-one"]').forEach((btn) => {
+  document.querySelectorAll('[data-action="save-one"], [data-action="save-row"]').forEach((btn) => {
     btn.addEventListener('click', async () => {
-      const detail = btn.closest('.roleta-detail');
-      const rateRow = document.querySelector(`.roleta-prize-row[data-id="${detail.dataset.id}"]`);
-      const patch = {
-        ...readPrizePatchFromRow(rateRow || detail),
-        ...readPrizePatchFromRow(detail),
-      };
+      const id = btn.closest('[data-id]')?.dataset.id;
+      if (!id) return;
+      btn.disabled = true;
       try {
-        const result = await roletaApi(`/premios/${patch.id}`, {
-          method: 'PATCH',
-          body: JSON.stringify(patch),
-        });
-        roletaState.premios = roletaState.premios.map((p) =>
-          p.id === patch.id ? result.prize : p,
-        );
-        renderRoletaAdmin();
-        roletaShowSuccess(`Salvo: ${result.prize.name}`);
+        await roletaSavePrize(id);
       } catch (err) {
+        btn.disabled = false;
         roletaShowError(err.message || 'Falha ao salvar prêmio.');
       }
     });
@@ -713,6 +726,7 @@ function bindRoletaEvents() {
   document.querySelectorAll('.roleta-prize-row [data-field]').forEach((input) => {
     input.addEventListener('change', () => {
       syncRoletaStateFromDom();
+      input.closest('.roleta-prize-row')?.classList.add('is-dirty');
       // live chance preview without full re-render of inputs focus loss — soft update badges
       document.querySelectorAll('.roleta-prize-row').forEach((row) => {
         const p = roletaState.premios.find((x) => x.id === row.dataset.id);

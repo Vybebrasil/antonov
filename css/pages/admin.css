@@ -118,13 +118,23 @@ h2 { font-size: 1.5rem; margin: 0 0 1rem; }
 
 .roleta-prize-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) 100px 90px 70px auto auto auto;
+  grid-template-columns: minmax(0, 1.6fr) 100px 90px 70px auto auto auto auto;
   gap: 0.65rem;
   align-items: center;
   padding: 0.65rem 0.75rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.18);
+}
+
+/* Flags edits that are still only in the form. */
+.roleta-prize-row.is-dirty {
+  border-color: rgba(250, 177, 15, 0.5);
+}
+
+.roleta-prize-row.is-dirty [data-action="save-row"] {
+  color: var(--yellow, #fab10f) !important;
+  border-color: rgba(250, 177, 15, 0.5);
 }
 
 .roleta-prize-name {
