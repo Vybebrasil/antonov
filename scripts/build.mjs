@@ -31,8 +31,13 @@ const JS_FILES = [
   'contato-form.js',
   'trabalhe-conosco-form.js',
   'admin.js',
+  'partner.js',
   'form-render.js',
   'achados-e-perdidos.js',
+  'parceiros-tracking.js',
+  'parceiros.js',
+  'parceiros-perfil.js',
+  'parceiros-home.js',
 ];
 
 const COPY_FILES = [
@@ -49,6 +54,9 @@ async function minifyJsToDist(file) {
   if (file === 'admin.js') {
     code += `\n${readFileSync(join(root, 'admin-pdi.js'), 'utf8')}`;
     code += `\n${readFileSync(join(root, 'admin-achados.js'), 'utf8')}`;
+    code += `\n${readFileSync(join(root, 'admin-parceiros.js'), 'utf8')}`;
+    code += `\n${readFileSync(join(root, 'admin-md5.js'), 'utf8')}`;
+    code += `\n${readFileSync(join(root, 'admin-telao.js'), 'utf8')}`;
   }
   const out = await esbuild.transform(code, {
     minify: true,
@@ -200,7 +208,10 @@ function processHtml(name) {
   if (name === 'admin.html') {
     html = html
       .replace(/<script[^>]*src=["']\/?admin-pdi\.js["'][^>]*>\s*<\/script>\s*/gi, '')
-      .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '');
+      .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-parceiros\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-md5\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-telao\.js["'][^>]*>\s*<\/script>\s*/gi, '');
   }
 
   writeFileSync(join(dist, name), html, 'utf8');

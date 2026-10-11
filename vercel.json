@@ -1,4 +1,10 @@
 {
+  "functions": {
+    "api/admin/index.js": {
+      "maxDuration": 60,
+      "includeFiles": "scripts/migrations/**"
+    }
+  },
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
@@ -15,6 +21,36 @@
     {
       "source": "/api/forms/:slug/submit",
       "destination": "/api/forms/:slug"
+    },
+    {
+      "source": "/parceiros/:slug",
+      "destination": "/parceiros-perfil?slug=:slug"
+    },
+    {
+      "source": "/go/:slug/:channel",
+      "destination": "/api/partners/go?slug=:slug&channel=:channel"
+    },
+    {
+      "source": "/sitemap-parceiros.xml",
+      "destination": "/api/partners/sitemap"
+    },
+    {
+      "source": "/api/telao/:job",
+      "destination": "/api/telao?job=:job"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/partners/jobs/tick",
+      "schedule": "15 6 * * *"
+    },
+    {
+      "path": "/api/telao/tick",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/telao/daily",
+      "schedule": "5 3 * * *"
     }
   ],
   "redirects": [

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<title>Portal do Parceiro | Antonov Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/pages/admin.css" />
+</head>
+<body>
+<div id="app">
+  <div id="partner-login" class="login-view">
+    <div class="login-card">
+      <img src="/assets/logo-211.png" alt="Antonov Center" width="211" height="32" class="login-logo" />
+      <h1>Portal do Parceiro</h1>
+      <p class="login-sub">Acompanhe contrato e pagamentos</p>
+      <form id="partner-login-form">
+        <label>
+          <span>E-mail</span>
+          <input type="email" name="email" required autocomplete="username" />
+        </label>
+        <label>
+          <span>Senha</span>
+          <input type="password" name="password" required autocomplete="current-password" />
+        </label>
+        <p id="partner-login-error" class="form-error" hidden></p>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="partner-panel" class="panel-view" hidden>
+    <header class="panel-header">
+      <div class="panel-brand">
+        <img src="/assets/logo-211.png" alt="Antonov Center" width="211" height="32" />
+        <span class="panel-brand__label">Parceiro</span>
+      </div>
+      <div class="panel-user">
+        <span id="partner-user-email" class="panel-user__email"></span>
+        <button type="button" id="partner-logout" class="btn btn-ghost btn-sm">Sair</button>
+      </div>
+    </header>
+    <main class="panel-main">
+      <div id="partner-content" class="partner-portal">
+        <p class="dash-loading">Carregando…</p>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="/partner.js"></script>
+</body>
+</html>

@@ -57,6 +57,13 @@
       "description": "Trabalhe na Antonov Center em Irecê. Vagas em coaching, recepção, operações e mais. Envie seu currículo para a tripulação.",
       "ogImage": "/assets/foto-hero.png"
     },
+    "parceiros.html": {
+      "seoPage": "parceiros",
+      "path": "/parceiros",
+      "title": "Parceiros Antonov | Ecossistema de performance — Irecê",
+      "description": "Profissionais selecionados do ecossistema Antonov: nutrição, personal trainers, estética, saúde e fisioterapia.",
+      "ogImage": "/assets/foto-hero.png"
+    },
     "termos.html": {
       "seoPage": "termos",
       "path": "/termos",

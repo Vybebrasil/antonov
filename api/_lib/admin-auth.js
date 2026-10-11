@@ -74,12 +74,12 @@ export async function requireAdmin(req, res) {
 export async function loginUser(email, password) {
   const sql = getSql();
   const rows = await sql`
-    SELECT id, email, password_hash FROM admin_users
+    SELECT id, email, password_hash, deleted_at FROM admin_users
     WHERE email = ${email.trim().toLowerCase()}
     LIMIT 1
   `;
   const user = rows[0];
-  if (!user) return null;
+  if (!user || user.deleted_at) return null;
   const ok = await bcrypt.compare(password, user.password_hash);
   if (!ok) return null;
   return { id: user.id, email: user.email };
@@ -95,4 +95,7 @@ export const RESERVED_SLUGS = new Set([
   'forms',
   'index',
   'assets',
+  'parceiros',
+  'go',
+  'partner',
 ]);

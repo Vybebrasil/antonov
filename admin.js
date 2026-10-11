@@ -505,6 +505,19 @@ function switchTab(name, opts = {}) {
     }
     if (typeof onAchadosTabOpen === 'function') onAchadosTabOpen();
   }
+  if (name === 'parceiros') {
+    if (typeof initParceirosAdmin === 'function' && !window._parceirosInited) {
+      initParceirosAdmin();
+      window._parceirosInited = true;
+    } else if (typeof onPxTabOpen === 'function') onPxTabOpen();
+  }
+  if (name === 'telao') {
+    if (typeof initTelaoAdmin === 'function' && !window._telaoInited) {
+      initTelaoAdmin();
+      window._telaoInited = true;
+    }
+    if (typeof onTelaoTabOpen === 'function') onTelaoTabOpen();
+  }
   requestAnimationFrame(() => {
     if (opts.focusTab) focusTabButton(name);
     else $(`#tab-heading-${name}`)?.focus({ preventScroll: true });
@@ -532,6 +545,10 @@ async function checkSession() {
   try {
     const data = await api('/me');
     state.user = data;
+    if (data.role === 'parceiro') {
+      window.location.href = '/partner';
+      return;
+    }
     showPanel(data.email);
     switchTab('dashboard');
   } catch {
@@ -566,8 +583,13 @@ function initAdmin() {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
-      state.user = data;
-      showPanel(data.email);
+      const me = await api('/me').catch(() => data);
+      state.user = me;
+      if (me.role === 'parceiro') {
+        window.location.href = '/partner';
+        return;
+      }
+      showPanel(me.email || data.email);
       switchTab('dashboard');
     } catch (err) {
       showError(errEl, err.message || 'Não foi possível entrar.');

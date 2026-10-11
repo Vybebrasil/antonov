@@ -1,5 +1,6 @@
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
 import { loginUser, signToken, setAuthCookie } from '../../api/_lib/admin-auth.js';
+import { ensureAppSchema, ensureIfNeeded, isMissingColumn } from '../../api/_lib/ensure-schema.js';
 import { checkRateLimit, clientIp } from '../../api/_lib/rate-limit.js';
 
 export default async function handler(req, res) {
@@ -18,12 +19,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const allowed = await checkRateLimit('admin:login', clientIp(req));
+    const allowed = await checkRateLimit('admin:login:v2', clientIp(req));
     if (!allowed) {
       return json(res, 429, { error: 'Muitas tentativas. Tente novamente em uma hora.' });
     }
 
-    const user = await loginUser(body.email, body.password);
+    await ensureIfNeeded();
+    let user;
+    try {
+      user = await loginUser(body.email, body.password);
+    } catch (err) {
+      if (!isMissingColumn(err)) throw err;
+      await ensureAppSchema();
+      user = await loginUser(body.email, body.password);
+    }
     if (!user) return json(res, 401, { error: 'Credenciais inválidas.' });
 
     const token = await signToken({ sub: String(user.id), email: user.email });

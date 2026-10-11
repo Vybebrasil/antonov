@@ -48,6 +48,8 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:visible}
 <link rel="preload" href="css/pages/home.css" as="style" />
 <link rel="stylesheet" href="css/pages/home.css" media="print" onload="this.media='all'" />
 <noscript><link rel="stylesheet" href="css/pages/home.css" /></noscript>
+<link rel="stylesheet" href="css/pages/parceiros.css" media="print" onload="this.media='all'" />
+<noscript><link rel="stylesheet" href="css/pages/parceiros.css" /></noscript>
 </head>
 <body data-seo-page="home">
 
@@ -57,10 +59,11 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:visible}
     <a href="/" class="nav__logo" data-no-transition>
       <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="(max-width: 880px) 42vw, 211px"><img alt="ANTONOV CENTER na Bahia" width="211" height="61" decoding="async" fetchpriority="low" src="assets/logo-211.png" srcset="assets/logo-211.png 211w, assets/logo-422.png 422w" sizes="(max-width: 880px) 42vw, 211px"></picture>
     </a>
-                    <nav class="nav__links" aria-label="Principal">
+                        <nav class="nav__links" aria-label="Principal">
       <a href="/" class="active">Home</a>
       <a href="/sobre">Sobre</a>
       <a href="/planos">Planos</a>
+      <a href="/parceiros">Parceiros</a>
       <a href="/contato">Contato</a>
     </nav>
     <a href="/planos" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
@@ -330,6 +333,23 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:visible}
 </section>
 
 
+<!-- ============= ECOSSISTEMA ANTONOV ============= -->
+<section class="ecosystem" id="ecossistema-antonov" data-screen-label="07 Ecossistema">
+  <div class="ecosystem__inner">
+    <div class="ecosystem__head">
+      <div>
+        <p class="ecosystem__crumb">/ ECOSSISTEMA ANTONOV</p>
+        <h2>PERFORMANCE NÃO TERMINA NO <span class="yel">TREINO.</span></h2>
+      </div>
+      <p class="ecosystem__lede">Nutrição, recuperação, saúde e profissionais que fazem parte do ecossistema Antonov.</p>
+    </div>
+    <div id="ecosystem-rows" aria-live="polite">
+      <p class="partners-loading">Carregando ecossistema…</p>
+    </div>
+  </div>
+</section>
+
+
 <!-- ============= THE CODE ============= -->
 <section class="code" data-screen-label="08 Código">
   <div class="code__inner">
@@ -426,6 +446,7 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:visible}
             <li><a href="/">Home</a></li>
             <li><a href="/sobre">Sobre</a></li>
             <li><a href="/planos">Planos</a></li>
+            <li><a href="/parceiros">Parceiros</a></li>
             <li><a href="/contato">Contato</a></li>
             <li><a href="/trabalhe-conosco">Trabalhe conosco</a></li>
             <li><a href="/achados-e-perdidos">Achados e perdidos</a></li>
@@ -515,6 +536,8 @@ html.antonov-loading-pending body>:not(.page-mask){visibility:visible}
 <script src="seo-config.js" defer></script>
 <script src="seo-schema.js" defer></script>
 <script defer src="google-review-prompt.js"></script>
+<script defer src="parceiros-tracking.js"></script>
+<script defer src="parceiros-home.js"></script>
 <script defer src="app.js"></script>
 </body>
 </html>

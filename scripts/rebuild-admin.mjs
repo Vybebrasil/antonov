@@ -11,7 +11,9 @@ const adminBundle = readFileSync(join(root, 'admin.js'), 'utf8')
   + '\n'
   + readFileSync(join(root, 'admin-pdi.js'), 'utf8')
   + '\n'
-  + readFileSync(join(root, 'admin-achados.js'), 'utf8');
+  + readFileSync(join(root, 'admin-achados.js'), 'utf8')
+  + '\n'
+  + readFileSync(join(root, 'admin-parceiros.js'), 'utf8');
 
 writeFileSync(
   join(root, 'dist', 'admin.min.js'),

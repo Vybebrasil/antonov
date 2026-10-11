@@ -2,8 +2,6 @@
 User-agent: *
 Allow: /
 
-Disallow: /admin
-Disallow: /form/
 Disallow: /api/
 Disallow: /aulas
 Disallow: /estudio

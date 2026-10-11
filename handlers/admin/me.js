@@ -1,5 +1,5 @@
 import { json, adminCors } from '../../api/_lib/admin-http.js';
-import { getSession } from '../../api/_lib/admin-auth.js';
+import { getParceirosSession } from '../../api/_lib/parceiros-auth.js';
 
 export default async function handler(req, res) {
   adminCors(req, res);
@@ -11,7 +11,13 @@ export default async function handler(req, res) {
     return json(res, 405, { error: 'Método não permitido.' });
   }
 
-  const session = await getSession(req);
+  const session = await getParceirosSession(req);
   if (!session) return json(res, 401, { error: 'Não autenticado.' });
-  return json(res, 200, { ok: true, email: session.email });
+  return json(res, 200, {
+    ok: true,
+    email: session.email,
+    name: session.name,
+    role: session.role,
+    partnerId: session.partnerId,
+  });
 }

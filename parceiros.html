@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-SXNR4ZH6Y5"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-SXNR4ZH6Y5');
+</script>
+<script>try{if(sessionStorage.getItem('antonov-nav')==='1')document.documentElement.classList.add('antonov-loading-pending');}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<title>Parceiros Antonov | Ecossistema de performance — Irecê</title>
+<meta name="description" content="Profissionais selecionados do ecossistema Antonov: nutrição, personal trainers, estética, saúde e fisioterapia para ir além do treino." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://www.antonovcenter.com.br/parceiros" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Parceiros Antonov | Ecossistema de performance" />
+<meta property="og:description" content="Profissionais selecionados para acompanhar sua performance dentro e fora do Antonov Center." />
+<meta property="og:url" content="https://www.antonovcenter.com.br/parceiros" />
+<meta property="og:image" content="https://www.antonovcenter.com.br/assets/foto-hero.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" /></noscript>
+<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="css/pages/parceiros.css" />
+<script src="seo-config.js" defer></script>
+<script src="seo-schema.js" defer></script>
+</head>
+<body data-seo-page="parceiros" data-page="parceiros">
+
+<div class="page-mask" aria-hidden="true" role="presentation">
+  <div class="page-mask__loader" aria-live="polite" aria-busy="true">
+    <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="211px"><img class="page-mask__logo" alt="Antonov Center" width="211" height="61" src="assets/logo-211.png"></picture>
+    <div class="page-mask__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+    <p class="page-mask__status">Preparando hangar…</p>
+  </div>
+</div>
+
+<header class="nav" data-screen-label="01 Nav">
+  <div class="nav__inner">
+    <a href="/" class="nav__logo">
+      <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-211.webp 211w, assets/logo.webp 422w" sizes="211px"><img class="nav__logo-img nav__logo-img--dark" alt="ANTONOV CENTER" width="211" height="61" src="assets/logo-211.png"></picture>
+      <picture class="logo-picture"><source type="image/webp" srcset="assets/logo-preta-253.webp 253w, assets/logo-preta.webp 506w" sizes="253px"><img class="nav__logo-img nav__logo-img--light" alt="ANTONOV CENTER" width="253" height="38" src="assets/logo-preta-506.png"></picture>
+    </a>
+        <nav class="nav__links" aria-label="Principal">
+      <a href="/">Home</a>
+      <a href="/sobre">Sobre</a>
+      <a href="/planos">Planos</a>
+      <a href="/parceiros" class="active">Parceiros</a>
+      <a href="/contato">Contato</a>
+    </nav>
+    <a href="/planos" class="btn btn--yellow nav__cta">Comece agora <span class="arrow"></span></a>
+    <button type="button" class="nav__burger" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav-drawer"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__backdrop" aria-hidden="true"></div>
+  <aside id="nav-drawer" class="nav__drawer" aria-hidden="true"><div class="nav__drawer-links" role="navigation"></div><a href="/planos" class="btn btn--yellow nav__drawer-cta">Comece agora <span class="arrow"></span></a></aside>
+</header>
+
+<section class="partners-hero">
+  <div class="partners-hero__inner">
+    <p class="partners-hero__crumb">/ PARCEIROS ANTONOV</p>
+    <h1>UM ECOSSISTEMA PARA IR <span class="yel">ALÉM.</span></h1>
+    <p class="partners-hero__lede">Profissionais e empresas selecionados para acompanhar sua performance dentro e fora do Antonov.</p>
+  </div>
+</section>
+
+<div class="partners-toolbar">
+  <label class="partners-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input id="partners-search" type="search" placeholder="Buscar profissional ou serviço..." aria-label="Buscar profissional ou serviço" autocomplete="off" />
+  </label>
+  <div id="partners-filters" class="partners-filters" role="toolbar" aria-label="Filtrar por categoria"></div>
+</div>
+
+<p id="partners-loading" class="partners-loading">Carregando parceiros…</p>
+<div class="partners-grid-wrap">
+  <div id="partners-grid" class="partners-grid" aria-live="polite"></div>
+  <div id="partners-empty" class="partners-empty" hidden>
+    <h2>Nenhum parceiro encontrado para sua busca.</h2>
+    <p>Tente outro termo ou explore todas as categorias do ecossistema Antonov.</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div>
+        <h2 class="footer__cta-title">Performance<br />não termina<br />no treino.</h2>
+        <p class="footer__cta-text">Conheça profissionais selecionados do ecossistema Antonov.</p>
+        <a href="/contato" class="btn btn--yellow">Fale conosco <span class="arrow"></span></a>
+      </div>
+      <div class="footer__cols" style="grid-template-columns:1fr 1fr;padding:0;">
+        <div class="footer__col">
+          <h3 class="footer__col-title">Navegação</h3>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/sobre">Sobre</a></li>
+            <li><a href="/planos">Planos</a></li>
+            <li><a href="/parceiros">Parceiros</a></li>
+            <li><a href="/contato">Contato</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom"><div>© 2026 Antonov Center LTDA</div></div>
+  </div>
+</footer>
+
+<script defer src="app.js"></script>
+<script defer src="parceiros-tracking.js"></script>
+<script defer src="parceiros.js"></script>
+</body>
+</html>

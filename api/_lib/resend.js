@@ -580,3 +580,10 @@ export async function sendDynamicFormEmails({ formName, fieldDefs, payload }) {
     });
   }
 }
+
+export async function sendOpsEmail({ to, subject, html, text }) {
+  if (!isResendConfigured()) return null;
+  const recipients = (Array.isArray(to) ? to : [to]).map((item) => String(item || '').trim()).filter(Boolean);
+  if (!recipients.length) return null;
+  return sendEmail({ from: getFrom(), to: recipients, subject, html, text });
+}

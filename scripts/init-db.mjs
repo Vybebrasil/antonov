@@ -352,3 +352,11 @@ await sql`ALTER TABLE achados_perdidos ADD COLUMN IF NOT EXISTS entregue_a_id TE
 await sql`CREATE INDEX IF NOT EXISTS achados_perdidos_status_idx ON achados_perdidos (status, data_cadastro DESC);`;
 
 console.log('Tabela achados_perdidos pronta.');
+
+const { ensureParceirosSchema } = await import('./init-parceiros.mjs');
+await ensureParceirosSchema(sql);
+console.log('Módulo Parceiros Antonov pronto.');
+
+const { ensureTelaoSchema } = await import('./init-telao.mjs');
+await ensureTelaoSchema(sql);
+console.log('Módulo Telão pronto.');
