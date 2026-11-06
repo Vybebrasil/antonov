@@ -68,7 +68,8 @@ export function callbackUrl(req, kind) {
   const base = publicBase(req);
   if (!token || !base) return '';
   const job = kind === 'screenshot' ? 'screenshot' : 'callback';
-  return `${base}/api/telao/${job}?token=${encodeURIComponent(token)}`;
+  // A NovaCloud não entrega o retorno quando a URL tem query string: o token vai no caminho.
+  return `${base}/api/telao/${job}/${encodeURIComponent(token)}`;
 }
 
 function alertRecipients(settings) {

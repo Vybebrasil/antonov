@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
 import { getParceirosSession } from '../../api/_lib/parceiros-auth.js';
+import { hasModule } from '../../api/_lib/access.js';
 import { airBlockReason, aspectWarning, parseWeekDays, pictureOverSpec, todayInBahia } from '../../api/_lib/telao-playlist.js';
 import { novacloudConfigured } from '../../api/_lib/telao-novacloud.js';
 import { createSignedUpload, MAX_UPLOAD_BYTES, storageConfigured } from '../../api/_lib/telao-storage.js';
@@ -100,7 +101,11 @@ async function requireStaff(req, res) {
     json(res, 401, { error: 'Não autenticado.' });
     return null;
   }
-  if (session.role === 'parceiro') {
+  if (session.mustChangePassword) {
+    json(res, 403, { error: 'Troque a senha para continuar.', code: 'password_change_required' });
+    return null;
+  }
+  if (session.role === 'parceiro' || !hasModule(session, 'telao')) {
     json(res, 403, { error: 'Sem permissão para o telão.' });
     return null;
   }

@@ -1,5 +1,5 @@
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
-import { requireAdmin } from '../../api/_lib/admin-auth.js';
+import { requireModule } from '../../api/_lib/parceiros-auth.js';
 import { getFormById, getFormFields, parseShowWhen, normalizeOptionalText } from '../../api/_lib/forms.js';
 import { getSql } from '../../api/_lib/db.js';
 
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     return res.end();
   }
 
-  const session = await requireAdmin(req, res);
+  const session = await requireModule(req, res, 'forms');
   if (!session) return;
 
   const body = parseBody(req) || {};

@@ -11,7 +11,7 @@
     "db:parceiros": "node scripts/init-parceiros.mjs",
     "db:seed-parceiros": "node scripts/seed-parceiros.mjs",
     "db:seed-parceiros-media": "node scripts/generate-parceiros-media.mjs",
-    "test": "node --test scripts/test-parceiros.mjs scripts/test-telao.mjs",
+    "test": "node --test scripts/test-parceiros.mjs scripts/test-telao.mjs scripts/test-access.mjs",
     "db:telao": "node scripts/init-telao.mjs",
     "admin:create": "node scripts/create-admin.mjs",
     "seo:patch": "node scripts/patch-seo-head.mjs && node scripts/patch-internal-links.mjs && node scripts/patch-image-perf.mjs && node scripts/generate-sitemap.mjs",

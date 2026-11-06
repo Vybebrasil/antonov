@@ -8,6 +8,7 @@ import {
   formatSubmissionValue,
   normalizeSubmissionPayload,
   LEGACY_TABLES,
+  findTurnoField,
 } from './forms.js';
 import { PDF_MARGIN } from './pdf/constants.js';
 import { buildPdfSegments } from './pdf/layout.js';
@@ -128,7 +129,7 @@ export function toPdfBuffer(title, rows, columns, labels, meta = {}) {
   });
 }
 
-export async function getAllSubmissionsForExport(form, fields, { from, to, search }) {
+export async function getAllSubmissionsForExport(form, fields, { from, to, search, turno = '' }) {
   const limit = 10000;
   let raw = [];
   let columns = [];
@@ -142,6 +143,7 @@ export async function getAllSubmissionsForExport(form, fields, { from, to, searc
       from,
       to,
       search,
+      turno,
       limit,
       offset: 0,
     });
@@ -150,7 +152,7 @@ export async function getAllSubmissionsForExport(form, fields, { from, to, searc
     const flds = fields.length ? fields : await getFormFields(form.id);
     columns = flds.map((f) => f.field_key);
     labels = Object.fromEntries(flds.map((f) => [f.field_key, f.label]));
-    const rows = await fetchDynamicSubmissions(form.id, { from, to, search, limit, offset: 0 });
+    const rows = await fetchDynamicSubmissions(form.id, { from, to, search, turno, turnoField: findTurnoField(flds), limit, offset: 0 });
     raw = rows.map((r) => ({
       id: r.id,
       created_at: r.created_at,

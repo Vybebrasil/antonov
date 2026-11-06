@@ -1,5 +1,6 @@
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
-import { requireAdmin } from '../../api/_lib/admin-auth.js';
+import { denyUnlessReportForm, requireAnyModule, requireModule } from '../../api/_lib/parceiros-auth.js';
+import { hasModule } from '../../api/_lib/access.js';
 import { getFormById, getFormFields, normalizeOptionalText } from '../../api/_lib/forms.js';
 import { getSql } from '../../api/_lib/db.js';
 
@@ -10,7 +11,9 @@ export default async function handler(req, res) {
     return res.end();
   }
 
-  const session = await requireAdmin(req, res);
+  const session = req.method === 'GET'
+    ? await requireAnyModule(req, res, ['forms', 'reports'])
+    : await requireModule(req, res, 'forms');
   if (!session) return;
 
   const id = Number(req.query?.id);
@@ -18,6 +21,7 @@ export default async function handler(req, res) {
 
   const form = await getFormById(id);
   if (!form) return json(res, 404, { error: 'Formulário não encontrado.' });
+  if (req.method === 'GET' && !hasModule(session, 'forms') && denyUnlessReportForm(res, session, id)) return;
 
   const sql = getSql();
 

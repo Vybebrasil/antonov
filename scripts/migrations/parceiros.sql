@@ -5,6 +5,8 @@ ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS name TEXT;
 ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS role TEXT;
 ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS partner_id BIGINT;
 ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS modules TEXT;
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS report_forms TEXT;
 
 UPDATE admin_users SET role = 'super_admin' WHERE role IS NULL OR role = '';
 

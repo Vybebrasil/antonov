@@ -1,6 +1,13 @@
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
 import { getSql } from '../../api/_lib/db.js';
 import { hasPermission, requireParceirosAdmin } from '../../api/_lib/parceiros-auth.js';
+import { hasModule } from '../../api/_lib/access.js';
+import {
+  createAdminUser,
+  deactivateAdminUser,
+  listAdminUsers,
+  updateAdminUser,
+} from '../../api/_lib/admin-users.js';
 import {
   getAdminPartner,
   listAdminPartners,
@@ -45,8 +52,6 @@ import {
   softDeleteContract,
   softDeletePlan,
 } from '../../api/_lib/parceiros-comercial.js';
-import { USER_ROLES } from '../../api/_lib/parceiros-logic.js';
-import bcrypt from 'bcryptjs';
 
 function segments(req) {
   const raw = req.query?.path;
@@ -79,6 +84,9 @@ export default async function handler(req, res) {
   const sql = getSql();
 
   try {
+    if (parts[0] !== 'portal' && parts[0] !== 'users' && !hasModule(session, 'parceiros')) {
+      return json(res, 403, { error: 'Sem permissão para esta área.' });
+    }
     await refreshOperationalStatuses(sql);
 
     if ((parts.length === 0 || parts[0] === 'dashboard') && req.method === 'GET') {
@@ -419,80 +427,26 @@ export default async function handler(req, res) {
     }
 
     if (parts[0] === 'users') {
-      const ok = await gate(req, res, session, req.method === 'GET' ? 'users.read' : 'users.write');
-      if (!ok) return;
+      if (!hasModule(session, 'equipe')) {
+        return json(res, 403, { error: 'Sem permissão para esta área.' });
+      }
       if (parts.length === 1 && req.method === 'GET') {
-        const users = await sql`
-          SELECT id, email, name, role, partner_id, created_at
-          FROM admin_users
-          WHERE deleted_at IS NULL
-          ORDER BY email ASC
-        `;
-        return json(res, 200, { users });
+        return json(res, 200, { users: await listAdminUsers() });
       }
       if (parts.length === 1 && req.method === 'POST') {
-        const email = String(body.email || '').trim().toLowerCase();
-        const password = String(body.password || '');
-        const role = USER_ROLES.includes(body.role) ? body.role : 'admin_antonov';
-        const name = String(body.name || '').trim() || null;
-        const partnerId = body.partner_id ? Number(body.partner_id) : null;
-        if (!email || !password || password.length < 8) {
-          return json(res, 400, { error: 'E-mail e senha (mín. 8 caracteres) são obrigatórios.' });
-        }
-        if (role === 'parceiro' && !partnerId) {
-          return json(res, 400, { error: 'Vincule um parceiro a contas com papel parceiro.' });
-        }
-        const hash = await bcrypt.hash(password, 12);
-        try {
-          const rows = await sql`
-            INSERT INTO admin_users (email, password_hash, name, role, partner_id)
-            VALUES (${email}, ${hash}, ${name}, ${role}, ${partnerId})
-            RETURNING id, email, name, role, partner_id, created_at
-          `;
-          return json(res, 201, { user: rows[0] });
-        } catch (err) {
-          const code = err?.code || err?.cause?.code;
-          if (code === '23503') return json(res, 400, { error: 'Parceiro não encontrado.' });
-          return json(res, 400, { error: 'E-mail já cadastrado.' });
-        }
+        const result = await createAdminUser(body, session);
+        if (result.error) return json(res, 400, { error: result.error });
+        return json(res, 201, result);
       }
       if (parts.length === 2 && (req.method === 'PATCH' || req.method === 'PUT')) {
-        const role = USER_ROLES.includes(body.role) ? body.role : null;
-        const name = body.name !== undefined ? String(body.name || '').trim() || null : undefined;
-        const partnerId = body.partner_id !== undefined ? (body.partner_id ? Number(body.partner_id) : null) : undefined;
-        const password = body.password ? String(body.password) : '';
-        const current = await sql`SELECT * FROM admin_users WHERE id = ${parts[1]} AND deleted_at IS NULL`;
-        if (!current[0]) return json(res, 404, { error: 'Usuário não encontrado.' });
-        const nextRole = role || current[0].role;
-        const nextName = name === undefined ? current[0].name : name;
-        const nextPartner = partnerId === undefined ? current[0].partner_id : partnerId;
-        if (nextRole === 'parceiro' && !nextPartner) {
-          return json(res, 400, { error: 'Vincule um parceiro a contas com papel parceiro.' });
-        }
-        if (password && password.length < 8) return json(res, 400, { error: 'Senha muito curta.' });
-        const hash = password ? await bcrypt.hash(password, 12) : current[0].password_hash;
-        try {
-          const rows = await sql`
-            UPDATE admin_users SET
-              name = ${nextName}, role = ${nextRole}, partner_id = ${nextPartner}, password_hash = ${hash}
-            WHERE id = ${parts[1]}
-            RETURNING id, email, name, role, partner_id, created_at
-          `;
-          return json(res, 200, { user: rows[0] });
-        } catch (err) {
-          const code = err?.code || err?.cause?.code;
-          if (code === '23503') return json(res, 400, { error: 'Parceiro não encontrado.' });
-          return json(res, 400, { error: 'Não foi possível atualizar o usuário.' });
-        }
+        const result = await updateAdminUser(parts[1], body, session);
+        if (result.error) return json(res, result.status || 400, { error: result.error });
+        return json(res, 200, result);
       }
       if (parts.length === 2 && req.method === 'DELETE') {
-        if (Number(parts[1]) === session.userId) {
-          return json(res, 400, { error: 'Não é possível excluir o próprio usuário.' });
-        }
-        await sql`
-          UPDATE admin_users SET deleted_at = NOW() WHERE id = ${parts[1]} AND deleted_at IS NULL
-        `;
-        return json(res, 200, { ok: true });
+        const result = await deactivateAdminUser(parts[1], session.userId);
+        if (result.error) return json(res, result.status || 400, { error: result.error });
+        return json(res, 200, result);
       }
     }
 

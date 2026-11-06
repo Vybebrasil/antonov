@@ -245,6 +245,7 @@ function hideDeleteSubmissionConfirm() {
 }
 
 function showDeleteSubmissionConfirm() {
+  if (state.user?.role !== 'super_admin') return;
   const confirm = $('#submission-delete-confirm');
   const actions = $('#submission-detail-actions');
   if (confirm) confirm.removeAttribute('hidden');
@@ -317,12 +318,13 @@ function updateSubmissionDetailActions(submission, data) {
 function openSubmissionDetail(submissionId, triggerEl) {
   const data = state.reportData;
   if (!data) return;
-  const submission = data.submissions.find((s) => s.id === submissionId);
+  const submission = data.submissions.find((s) => Number(s.id) === Number(submissionId));
   if (!submission) return;
 
   state.activeSubmissionId = submissionId;
   hideDeleteSubmissionConfirm();
   hideError($('#submission-detail-error'));
+  $('#submission-delete')?.toggleAttribute('hidden', state.user?.role !== 'super_admin');
 
   const title = $('#submission-detail-title');
   const dateEl = $('#submission-detail-date');
@@ -355,6 +357,7 @@ function openSubmissionDetail(submissionId, triggerEl) {
   }
 
   updateSubmissionDetailActions(submission, data);
+  renderSubmissionWorkout(submission, data);
   openSubmissionDetailDialog(triggerEl);
 }
 
@@ -362,6 +365,7 @@ function bindSubmissionDetailHandlers() {
   $$('#report-table tbody tr[data-submission-id]').forEach((tr) => {
     tr.addEventListener('click', () => openSubmissionDetail(Number(tr.dataset.submissionId), tr));
     tr.addEventListener('keydown', (e) => {
+      if (e.target !== tr) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         openSubmissionDetail(Number(tr.dataset.submissionId), tr);
@@ -369,9 +373,17 @@ function bindSubmissionDetailHandlers() {
     });
   });
 
+  $$('#report-results [data-workout-mark]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setWorkout(Number(btn.dataset.workoutMark), true, btn);
+    });
+  });
+
   $$('.report-card[data-submission-id]').forEach((card) => {
     card.addEventListener('click', () => openSubmissionDetail(Number(card.dataset.submissionId), card));
     card.addEventListener('keydown', (e) => {
+      if (e.target !== card) return;
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         openSubmissionDetail(Number(card.dataset.submissionId), card);
@@ -428,19 +440,74 @@ function showLogin() {
   const panel = $('#panel-view');
   if (login) login.removeAttribute('hidden');
   if (panel) panel.setAttribute('hidden', '');
+  $('#password-view')?.setAttribute('hidden', '');
+}
+
+function showPasswordChange() {
+  $('#login-view')?.setAttribute('hidden', '');
+  $('#panel-view')?.setAttribute('hidden', '');
+  $('#password-view')?.removeAttribute('hidden');
+  requestAnimationFrame(() => $('#password-form [name="new_password"]')?.focus());
+}
+
+function enterPanel(user) {
+  state.user = user;
+  if (user.role === 'parceiro') {
+    window.location.href = '/partner';
+    return;
+  }
+  if (user.mustChangePassword) {
+    showPasswordChange();
+    return;
+  }
+  showPanel(user.email);
+  applyAccess();
+  switchTab(firstAllowedTab() || 'dashboard');
 }
 
 function showPanel(email) {
   const login = $('#login-view');
   const panel = $('#panel-view');
   if (login) login.setAttribute('hidden', '');
+  $('#password-view')?.setAttribute('hidden', '');
   if (panel) panel.removeAttribute('hidden');
   const userEl = $('#user-email');
   if (userEl) userEl.textContent = email;
 }
 
+function userModules() {
+  return Array.isArray(state.user?.modules) ? state.user.modules : [];
+}
+
+function allowedReportForms(forms) {
+  if (state.user?.role === 'super_admin') return forms;
+  const allowed = state.user?.reportForms;
+  if (allowed == null) return forms;
+  const set = new Set(allowed.map(Number));
+  return forms.filter((item) => set.has(Number(item.id)));
+}
+
+const DISABLED_TABS = new Set(['telao']);
+
+function canOpenTab(name) {
+  if (DISABLED_TABS.has(name)) return false;
+  if (name === 'configuracoes') return userModules().includes('equipe');
+  return userModules().includes(name);
+}
+
+function firstAllowedTab() {
+  return ['dashboard', 'reports', 'forms', 'hr', 'achados', 'parceiros', 'telao', 'configuracoes']
+    .find((name) => canOpenTab(name)) || null;
+}
+
+function applyAccess() {
+  $$('.panel-tabs [data-tab]').forEach((button) => {
+    button.hidden = !canOpenTab(button.dataset.tab);
+  });
+}
+
 function getTabButtons() {
-  return $$('.panel-tabs [role="tab"]');
+  return $$('.panel-tabs [role="tab"]').filter((tab) => !tab.hidden);
 }
 
 function focusTabButton(name) {
@@ -475,6 +542,11 @@ function initTabKeyboard() {
 }
 
 function switchTab(name, opts = {}) {
+  if (!canOpenTab(name)) {
+    const fallback = firstAllowedTab();
+    if (fallback && fallback !== name) return switchTab(fallback, opts);
+    return;
+  }
   $$('.tab').forEach((t) => {
     const active = t.dataset.tab === name;
     t.classList.toggle('active', active);
@@ -492,6 +564,7 @@ function switchTab(name, opts = {}) {
   if (name === 'reports') initReports();
   if (name === 'forms') loadForms();
   if (name === 'hr') {
+    loadWorkoutRanking();
     if (typeof initPdiAdmin === 'function' && !window._pdiInited) {
       initPdiAdmin();
       window._pdiInited = true;
@@ -517,6 +590,13 @@ function switchTab(name, opts = {}) {
       window._telaoInited = true;
     }
     if (typeof onTelaoTabOpen === 'function') onTelaoTabOpen();
+  }
+  if (name === 'configuracoes') {
+    if (typeof initEquipeAdmin === 'function' && !window._equipeInited) {
+      initEquipeAdmin();
+      window._equipeInited = true;
+    }
+    if (typeof onEquipeTabOpen === 'function') onEquipeTabOpen();
   }
   requestAnimationFrame(() => {
     if (opts.focusTab) focusTabButton(name);
@@ -544,13 +624,7 @@ function defaultReportRange() {
 async function checkSession() {
   try {
     const data = await api('/me');
-    state.user = data;
-    if (data.role === 'parceiro') {
-      window.location.href = '/partner';
-      return;
-    }
-    showPanel(data.email);
-    switchTab('dashboard');
+    enterPanel(data);
   } catch {
     showLogin();
   }
@@ -584,13 +658,7 @@ function initAdmin() {
         body: JSON.stringify({ email, password }),
       });
       const me = await api('/me').catch(() => data);
-      state.user = me;
-      if (me.role === 'parceiro') {
-        window.location.href = '/partner';
-        return;
-      }
-      showPanel(me.email || data.email);
-      switchTab('dashboard');
+      enterPanel({ ...me, email: me.email || data.email });
     } catch (err) {
       showError(errEl, err.message || 'Não foi possível entrar.');
     } finally {
@@ -605,6 +673,45 @@ function initAdmin() {
     try { await api('/logout', { method: 'POST' }); } catch { /* ignore */ }
     state.user = null;
     showLogin();
+  });
+
+  initReportView();
+  initWorkoutRanking();
+
+  bind('#submission-workout', 'click', (e) => {
+    const mark = e.target.closest('[data-workout-mark]');
+    const unmark = e.target.closest('[data-workout-unmark]');
+    if (mark) setWorkout(Number(mark.dataset.workoutMark), true, mark);
+    if (unmark) setWorkout(Number(unmark.dataset.workoutUnmark), false, unmark);
+  });
+
+  bind('#password-logout', 'click', async () => {
+    try { await api('/logout', { method: 'POST' }); } catch { /* ignore */ }
+    state.user = null;
+    showLogin();
+  });
+
+  bind('#password-form', 'submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const errEl = $('#password-error');
+    const btn = form.querySelector('[type="submit"]');
+    hideError(errEl);
+    const next = form.querySelector('[name="new_password"]')?.value || '';
+    const confirm = form.querySelector('[name="confirm_password"]')?.value || '';
+    if (next.length < 8) return showError(errEl, 'A senha precisa de pelo menos 8 caracteres.');
+    if (next !== confirm) return showError(errEl, 'As senhas não conferem.');
+    const prevLabel = btn?.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+    try {
+      await api('/password', { method: 'POST', body: JSON.stringify({ new_password: next }) });
+      form.reset();
+      enterPanel({ ...state.user, mustChangePassword: false });
+    } catch (err) {
+      showError(errEl, err.message || 'Não foi possível salvar a senha.');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = prevLabel || 'Salvar e entrar'; }
+    }
   });
 
   initTabKeyboard();
@@ -641,6 +748,10 @@ function initAdmin() {
       if (!validateReportRange()) return;
       loadReport(1);
     }
+  });
+  bind('#report-turno', 'change', () => {
+    if (!validateReportRange()) return;
+    loadReport(1);
   });
   bind('#report-from', 'change', validateReportRange);
   bind('#report-to', 'change', validateReportRange);
@@ -1550,14 +1661,22 @@ async function initReports() {
 
   clearSectionError(results);
 
-  if (!sel.options.length) {
-    sel.innerHTML = state.forms.map((f) =>
-      `<option value="${f.id}">${f.name}${f.status === 'archived' ? ' (arquivado)' : ''}</option>`,
-    ).join('');
+  const reportForms = allowedReportForms(state.forms);
+  sel.innerHTML = reportForms.map((f) =>
+    `<option value="${f.id}">${f.name}${f.status === 'archived' ? ' (arquivado)' : ''}</option>`,
+  ).join('');
+  if (!reportForms.length) {
+    $('#report-table thead').innerHTML = '';
+    $('#report-table tbody').innerHTML = '';
+    $('#report-cards').innerHTML = '';
+    $('#report-pagination').innerHTML = '';
+    setSectionError(results, 'Nenhum relatório liberado para esta conta.', () => initReports());
+    return;
   }
 
   if (state.pendingReportFormId && sel) {
-    sel.value = String(state.pendingReportFormId);
+    const pending = String(state.pendingReportFormId);
+    if ([...sel.options].some((option) => option.value === pending)) sel.value = pending;
     state.pendingReportFormId = null;
   }
 
@@ -1590,6 +1709,8 @@ async function loadReport(page) {
   });
   const search = $('#report-search').value.trim();
   if (search) params.set('search', search);
+  const turno = $('#report-turno')?.value;
+  if (turno) params.set('turno', turno);
 
   setLoading(results, true, 'Carregando relatório…');
   clearSectionError(results);
@@ -1620,6 +1741,9 @@ function renderActiveFilters() {
   const search = $('#report-search')?.value.trim();
   if (search) chips.push(`busca: ${search}`);
 
+  const turnoOpt = $('#report-turno')?.selectedOptions?.[0];
+  if (turnoOpt?.value) chips.push(`turno: ${turnoOpt.textContent.trim()}`);
+
   const days = state.reportRangeDays;
   if (days) chips.push(`${days} dias`);
 
@@ -1645,7 +1769,7 @@ function onReportSort(sortKey) {
 
 async function onCopySubmission() {
   const data = state.reportData;
-  const submission = data?.submissions.find((s) => s.id === state.activeSubmissionId);
+  const submission = data?.submissions.find((s) => Number(s.id) === Number(state.activeSubmissionId));
   if (!submission || !data) return;
 
   const text = submissionCopyText(submission, data);
@@ -1929,13 +2053,29 @@ function renderReportCards(data) {
     return;
   }
 
+  const titleKey = data.columns.find((c) => /nome/i.test(data.labels[c] || c)) || null;
+  const previewLimit = 8;
+  const mobilePreviewLimit = 4;
+  const compact = window.matchMedia('(max-width: 768px)').matches;
+
   el.innerHTML = data.submissions.map((s) => {
-    const fields = data.columns.map((c) => `
-      <div class="report-card__field">
-        <span class="report-card__lbl">${escapeHtml(data.labels[c] || c)}</span>
-        <span class="report-card__val">${escapeHtml(String(formatSubmissionValue(s.payload[c])))}</span>
+    const title = titleKey ? String(formatSubmissionValue(s.payload[titleKey]) || '').trim() : '';
+    let shown = 0;
+    const fields = data.columns.map((c) => {
+      const value = String(formatSubmissionValue(s.payload[c]) ?? '');
+      const isTitle = c === titleKey;
+      const isEmpty = !value.trim() || value.trim() === '—';
+      const position = !isTitle && !isEmpty ? shown++ : -1;
+      const isExtra = !isTitle && (isEmpty || position >= previewLimit);
+      const isMobileExtra = !isExtra && position >= mobilePreviewLimit;
+      return `
+      <div class="report-card__field${isTitle ? ' report-card__field--title' : ''}${isExtra ? ' report-card__field--extra' : ''}${isMobileExtra ? ' report-card__field--mobile-extra' : ''}">
+        <span class="report-card__lbl" title="${escapeHtml(data.labels[c] || c)}">${escapeHtml(data.labels[c] || c)}</span>
+        <span class="report-card__val">${escapeHtml(value)}</span>
       </div>
-    `).join('');
+    `;
+    }).join('');
+    const extra = Math.max(0, data.columns.length - (titleKey ? 1 : 0) - Math.min(shown, compact ? mobilePreviewLimit : previewLimit));
 
     return `
       <article class="report-card report-card--clickable" data-submission-id="${s.id}" tabindex="0" role="button" aria-label="Ver resposta #${s.id}">
@@ -1943,10 +2083,96 @@ function renderReportCards(data) {
           <span class="report-card__id">#${s.id}</span>
           <time class="report-card__date">${formatDate(s.created_at)}</time>
         </header>
+        ${title ? `<h3 class="report-card__title">${escapeHtml(title)}</h3>` : ''}
         <div class="report-card__body">${fields}</div>
+        <footer class="report-card__foot">
+          <span class="report-card__more">${extra ? `+${extra} campo(s) · ` : ''}Ver ficha completa →</span>
+          ${isWorkoutForm(data) ? workoutCardHtml(s) : ''}
+        </footer>
       </article>
     `;
   }).join('');
+}
+
+function isWorkoutForm(data) {
+  const form = data?.form || {};
+  return form.slug === 'anamnese' || /anamnese/i.test(form.name || '');
+}
+
+function workoutWhen(workout) {
+  return `${workout.done_by_name} · ${formatDate(workout.done_at)}`;
+}
+
+function workoutCardHtml(submission) {
+  if (submission.workout) {
+    return `<span class="workout-chip" title="Treino feito por ${escapeHtml(workoutWhen(submission.workout))}">✓ Treino feito · ${escapeHtml(submission.workout.done_by_name)}</span>`;
+  }
+  return `<button type="button" class="workout-btn" data-workout-mark="${submission.id}">Marcar treino feito</button>`;
+}
+
+function canUnmarkWorkout(workout) {
+  return state.user?.role === 'super_admin' || Number(workout?.done_by) === Number(state.user?.userId);
+}
+
+function renderSubmissionWorkout(submission, data) {
+  const el = $('#submission-workout');
+  if (!el) return;
+  if (!isWorkoutForm(data)) {
+    el.setAttribute('hidden', '');
+    el.innerHTML = '';
+    return;
+  }
+  el.removeAttribute('hidden');
+  const w = submission.workout;
+  el.innerHTML = w
+    ? `
+      <div class="submission-workout__done">
+        <span class="submission-workout__icon" aria-hidden="true">✓</span>
+        <div>
+          <strong>Treino feito</strong>
+          <span>por ${escapeHtml(w.done_by_name)} em ${escapeHtml(formatDate(w.done_at))}</span>
+        </div>
+      </div>
+      ${canUnmarkWorkout(w) ? `<button type="button" class="btn btn-ghost btn-sm" data-workout-unmark="${submission.id}">Desmarcar</button>` : ''}`
+    : `
+      <div class="submission-workout__todo">
+        <strong>Treino ainda não feito</strong>
+        <span>Marque quando o treino desta ficha estiver pronto.</span>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" data-workout-mark="${submission.id}">Marcar treino feito</button>`;
+}
+
+async function setWorkout(submissionId, done, btn) {
+  const data = state.reportData;
+  const submission = data?.submissions.find((s) => Number(s.id) === Number(submissionId));
+  if (!submission) return;
+  const formId = data.form?.id;
+  const prevLabel = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = done ? 'Salvando…' : 'Desmarcando…'; }
+  hideError($('#submission-detail-error'));
+  try {
+    if (done) {
+      const res = await api('/workouts', {
+        method: 'POST',
+        body: JSON.stringify({ form_id: formId, submission_id: submissionId }),
+      });
+      submission.workout = res.workout;
+    } else {
+      await api(`/workouts?form_id=${formId}&submission_id=${submissionId}`, { method: 'DELETE' });
+      submission.workout = null;
+    }
+    const scrollY = window.scrollY;
+    renderReportTable(data);
+    window.scrollTo(0, scrollY);
+    if (state.activeSubmissionId === submissionId) renderSubmissionWorkout(submission, data);
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = prevLabel; }
+    if (state.activeSubmissionId === submissionId) {
+      showError($('#submission-detail-error'), err.message || 'Não foi possível salvar o treino.');
+    } else {
+      setSectionError($('#report-results'), err.message || 'Não foi possível salvar o treino.');
+    }
+  }
 }
 
 function renderReportTable(data) {
@@ -1956,7 +2182,8 @@ function renderReportTable(data) {
   const sortKeys = ['id', 'created_at', ...data.columns];
   const headerLabels = ['ID', 'Data', ...data.columns.map((c) => data.labels[c] || c)];
 
-  thead.innerHTML = `<tr>${headerLabels.map((label, i) => {
+  const workoutForm = isWorkoutForm(data);
+  thead.innerHTML = `<tr>${workoutForm ? '<th scope="col">Treino</th>' : ''}${headerLabels.map((label, i) => {
     const key = sortKeys[i];
     const active = state.reportSort === key;
     const arrow = active ? (state.reportOrder === 'asc' ? ' ↑' : ' ↓') : '';
@@ -1978,7 +2205,7 @@ function renderReportTable(data) {
   });
 
   if (!data.submissions.length) {
-    tbody.innerHTML = `<tr><td colspan="${headerLabels.length}" class="empty-msg">Nenhuma resposta</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="${headerLabels.length + (workoutForm ? 1 : 0)}" class="empty-msg">Nenhuma resposta</td></tr>`;
   } else {
     tbody.innerHTML = data.submissions.map((s) => {
       const cells = [
@@ -1986,7 +2213,8 @@ function renderReportTable(data) {
         formatDate(s.created_at),
         ...data.columns.map((c) => formatSubmissionValue(s.payload[c])),
       ];
-      return `<tr class="data-table__row data-table__row--clickable" data-submission-id="${s.id}" tabindex="0" role="button" aria-label="Ver resposta #${s.id}">${cells.map((c) => `<td>${escapeHtml(String(c))}</td>`).join('')}</tr>`;
+      const workoutCell = workoutForm ? `<td class="report-workout-cell">${workoutCardHtml(s)}</td>` : '';
+      return `<tr class="data-table__row data-table__row--clickable" data-submission-id="${s.id}" tabindex="0" role="button" aria-label="Ver resposta #${s.id}">${workoutCell}${cells.map((c) => `<td title="${escapeHtml(String(c))}">${escapeHtml(String(c))}</td>`).join('')}</tr>`;
     }).join('');
   }
 
@@ -2023,6 +2251,196 @@ function renderReportTable(data) {
   bindSubmissionDetailHandlers();
 }
 
+const wkState = { period: 'month', from: null, to: null, expanded: false };
+
+function startOfDay(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function workoutPeriodRange(period) {
+  const now = new Date();
+  const today = startOfDay(now);
+  const end = new Date(today);
+  end.setHours(23, 59, 59, 999);
+  let start = null;
+  if (period === 'day') start = today;
+  if (period === 'week') {
+    start = new Date(today);
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  }
+  if (period === 'month') start = new Date(today.getFullYear(), today.getMonth(), 1);
+  if (period === 'quarter') start = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
+  if (period === 'semester') start = new Date(today.getFullYear(), today.getMonth() < 6 ? 0 : 6, 1);
+  if (period === 'year') start = new Date(today.getFullYear(), 0, 1);
+  if (period === 'custom') {
+    if (!wkState.from || !wkState.to) return null;
+    const from = new Date(`${wkState.from}T00:00:00`);
+    const to = new Date(`${wkState.to}T23:59:59.999`);
+    return { from, to };
+  }
+  if (period === 'all') return { from: null, to: null };
+  return { from: start, to: end };
+}
+
+function formatShortDate(d) {
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+const WK_PREVIEW = 5;
+
+function renderWorkoutRanking(data, range) {
+  const el = $('#wk-ranking');
+  const rangeEl = $('#wk-range');
+  const rows = data.ranking || [];
+  if (rangeEl) {
+    rangeEl.textContent = range.from
+      ? `${formatShortDate(range.from)} até ${formatShortDate(range.to)}`
+      : 'Desde o primeiro treino marcado';
+  }
+  renderWorkoutKpis(data, rows);
+  if (!el) return;
+  if (!rows.length) {
+    el.innerHTML = '<p class="wk-empty">Nenhum treino marcado neste período. Os treinos entram aqui quando alguém marca "Treino feito" numa ficha de Anamnese.</p>';
+    return;
+  }
+  const max = rows[0].total || 1;
+  const hidden = Math.max(0, rows.length - WK_PREVIEW);
+  el.innerHTML = `
+    <ol class="wk-list${wkState.expanded ? ' is-expanded' : ''}">
+      ${rows.map((row, i) => `
+        <li class="wk-row${i < 3 ? ` wk-row--top wk-row--${i + 1}` : ''}${i >= WK_PREVIEW ? ' wk-row--more' : ''}">
+          <span class="wk-pos">${i + 1}º</span>
+          <div class="wk-who">
+            <strong title="${escapeHtml(row.email)}">${escapeHtml(row.name)}</strong>
+            <div class="wk-bar"><i style="width:${Math.max(4, Math.round((row.total / max) * 100))}%"></i></div>
+          </div>
+          <span class="wk-total"><strong>${row.total}</strong> ${row.total === 1 ? 'treino' : 'treinos'}</span>
+        </li>`).join('')}
+    </ol>
+    ${hidden ? `<button type="button" class="btn btn-ghost btn-sm wk-toggle" id="wk-toggle">${wkState.expanded ? 'Mostrar só o top 5' : `Ver todos (${rows.length})`}</button>` : ''}`;
+  $('#wk-toggle')?.addEventListener('click', () => {
+    wkState.expanded = !wkState.expanded;
+    renderWorkoutRanking(data, range);
+  });
+}
+
+function renderWorkoutKpis(data, rows) {
+  const el = $('#wk-kpis');
+  if (!el) return;
+  const open = data.open || { total: 0, oldest_at: null };
+  const since = open.since ? ` · desde ${formatShortDate(new Date(open.since))}` : '';
+  const openSub = open.total
+    ? `Mais antiga de ${formatShortDate(new Date(open.oldest_at))}`
+    : `Tudo em dia${since}`;
+  el.innerHTML = `
+    <div class="wk-kpi${open.total ? ' wk-kpi--warn' : ' wk-kpi--ok'}">
+      <span class="wk-kpi__lbl">Treino inicial em aberto</span>
+      <strong class="wk-kpi__val">${open.total}</strong>
+      <span class="wk-kpi__sub">${escapeHtml(openSub)}</span>
+    </div>
+    <div class="wk-kpi">
+      <span class="wk-kpi__lbl">Treinos feitos</span>
+      <strong class="wk-kpi__val">${data.total || 0}</strong>
+      <span class="wk-kpi__sub">No período</span>
+    </div>
+    <div class="wk-kpi">
+      <span class="wk-kpi__lbl">Profissionais</span>
+      <strong class="wk-kpi__val">${rows.length}</strong>
+      <span class="wk-kpi__sub">Com treino no período</span>
+    </div>`;
+}
+
+async function loadWorkoutRanking() {
+  const range = workoutPeriodRange(wkState.period);
+  const el = $('#wk-ranking');
+  const errEl = $('#wk-error');
+  if (!el || !state.user || !userModules().includes('hr')) return;
+  hideError(errEl);
+  if (!range) {
+    el.innerHTML = '';
+    if ($('#wk-range')) $('#wk-range').textContent = 'Escolha as datas e toque em Aplicar.';
+    return;
+  }
+  el.innerHTML = '<p class="dash-loading"><span class="dash-skeleton__block"></span> Carregando…</p>';
+  const params = new URLSearchParams();
+  if (range.from) params.set('from', range.from.toISOString());
+  if (range.to) params.set('to', range.to.toISOString());
+  try {
+    const data = await api(`/workouts/ranking?${params}`);
+    renderWorkoutRanking(data, range);
+  } catch (err) {
+    el.innerHTML = '';
+    showError(errEl, err.message || 'Não foi possível carregar o ranking.');
+  }
+}
+
+function showPdiSubview(view) {
+  $('#pdi-view-gestor')?.toggleAttribute('hidden', view !== 'gestor');
+  $('#pdi-view-colaborador')?.toggleAttribute('hidden', view !== 'colaborador');
+}
+
+function initWorkoutRanking() {
+  $$('[data-pdi-subview]').forEach((btn) => {
+    btn.addEventListener('click', () => showPdiSubview(btn.dataset.pdiSubview));
+  });
+  bind('#pdi-refresh', 'click', () => loadWorkoutRanking());
+  bind('#wk-period', 'change', (e) => {
+    wkState.period = e.target.value;
+    wkState.expanded = false;
+    const form = $('#wk-custom');
+    form?.toggleAttribute('hidden', wkState.period !== 'custom');
+    if (wkState.period === 'custom' && form) {
+      if (!form.from.value) {
+        const today = new Date();
+        const local = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        form.to.value = local(today);
+        form.from.value = local(new Date(today.getFullYear(), today.getMonth(), 1));
+      }
+      wkState.from = form.from.value;
+      wkState.to = form.to.value;
+    }
+    loadWorkoutRanking();
+  });
+  bind('#wk-custom', 'submit', (e) => {
+    e.preventDefault();
+    const form = e.target;
+    if (form.from.value > form.to.value) {
+      showError($('#wk-error'), 'A data inicial não pode ser depois da final.');
+      return;
+    }
+    wkState.from = form.from.value;
+    wkState.to = form.to.value;
+    loadWorkoutRanking();
+  });
+}
+
+const REPORT_VIEW_KEY = 'antonov.admin.reportView';
+
+function applyReportView(view) {
+  const mode = view === 'table' ? 'table' : 'cards';
+  const wrap = $('#report-results');
+  if (!wrap) return;
+  wrap.classList.toggle('report-view-cards', mode === 'cards');
+  wrap.classList.toggle('report-view-table', mode === 'table');
+  $$('[data-report-view]').forEach((btn) => {
+    const on = btn.dataset.reportView === mode;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  try { localStorage.setItem(REPORT_VIEW_KEY, mode); } catch { /* ignore */ }
+}
+
+function initReportView() {
+  let saved = 'cards';
+  try { saved = localStorage.getItem(REPORT_VIEW_KEY) || 'cards'; } catch { /* ignore */ }
+  applyReportView(saved);
+  $$('[data-report-view]').forEach((btn) => {
+    btn.addEventListener('click', () => applyReportView(btn.dataset.reportView));
+  });
+}
+
 async function exportReport(format) {
   const formId = $('#report-form').value;
   if (!formId) return;
@@ -2038,6 +2456,8 @@ async function exportReport(format) {
   });
   const search = $('#report-search').value.trim();
   if (search) params.set('search', search);
+  const turno = $('#report-turno')?.value;
+  if (turno) params.set('turno', turno);
 
   setButtonLoading(btn, true, 'Exportando…');
   exportButtons.forEach((b) => {

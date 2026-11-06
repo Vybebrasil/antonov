@@ -35,6 +35,9 @@ export default async function handler(req, res) {
     if (parts.length === 1 && parts[0] === 'me') {
       return (await import('../../handlers/admin/me.js')).default(req, res);
     }
+    if (parts.length === 1 && parts[0] === 'password') {
+      return (await import('../../handlers/admin/password.js')).default(req, res);
+    }
     if (parts.length === 1 && parts[0] === 'form-fields') {
       return (await import('../../handlers/admin/form-fields.js')).default(req, res);
     }
@@ -64,6 +67,11 @@ export default async function handler(req, res) {
       req.query.path = parts.slice(1).join('/');
       return (await import('../../handlers/admin/pdi.js')).default(req, res);
     }
+    if (parts[0] === 'rh') {
+      if (!req.query) req.query = {};
+      req.query.path = parts.slice(1).join('/');
+      return (await import('../../handlers/admin/rh.js')).default(req, res);
+    }
     if (parts[0] === 'achados-perdidos') {
       if (!req.query) req.query = {};
       req.query.path = parts.slice(1).join('/');
@@ -73,6 +81,16 @@ export default async function handler(req, res) {
       if (!req.query) req.query = {};
       req.query.path = parts.slice(1).join('/');
       return (await import('../../handlers/admin/parceiros.js')).default(req, res);
+    }
+    if (parts[0] === 'equipe') {
+      if (!req.query) req.query = {};
+      req.query.path = parts.slice(1).join('/');
+      return (await import('../../handlers/admin/equipe.js')).default(req, res);
+    }
+    if (parts[0] === 'workouts') {
+      if (!req.query) req.query = {};
+      req.query.path = parts.slice(1).join('/');
+      return (await import('../../handlers/admin/workouts.js')).default(req, res);
     }
     if (parts[0] === 'telao') {
       if (!req.query) req.query = {};

@@ -1,5 +1,5 @@
 import { json, adminCors } from '../../api/_lib/admin-http.js';
-import { requireAdmin } from '../../api/_lib/admin-auth.js';
+import { requireModule } from '../../api/_lib/parceiros-auth.js';
 import {
   countAllInRange,
   countFormInRange,
@@ -62,7 +62,7 @@ export default async function handler(req, res) {
     return json(res, 405, { error: 'Método não permitido.' });
   }
 
-  const session = await requireAdmin(req, res);
+  const session = await requireModule(req, res, 'dashboard');
   if (!session) return;
 
   try {

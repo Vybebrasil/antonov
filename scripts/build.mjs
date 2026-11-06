@@ -49,6 +49,8 @@ const COPY_FILES = [
 
 const cssMin = new CleanCSS({ level: 2 });
 
+const RH_MODULES = ['one-on-one', 'onboarding', 'avaliacao', 'ninebox', 'bemestar', 'cargos', 'trilhas'];
+
 async function minifyJsToDist(file) {
   let code = readFileSync(join(root, file), 'utf8');
   if (file === 'admin.js') {
@@ -57,6 +59,10 @@ async function minifyJsToDist(file) {
     code += `\n${readFileSync(join(root, 'admin-parceiros.js'), 'utf8')}`;
     code += `\n${readFileSync(join(root, 'admin-md5.js'), 'utf8')}`;
     code += `\n${readFileSync(join(root, 'admin-telao.js'), 'utf8')}`;
+    code += `\n${readFileSync(join(root, 'admin-equipe.js'), 'utf8')}`;
+    for (const mod of RH_MODULES) {
+      code += `\n${readFileSync(join(root, `admin-rh-${mod}.js`), 'utf8')}`;
+    }
   }
   const out = await esbuild.transform(code, {
     minify: true,
@@ -211,7 +217,9 @@ function processHtml(name) {
       .replace(/<script[^>]*src=["']\/?admin-achados\.js["'][^>]*>\s*<\/script>\s*/gi, '')
       .replace(/<script[^>]*src=["']\/?admin-parceiros\.js["'][^>]*>\s*<\/script>\s*/gi, '')
       .replace(/<script[^>]*src=["']\/?admin-md5\.js["'][^>]*>\s*<\/script>\s*/gi, '')
-      .replace(/<script[^>]*src=["']\/?admin-telao\.js["'][^>]*>\s*<\/script>\s*/gi, '');
+      .replace(/<script[^>]*src=["']\/?admin-telao\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-equipe\.js["'][^>]*>\s*<\/script>\s*/gi, '')
+      .replace(/<script[^>]*src=["']\/?admin-rh-[a-z0-9-]+\.js["'][^>]*>\s*<\/script>\s*/gi, '');
   }
 
   writeFileSync(join(dist, name), html, 'utf8');

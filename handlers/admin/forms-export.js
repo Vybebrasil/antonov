@@ -1,6 +1,6 @@
 import { json, adminCors } from '../../api/_lib/admin-http.js';
-import { requireAdmin } from '../../api/_lib/admin-auth.js';
-import { getFormById, getFormFields } from '../../api/_lib/forms.js';
+import { denyUnlessReportForm, requireAnyModule } from '../../api/_lib/parceiros-auth.js';
+import { getFormById, getFormFields, parseTurno } from '../../api/_lib/forms.js';
 import { getAllSubmissionsForExport, toXlsxBuffer, toPdfBuffer, toCsvBuffer } from '../../api/_lib/export.js';
 
 function defaultRange() {
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     return json(res, 405, { error: 'Método não permitido.' });
   }
 
-  const session = await requireAdmin(req, res);
+  const session = await requireAnyModule(req, res, ['forms', 'reports']);
   if (!session) return;
 
   const formId = Number(req.query?.id);
@@ -28,6 +28,7 @@ export default async function handler(req, res) {
 
   const form = await getFormById(formId);
   if (!form) return json(res, 404, { error: 'Formulário não encontrado.' });
+  if (denyUnlessReportForm(res, session, formId)) return;
 
   const q = req.query || {};
   const format = q.format === 'pdf' ? 'pdf' : q.format === 'csv' ? 'csv' : 'xlsx';
@@ -35,6 +36,7 @@ export default async function handler(req, res) {
   const from = q.from || defaults.from;
   const to = q.to || defaults.to;
   const search = q.search ? String(q.search).trim() : '';
+  const turno = parseTurno(q.turno);
 
   try {
     const fields = form.source_type === 'dynamic' ? await getFormFields(formId) : [];
@@ -42,6 +44,7 @@ export default async function handler(req, res) {
       from,
       to,
       search,
+      turno,
     });
 
     const safeName = form.slug.replace(/[^a-z0-9-]/gi, '-');

@@ -13,7 +13,13 @@ const adminBundle = readFileSync(join(root, 'admin.js'), 'utf8')
   + '\n'
   + readFileSync(join(root, 'admin-achados.js'), 'utf8')
   + '\n'
-  + readFileSync(join(root, 'admin-parceiros.js'), 'utf8');
+  + readFileSync(join(root, 'admin-parceiros.js'), 'utf8')
+  + '\n'
+  + readFileSync(join(root, 'admin-md5.js'), 'utf8')
+  + '\n'
+  + readFileSync(join(root, 'admin-telao.js'), 'utf8')
+  + '\n'
+  + readFileSync(join(root, 'admin-equipe.js'), 'utf8');
 
 writeFileSync(
   join(root, 'dist', 'admin.min.js'),
@@ -39,7 +45,15 @@ html = html
   .split('src="/admin-pdi.js"').join('')
   .split("src='/admin-pdi.js'").join('')
   .split('src="/admin-achados.js"').join('')
-  .split("src='/admin-achados.js'").join('');
+  .split("src='/admin-achados.js'").join('')
+  .split('src="/admin-parceiros.js"').join('')
+  .split("src='/admin-parceiros.js'").join('')
+  .split('src="/admin-md5.js"').join('')
+  .split("src='/admin-md5.js'").join('')
+  .split('src="/admin-telao.js"').join('')
+  .split("src='/admin-telao.js'").join('')
+  .split('src="/admin-equipe.js"').join('')
+  .split("src='/admin-equipe.js'").join('');
 writeFileSync(join(root, 'dist', 'admin.html'), html);
 
 console.log('admin rebuilt');

@@ -10,6 +10,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="/css/pages/admin.css" />
+<link rel="stylesheet" href="/css/pages/rh-pdi.css" />
+<link rel="stylesheet" href="/css/pages/rh-one-on-one.css" />
+<link rel="stylesheet" href="/css/pages/rh-onboarding.css" />
+<link rel="stylesheet" href="/css/pages/rh-avaliacao.css" />
+<link rel="stylesheet" href="/css/pages/rh-ninebox.css" />
+<link rel="stylesheet" href="/css/pages/rh-bemestar.css" />
+<link rel="stylesheet" href="/css/pages/rh-cargos.css" />
+<link rel="stylesheet" href="/css/pages/rh-trilhas.css" />
 </head>
 <body>
 <div id="app">
@@ -29,6 +37,28 @@
         </label>
         <p id="login-error" class="form-error" hidden></p>
         <button type="submit" class="btn btn-primary">Entrar</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="password-view" class="login-view" hidden>
+    <div class="login-card">
+      <img src="/assets/logo-211.png" alt="Antonov Center" width="211" height="32" class="login-logo" />
+      <h1>Crie sua senha</h1>
+      <p class="login-sub">No primeiro acesso, troque a senha temporária por uma só sua.</p>
+      <form id="password-form">
+        <label>
+          <span>Nova senha</span>
+          <input type="password" name="new_password" required minlength="8" autocomplete="new-password" />
+        </label>
+        <label>
+          <span>Repita a nova senha</span>
+          <input type="password" name="confirm_password" required minlength="8" autocomplete="new-password" />
+        </label>
+        <p class="login-hint">Mínimo de 8 caracteres.</p>
+        <p id="password-error" class="form-error" hidden></p>
+        <button type="submit" class="btn btn-primary">Salvar e entrar</button>
+        <button type="button" id="password-logout" class="btn btn-ghost">Sair</button>
       </form>
     </div>
   </div>
@@ -67,6 +97,10 @@
         <button type="button" class="tab" id="tab-btn-telao" role="tab" data-tab="telao" aria-selected="false" aria-controls="tab-telao" tabindex="-1">
           <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v12H3V5zm2 2v8h14V7H5zm4 12h6v2H9v-2z" fill="currentColor"/></svg>
           <span class="tab-label">Telão</span>
+        </button>
+        <button type="button" class="tab" id="tab-btn-configuracoes" role="tab" data-tab="configuracoes" aria-selected="false" aria-controls="tab-configuracoes" tabindex="-1">
+          <svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94a7.5 7.5 0 0 0 .06-.94 7.5 7.5 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.3 7.3 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.9 1h-3.8a.5.5 0 0 0-.49.42l-.36 2.54c-.58.23-1.12.54-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.71 7.48a.5.5 0 0 0 .12.64L4.86 9.7a7.5 7.5 0 0 0-.06.94 7.5 7.5 0 0 0 .06.94L2.83 13.16a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.51.4 1.05.71 1.63.94l.36 2.54a.5.5 0 0 0 .49.42h3.8a.5.5 0 0 0 .49-.42l.36-2.54c.58-.23 1.12-.54 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z" fill="currentColor"/></svg>
+          <span class="tab-label">Configurações</span>
         </button>
       </nav>
       <div class="panel-user">
@@ -182,6 +216,15 @@
               <span>Busca (nome/e-mail)</span>
               <input type="search" id="report-search" placeholder="Opcional" />
             </label>
+            <label class="report-filters__field report-filters__field--turno">
+              <span>Turno</span>
+              <select id="report-turno">
+                <option value="">Todos</option>
+                <option value="matutino">Matutino (5h–11h)</option>
+                <option value="vespertino">Vespertino (11h–17h)</option>
+                <option value="noturno">Noturno (17h–23h)</option>
+              </select>
+            </label>
             <div class="report-filters__dates">
               <label class="report-filters__field">
                 <span>De</span>
@@ -212,7 +255,13 @@
         </div>
         <p id="report-active-filters" class="report-active-filters" hidden aria-live="polite"></p>
         <p id="report-range-error" class="form-error report-range-error" hidden></p>
-        <div class="card table-wrap" id="report-results">
+        <div class="card table-wrap report-view-cards" id="report-results">
+          <div class="report-view-bar">
+            <div class="report-view-toggle" role="group" aria-label="Modo de visualização">
+              <button type="button" class="report-view-btn is-active" data-report-view="cards" aria-pressed="true">Fichas</button>
+              <button type="button" class="report-view-btn" data-report-view="table" aria-pressed="false">Tabela</button>
+            </div>
+          </div>
           <table class="data-table" id="report-table">
             <thead></thead>
             <tbody></tbody>
@@ -333,17 +382,40 @@
         <header class="dash-head">
           <div class="dash-head__main">
             <p class="dash-kicker">Recursos humanos</p>
-            <h2 tabindex="-1" id="tab-heading-hr">Gestão de PDI</h2>
-            <p class="dash-sub">Plano de Desenvolvimento Individual — acompanhamento contínuo da equipe</p>
+            <h2 tabindex="-1" id="tab-heading-hr">Gestão de pessoas</h2>
+            <p class="dash-sub">PDI, 1:1, integração, avaliação, talentos e bem-estar da equipe</p>
           </div>
-          <div class="dash-toolbar">
-            <div class="pdi-subtabs" role="tablist" aria-label="Visão RH">
-              <button type="button" class="btn btn-sm btn-secondary active" data-pdi-subview="gestor">Visão gestor</button>
-              <button type="button" class="btn btn-sm btn-secondary" data-pdi-subview="colaborador">Workspace colaborador</button>
-            </div>
-            <button type="button" id="pdi-refresh" class="btn btn-secondary btn-sm">Atualizar</button>
+          <div class="dash-toolbar pdi-toolbar">
+            <button type="button" id="pdi-refresh" class="btn btn-secondary btn-sm pdi-refresh" aria-label="Atualizar"><span class="pdi-refresh__icon" aria-hidden="true">↻</span><span class="lbl-long">Atualizar</span></button>
           </div>
         </header>
+        <nav class="rh-nav" aria-label="Seções de RH">
+          <div class="rh-nav__tabs" role="tablist">
+            <button type="button" class="rh-nav__btn active" role="tab" data-pdi-subview="gestor">Gestor</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="colaborador">Colaborador</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="one-on-one">1:1</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="onboarding">Integração</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="avaliacao">Avaliação</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="ninebox">9-Box</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="bemestar">Bem-estar</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="cargos">Cargos</button>
+            <button type="button" class="rh-nav__btn" role="tab" data-pdi-subview="trilhas">Trilhas</button>
+          </div>
+          <label class="rh-nav__select">
+            <span class="sr-only">Seção de RH</span>
+            <select id="rh-nav-select" aria-label="Seção de RH">
+              <option value="gestor">Visão gestor</option>
+              <option value="colaborador">Colaborador</option>
+              <option value="one-on-one">Reuniões 1:1</option>
+              <option value="onboarding">Integração 30/60/90</option>
+              <option value="avaliacao">Avaliação de desempenho</option>
+              <option value="ninebox">Matriz 9-Box</option>
+              <option value="bemestar">Bem-estar</option>
+              <option value="cargos">Cargos e CBO</option>
+              <option value="trilhas">Trilhas de aprendizagem</option>
+            </select>
+          </label>
+        </nav>
         <p id="pdi-loading" class="dash-loading" hidden><span class="dash-skeleton__block"></span> Carregando…</p>
         <p id="pdi-error" class="section-error" hidden role="alert"></p>
         <div id="pdi-view-gestor">
@@ -353,6 +425,42 @@
           <p class="pdi-muted pdi-colab-hint">Selecione um colaborador na visão gestor (botão Abrir) para ver o workspace de autodesenvolvimento.</p>
           <div id="pdi-colab-content"></div>
         </div>
+        <div id="rh-view-one-on-one" class="rh-view" hidden></div>
+        <div id="rh-view-onboarding" class="rh-view" hidden></div>
+        <div id="rh-view-avaliacao" class="rh-view" hidden></div>
+        <div id="rh-view-ninebox" class="rh-view" hidden></div>
+        <div id="rh-view-bemestar" class="rh-view" hidden></div>
+        <div id="rh-view-cargos" class="rh-view" hidden></div>
+        <div id="rh-view-trilhas" class="rh-view" hidden></div>
+        <section id="wk-card" class="card wk-card" aria-labelledby="wk-card-title">
+          <header class="wk-card__head">
+            <div class="wk-card__title">
+              <h3 id="wk-card-title" class="pdi-section-title">Treinos</h3>
+              <p id="wk-range" class="wk-range"></p>
+            </div>
+            <label class="wk-select">
+              <span class="sr-only">Período</span>
+              <select id="wk-period" aria-label="Período do ranking">
+                <option value="day">Hoje</option>
+                <option value="week">Esta semana</option>
+                <option value="month" selected>Este mês</option>
+                <option value="quarter">Este trimestre</option>
+                <option value="semester">Este semestre</option>
+                <option value="year">Este ano</option>
+                <option value="custom">Personalizado</option>
+                <option value="all">Todo período</option>
+              </select>
+            </label>
+          </header>
+          <div id="wk-kpis" class="wk-kpis" aria-live="polite"></div>
+          <form id="wk-custom" class="wk-custom" hidden>
+            <label><span>De</span><input type="date" name="from" required /></label>
+            <label><span>Até</span><input type="date" name="to" required /></label>
+            <button type="submit" class="btn btn-primary btn-sm">Aplicar</button>
+          </form>
+          <p id="wk-error" class="form-error" hidden role="alert"></p>
+          <div id="wk-ranking" class="wk-ranking" aria-live="polite"></div>
+        </section>
       </section>
 
       <section id="tab-parceiros" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-parceiros" hidden></section>
@@ -380,6 +488,27 @@
         <p id="telao-loading" class="dash-loading" hidden><span class="dash-skeleton__block"></span> Carregando…</p>
         <p id="telao-error" class="section-error" hidden role="alert"></p>
         <div id="telao-content"></div>
+      </section>
+
+      <section id="tab-configuracoes" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-configuracoes" hidden>
+        <header class="dash-head">
+          <div class="dash-head__main">
+            <p class="dash-kicker">Painel</p>
+            <h2 tabindex="-1" id="tab-heading-configuracoes">Configurações</h2>
+            <p class="dash-sub">Ajustes da plataforma</p>
+          </div>
+          <div class="dash-toolbar" id="cfg-acesso-actions">
+            <button type="button" id="eq-refresh" class="btn btn-secondary btn-sm">Atualizar</button>
+            <button type="button" id="eq-new" class="btn btn-primary btn-sm">Novo usuário</button>
+          </div>
+        </header>
+        <div class="pdi-subtabs" id="cfg-subtabs" role="tablist" aria-label="Seções de configurações">
+          <button type="button" class="btn btn-sm btn-secondary active" data-cfg-view="acesso" aria-selected="true">Configurações de acesso</button>
+        </div>
+        <div id="cfg-view-acesso">
+          <p id="eq-error" class="section-error" hidden role="alert"></p>
+          <div id="eq-content"></div>
+        </div>
       </section>
 
       <section id="tab-achados" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-achados" hidden>
@@ -460,6 +589,7 @@
         <button type="button" id="submission-delete-confirm-btn" class="btn btn-danger btn-sm">Confirmar exclusão</button>
       </div>
     </div>
+    <div id="submission-workout" class="submission-workout" hidden></div>
     <p id="submission-detail-error" class="form-error" hidden></p>
     <dl id="submission-detail-fields" class="submission-detail__fields"></dl>
   </div>
@@ -486,6 +616,13 @@
   </div>
 </div>
 
+<div id="eq-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="eq-modal-title">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box card eq-modal-box">
+    <div id="eq-modal-body"></div>
+  </div>
+</div>
+
 <div id="px-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="px-modal-title">
   <div class="modal-backdrop"></div>
   <div class="modal-box card pdi-modal-box">
@@ -499,5 +636,13 @@
 <script src="/admin-parceiros.js" defer></script>
 <script src="/admin-md5.js" defer></script>
 <script src="/admin-telao.js" defer></script>
+<script src="/admin-equipe.js" defer></script>
+<script src="/admin-rh-one-on-one.js" defer></script>
+<script src="/admin-rh-onboarding.js" defer></script>
+<script src="/admin-rh-avaliacao.js" defer></script>
+<script src="/admin-rh-ninebox.js" defer></script>
+<script src="/admin-rh-bemestar.js" defer></script>
+<script src="/admin-rh-cargos.js" defer></script>
+<script src="/admin-rh-trilhas.js" defer></script>
 </body>
 </html>

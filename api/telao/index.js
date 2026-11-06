@@ -6,12 +6,24 @@ export default async function handler(req, res) {
   const job = String(req.query?.job || '').toLowerCase();
   try {
     if (job === 'callback' || job === 'screenshot') {
+      const given = req.query?.token || req.headers['x-telao-token'];
+      console.log('telao callback recebido', JSON.stringify({
+        job,
+        method: req.method,
+        token: given ? `presente(${String(given).length})` : 'ausente',
+        esperado: String(process.env.TELAO_CALLBACK_TOKEN || '').length,
+        url: String(req.url || '').replace(/token=[^&]*/, 'token=***').replace(/\/(callback|screenshot)\/[^?]+/, '/$1/***').slice(0, 200),
+        agent: String(req.headers['user-agent'] || '').slice(0, 80),
+        type: String(req.headers['content-type'] || ''),
+        body: JSON.stringify(req.body ?? null).slice(0, 1500),
+      }));
       if (req.method !== 'POST') return json(res, 405, { error: 'Método não permitido.' });
       const result = await receiveCallback({
-        token: req.query?.token || req.headers['x-telao-token'],
+        token: given,
         kind: job === 'screenshot' ? 'screenshot' : 'program',
         body: req.body,
       });
+      if (result.unauthorized) console.warn('telao callback recusado: token inválido', job);
       if (result.unauthorized) return json(res, 401, { error: 'Token inválido.' });
       return json(res, 200, { ok: true });
     }

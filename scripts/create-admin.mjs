@@ -44,12 +44,16 @@ if (!url) {
 }
 
 const sql = neon(url);
+await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS modules TEXT`;
 const hash = await bcrypt.hash(password, 12);
 const normalized = email.trim().toLowerCase();
 
 const rows = await sql`
-  INSERT INTO admin_users (email, password_hash)
-  VALUES (${normalized}, ${hash})
+  INSERT INTO admin_users (email, password_hash, role, modules)
+  VALUES (
+    ${normalized}, ${hash}, 'super_admin',
+    'dashboard,reports,forms,hr,achados,parceiros,telao,equipe'
+  )
   ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash
   RETURNING id, email
 `;

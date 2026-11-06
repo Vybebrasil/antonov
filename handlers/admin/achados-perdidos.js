@@ -1,5 +1,5 @@
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
-import { requireAdmin } from '../../api/_lib/admin-auth.js';
+import { requireModule } from '../../api/_lib/parceiros-auth.js';
 import {
   ACHADOS_STATUS,
   parseFotoBody,
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     return res.end();
   }
 
-  const session = await requireAdmin(req, res);
+  const session = await requireModule(req, res, 'achados');
   if (!session) return;
 
   const parts = segments(req);

@@ -9,6 +9,94 @@ const pdiState = {
   mentores: null,
 };
 
+/* Registro de módulos de RH (arquivos admin-rh-*.js) */
+window.RH_MODULES = window.RH_MODULES || {};
+window.RH_GESTOR_WIDGETS = window.RH_GESTOR_WIDGETS || [];
+window.RH_COLAB_SECTIONS = window.RH_COLAB_SECTIONS || [];
+
+const RH_BUILTIN_VIEWS = ['gestor', 'colaborador'];
+
+/** Aba própria: def = { label, onOpen(container) } */
+function rhRegisterModule(name, def) {
+  window.RH_MODULES[name] = def;
+}
+
+/** Quadro na visão gestor: def = { id, order?, render(container, dashboard) } */
+function rhRegisterGestorWidget(def) {
+  window.RH_GESTOR_WIDGETS.push(def);
+}
+
+/** Bloco na ficha do colaborador: def = { id, order?, render(container, colaborador) } */
+function rhRegisterColabSection(def) {
+  window.RH_COLAB_SECTIONS.push(def);
+}
+
+async function rhApi(path, opts = {}) {
+  return api(`/rh${path}`, opts);
+}
+
+/** Colaboradores ativos (usa o cache do dashboard quando existir). */
+async function rhColaboradores({ refresh = false } = {}) {
+  if (!refresh && pdiState.dashboard?.colaboradores) return pdiState.dashboard.colaboradores;
+  const data = await pdiApi('/colaboradores');
+  return data.colaboradores || [];
+}
+
+function rhOpenModal(html) {
+  const modal = document.getElementById('pdi-modal');
+  const box = document.getElementById('pdi-modal-body');
+  if (!modal || !box) return null;
+  box.innerHTML = html;
+  modal.removeAttribute('hidden');
+  box.querySelectorAll('[data-rh-close]').forEach((btn) => btn.addEventListener('click', rhCloseModal));
+  return box;
+}
+
+function rhCloseModal() {
+  document.getElementById('pdi-modal')?.setAttribute('hidden', '');
+}
+
+function rhRunSlots(slots, makeHost, args) {
+  [...slots]
+    .sort((a, b) => (a.order ?? 100) - (b.order ?? 100))
+    .forEach((slot) => {
+      const host = makeHost(slot);
+      if (!host) return;
+      Promise.resolve()
+        .then(() => slot.render(host, ...args))
+        .catch((err) => {
+          console.error(`rh slot ${slot.id}`, err);
+          host.innerHTML = `<p class="form-error">${pdiEsc(err.message || 'Erro ao carregar.')}</p>`;
+        });
+    });
+}
+
+function rhRenderGestorWidgets(container, dashboard) {
+  if (!container) return;
+  container.innerHTML = '';
+  rhRunSlots(window.RH_GESTOR_WIDGETS, (slot) => {
+    const host = document.createElement('div');
+    host.className = 'rh-widget';
+    host.dataset.rhWidget = slot.id;
+    container.appendChild(host);
+    return host;
+  }, [dashboard]);
+}
+
+function rhRenderColabSections(container, colaborador) {
+  if (!container) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'rh-colab-sections';
+  container.appendChild(wrap);
+  rhRunSlots(window.RH_COLAB_SECTIONS, (slot) => {
+    const host = document.createElement('section');
+    host.className = 'rh-colab-section';
+    host.dataset.rhSection = slot.id;
+    wrap.appendChild(host);
+    return host;
+  }, [colaborador]);
+}
+
 const DIM_LABELS = {
   pratico_70: 'Prático (70%)',
   social_20: 'Social (20%)',
@@ -138,6 +226,9 @@ function render702010Bar(metricas) {
 
 function renderAlertas(metricas) {
   const alerts = [];
+  (metricas?.estrutura?.alertas || []).forEach((a) => alerts.push(a));
+  if (metricas?.capacidade?.alerta) alerts.push(metricas.capacidade.alerta);
+  if (metricas?.revisaoTrimestral?.message) alerts.push(metricas.revisaoTrimestral.message);
   if (metricas?.dist702010?.alerta) alerts.push(metricas.dist702010.alerta);
   if (metricas?.equilibrio?.alerta) alerts.push(metricas.equilibrio.alerta);
   if (metricas?.checkpoints?.message) alerts.push(metricas.checkpoints.message);
@@ -153,9 +244,140 @@ function renderMentorSelect(name, mentores, selected = '') {
     <label><span>Mentor</span>
       <select name="${name}">
         <option value="">Nenhum</option>
-        ${mentores.map((m) => `<option value="${m.id}" ${String(m.id) === String(selected) ? 'selected' : ''}>${pdiEsc(m.email)}</option>`).join('')}
+        ${mentores.map((m) => `<option value="${m.id}" ${String(m.id) === String(selected) ? 'selected' : ''}>${pdiEsc(pdiMentorLabel(m))}</option>`).join('')}
       </select>
     </label>`;
+}
+
+/* PDI estruturado (skill pdi-builder): aspiração, 3 objetivos SMART, mentor, revisão trimestral, KPIs */
+
+const PDI_TRIMESTRES = ['Q1', 'Q2', 'Q3', 'Q4'];
+const PDI_MAX_OBJETIVOS = 3;
+const PDI_SMART_CAMPOS = [
+  ['especifico', 'S · Específico', 'O que exatamente será desenvolvido?'],
+  ['mensuravel', 'M · Mensurável', 'Como saberemos que foi atingido?'],
+  ['atingivel', 'A · Atingível', 'Por que é viável com o tempo/recursos?'],
+  ['relevante', 'R · Relevante', 'Como se conecta à aspiração?'],
+];
+
+function pdiAttr(s) {
+  return pdiEsc(s).replace(/"/g, '&quot;');
+}
+
+function pdiMentorLabel(m) {
+  return m?.name ? `${m.name} (${m.email})` : String(m?.email || '');
+}
+
+function pdiCicloMentorSelect(mentores, selected = '') {
+  return `
+    <label><span>Mentor designado *</span>
+      <select name="ciclo_mentor_id" required>
+        <option value="">Selecione…</option>
+        ${mentores.map((m) => `<option value="${m.id}" ${String(m.id) === String(selected) ? 'selected' : ''}>${pdiEsc(pdiMentorLabel(m))}</option>`).join('')}
+      </select>
+    </label>`;
+}
+
+/** Espelho de evaluateCapacidade (api/_lib/pdi.js) para pré-visualização no formulário. */
+function pdiCapacidade(horas, totalObjetivos = 0) {
+  if (horas == null || horas === '' || Number.isNaN(Number(horas))) return { nivel: null, alerta: null, recomendacao: null };
+  const h = Number(horas);
+  if (h < 2) return { nivel: 'insuficiente', alerta: `Com ${h}h/mês o PDI não decola, prefira uma conversa de carreira.`, recomendacao: null };
+  if (h <= 8) {
+    return {
+      nivel: 'realista',
+      alerta: totalObjetivos > 2 ? `Com ${h}h/mês recomendamos até 2 objetivos. Este PDI tem ${totalObjetivos}: considere priorizar.` : null,
+      recomendacao: 'PDI realista: até 2 objetivos.',
+    };
+  }
+  if (h < 16) return { nivel: 'moderado', alerta: null, recomendacao: 'Até 3 objetivos; com 16h+/mês cabe também um projeto estruturador.' };
+  return { nivel: 'ambicioso', alerta: null, recomendacao: 'PDI ambicioso: 3 objetivos + projeto estruturador (experiência on-the-job).' };
+}
+
+function pdiRenderCapacidade(cap) {
+  if (!cap) return '';
+  return `${cap.alerta ? `<p class="pdi-alert">${pdiEsc(cap.alerta)}</p>` : ''}${cap.recomendacao ? `<p class="rh-pdi-hint">${pdiEsc(cap.recomendacao)}</p>` : ''}`;
+}
+
+function pdiObjFields(prefix, values = {}, { required = false } = {}) {
+  return `
+    <label><span>Título${required ? ' *' : ''}</span>
+      <input name="${prefix}titulo" value="${pdiAttr(values.titulo || '')}" ${required ? 'required' : ''} maxlength="300" placeholder="Ex.: Conduzir os rituais do squad" />
+    </label>
+    <div class="rh-pdi-smart-grid">
+      ${PDI_SMART_CAMPOS.map(([k, label, ph]) => `
+        <label><span>${label}</span><textarea name="${prefix}${k}" rows="2" placeholder="${pdiAttr(ph)}">${pdiEsc(values[k] || '')}</textarea></label>
+      `).join('')}
+    </div>
+    <label class="rh-pdi-trim-field"><span>T · Trimestre</span>
+      <select name="${prefix}trimestre">
+        <option value="">—</option>
+        ${PDI_TRIMESTRES.map((q) => `<option value="${q}" ${values.trimestre === q ? 'selected' : ''}>${q}</option>`).join('')}
+      </select>
+    </label>`;
+}
+
+function pdiCollectObjetivo(form, prefix) {
+  const get = (k) => form.elements[`${prefix}${k}`]?.value?.trim() || '';
+  const titulo = get('titulo');
+  if (!titulo) return null;
+  return {
+    titulo,
+    especifico: get('especifico'),
+    mensuravel: get('mensuravel'),
+    atingivel: get('atingivel'),
+    relevante: get('relevante'),
+    trimestre: get('trimestre') || null,
+  };
+}
+
+function pdiSmartList(o) {
+  const items = PDI_SMART_CAMPOS.filter(([k]) => o[k]).map(([k, label]) => `<li><strong>${label.split(' · ')[0]}</strong> ${pdiEsc(o[k])}</li>`);
+  return items.length ? `<ul class="rh-pdi-smart-list">${items.join('')}</ul>` : '';
+}
+
+function pdiObjStatusBadge(status) {
+  const cls = status === 'concluido' ? 'pdi-badge--ativo' : status === 'em_andamento' ? 'pdi-badge--pending' : 'pdi-badge--muted';
+  return `<span class="pdi-badge ${cls}">${STATUS_ACAO[status] || status}</span>`;
+}
+
+function pdiRenderRevisao(rt) {
+  if (!rt) return '';
+  const partes = [rt.ultima ? `última em ${pdiFmtDate(rt.ultima)}` : 'nenhuma registrada'];
+  if (rt.proxima) partes.push(`próxima até ${pdiFmtDate(rt.proxima)}`);
+  return `<p class="rh-pdi-rev ${rt.atrasada ? 'rh-pdi-rev--late' : ''}">
+    <span class="pdi-badge ${rt.atrasada ? 'pdi-badge--danger' : 'pdi-badge--ativo'}">${rt.atrasada ? 'Revisão trimestral atrasada' : 'Revisão trimestral em dia'}</span>
+    <span class="pdi-muted">${partes.join(' · ')}</span>
+  </p>`;
+}
+
+function pdiRenderTrimestral(metricas, mentorTxt) {
+  const trims = metricas?.trimestres || [];
+  if (!trims.length) return '';
+  return `
+    <div class="rh-pdi-trim">
+      <table class="data-table rh-pdi-trim-table">
+        <thead><tr><th>Trimestre</th><th>Foco</th><th>Mentor</th><th>Revisão</th></tr></thead>
+        <tbody>
+          ${trims.map((t) => {
+            const objs = t.objetivos.map((o) => `<li>${pdiEsc(o.titulo)} ${pdiObjStatusBadge(o.status)}</li>`).join('');
+            const foco = `${t.foco ? `<p class="rh-pdi-trim__foco">${pdiEsc(t.foco)}</p>` : ''}${objs ? `<ul class="rh-pdi-trim__objs">${objs}</ul>` : (t.foco ? '' : '<span class="pdi-muted">Sem objetivo neste trimestre</span>')}`;
+            return `<tr>
+              <td data-label="Trimestre"><strong>${t.trimestre}</strong></td>
+              <td data-label="Foco">${foco}</td>
+              <td data-label="Mentor">${pdiEsc(mentorTxt || '—')}</td>
+              <td data-label="Revisão">${t.revisao ? `<span class="pdi-badge pdi-badge--ativo">${pdiFmtDate(t.revisao)}</span>` : '<span class="pdi-muted">—</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function pdiRenderKpis(kpis) {
+  const list = pdiLines(kpis);
+  if (!list.length) return '<p class="pdi-muted">Nenhum KPI definido.</p>';
+  return `<ul class="rh-pdi-kpis">${list.map((k) => `<li>${pdiEsc(k)}</li>`).join('')}</ul>`;
 }
 
 function renderAcaoRowHtml(index, mentores, values = {}) {
@@ -169,9 +391,9 @@ function renderAcaoRowHtml(index, mentores, values = {}) {
         </select>
       </label>
       <label class="pdi-grow"><span>Ação</span>
-        <input name="acao_${index}" value="${pdiEsc(values.descricao || '')}" placeholder="Qual formato de aprendizado prefere?" />
+        <input name="acao_${index}" value="${pdiAttr(values.descricao || '')}" placeholder="Qual formato de aprendizado prefere?" />
       </label>
-      <label><span>Prazo</span><input type="date" name="prazo_${index}" value="${pdiEsc(values.prazo || '')}" /></label>
+      <label><span>Prazo</span><input type="date" name="prazo_${index}" value="${pdiAttr(values.prazo || '')}" /></label>
       <label><span>Investimento R$</span><input type="number" name="inv_${index}" min="0" step="0.01" value="${values.investimento ?? ''}" /></label>
       ${renderMentorSelect(`mentor_${index}`, mentores, values.mentor_id || '')}
       ${index > 0 ? `<button type="button" class="btn btn-ghost btn-sm pdi-remove-row" data-remove-row="${index}" title="Remover">×</button>` : ''}
@@ -213,14 +435,18 @@ function renderGestorDashboard(data) {
   const resumo = data.resumo || {};
   const el = document.getElementById('pdi-gestor-content');
   if (!el) return;
+  const workoutCard = document.getElementById('wk-card');
+  workoutCard?.remove();
 
   el.innerHTML = `
     <div class="pdi-stats">
       <article class="pdi-stat"><span class="pdi-stat__val">${resumo.totalColaboradores || 0}</span><span class="pdi-stat__lbl">Colaboradores</span></article>
       <article class="pdi-stat"><span class="pdi-stat__val">${resumo.pdisAtivos || 0}</span><span class="pdi-stat__lbl">PDIs ativos</span></article>
       <article class="pdi-stat pdi-stat--warn"><span class="pdi-stat__val">${resumo.alertas || 0}</span><span class="pdi-stat__lbl">Alertas</span></article>
+      <article class="pdi-stat ${resumo.revisoesAtrasadas ? 'pdi-stat--warn' : ''}"><span class="pdi-stat__val">${resumo.revisoesAtrasadas || 0}</span><span class="pdi-stat__lbl">Revisões trimestrais atrasadas</span></article>
       <article class="pdi-stat"><span class="pdi-stat__val">${pdiFmtMoney(resumo.budgetGasto)}</span><span class="pdi-stat__lbl">Investimento em PDIs</span></article>
     </div>
+    <div id="rh-gestor-widgets" class="rh-widgets"></div>
     <div class="pdi-toolbar">
       <button type="button" class="btn btn-primary btn-sm" id="pdi-new-colaborador">+ Colaborador</button>
       <button type="button" class="btn btn-secondary btn-sm" id="pdi-new-ciclo">+ Novo PDI</button>
@@ -244,14 +470,22 @@ function renderGestorDashboard(data) {
             const prog = ciclo?.progresso ?? 0;
             const alert = ciclo?.metricas?.acoesAtrasadas > 0
               || ciclo?.metricas?.checkpoints?.overdue
-              || ciclo?.metricas?.dist702010?.desbalanceado;
+              || ciclo?.metricas?.dist702010?.desbalanceado
+              || ciclo?.metricas?.revisaoTrimestral?.atrasada
+              || ciclo?.metricas?.capacidade?.alerta;
             return `<tr class="${alert ? 'pdi-row--alert' : ''}">
               <td><strong>${pdiEsc(c.nome)}</strong><br><small>${pdiEsc(c.email)}</small></td>
               <td>${pdiEsc(c.cargo_atual || '—')} → ${pdiEsc(c.cargo_almejado || '—')}</td>
               <td>${c.pdi_status_ativo ? `<span class="pdi-badge pdi-badge--ativo">Ativo</span>` : '<span class="pdi-muted">Sem PDI ativo</span>'}</td>
               <td><div class="pdi-progress"><span style="width:${prog}%"></span></div> ${prog}%</td>
               <td>${pdiFmtDate(c.ultimo_checkpoint)}</td>
-              <td><button type="button" class="btn btn-sm btn-secondary" data-pdi-open="${c.id}">Abrir</button></td>
+              <td>
+                <div class="pdi-row-actions">
+                  <button type="button" class="btn btn-sm btn-secondary" data-pdi-open="${c.id}">Abrir</button>
+                  <button type="button" class="btn btn-sm btn-ghost" data-pdi-edit="${c.id}">Editar</button>
+                  <button type="button" class="btn btn-sm btn-ghost pdi-btn-danger" data-pdi-delete="${c.id}">Excluir</button>
+                </div>
+              </td>
             </tr>`;
           }).join('') || '<tr><td colspan="6" class="empty-msg">Nenhum colaborador cadastrado.</td></tr>'}
         </tbody>
@@ -264,7 +498,11 @@ function renderGestorDashboard(data) {
             <h4>${pdiEsc(c.colaborador_nome)}</h4>
             <span class="pdi-badge">${pdiFmtDate(c.data_fim)}</span>
           </header>
-          <p class="pdi-smart">${pdiEsc(c.objetivo_principal_smart)}</p>
+          ${c.aspiracao_12m ? `<p class="rh-pdi-aspiracao"><span>Aspiração 12 meses</span>${pdiEsc(c.aspiracao_12m)}</p>` : ''}
+          ${(c.objetivos || []).length
+            ? `<ul class="rh-pdi-card-objs">${c.objetivos.map((o) => `<li>${o.trimestre ? `<span class="rh-pdi-q">${o.trimestre}</span>` : ''}${pdiEsc(o.titulo)} ${pdiObjStatusBadge(o.status)}</li>`).join('')}</ul>`
+            : `<p class="pdi-smart">${pdiEsc(c.objetivo_principal_smart)}</p>`}
+          ${pdiRenderRevisao(c.metricas?.revisaoTrimestral)}
           ${renderAlertas(c.metricas)}
           ${render702010Bar(c.metricas)}
           <p class="pdi-budget">Budget: ${pdiFmtMoney(c.metricas?.budget?.gasto)} / ${pdiFmtMoney(c.metricas?.budget?.limite)}</p>
@@ -273,10 +511,28 @@ function renderGestorDashboard(data) {
       `).join('')}
     </div>`;
 
+  if (workoutCard) {
+    const anchor = el.querySelector('.pdi-toolbar');
+    if (anchor) anchor.after(workoutCard);
+    else el.prepend(workoutCard);
+  }
+
+  rhRenderGestorWidgets(el.querySelector('#rh-gestor-widgets'), data);
+
   el.querySelector('#pdi-new-colaborador')?.addEventListener('click', () => openColaboradorForm());
   el.querySelector('#pdi-new-ciclo')?.addEventListener('click', () => openCocriacaoForm());
   el.querySelectorAll('[data-pdi-open]').forEach((btn) => {
     btn.addEventListener('click', () => openColaboradorWorkspace(btn.dataset.pdiOpen));
+  });
+  const findColaborador = (id) => (data.colaboradores || []).find((c) => String(c.id) === String(id));
+  el.querySelectorAll('[data-pdi-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const col = findColaborador(btn.dataset.pdiEdit);
+      if (col) openColaboradorForm(col);
+    });
+  });
+  el.querySelectorAll('[data-pdi-delete]').forEach((btn) => {
+    btn.addEventListener('click', () => deleteColaborador(findColaborador(btn.dataset.pdiDelete), btn));
   });
   el.querySelectorAll('[data-pdi-ciclo]').forEach((btn) => {
     btn.addEventListener('click', () => openCicloDetail(btn.dataset.pdiCiclo));
@@ -297,10 +553,15 @@ function renderColaboradorWorkspace(data) {
         <p><strong>Cargo atual:</strong> ${pdiEsc(c.cargo_atual || '—')}</p>
         <p><strong>Cargo almejado:</strong> ${pdiEsc(c.cargo_almejado || '—')}</p>
       </div>`;
+    rhRenderColabSections(el, c);
     return;
   }
 
   const m = ciclo.metricas;
+  const objetivos = ciclo.objetivos || [];
+  const cc = ciclo.ciclo;
+  const mentorTxt = cc.mentor_id ? pdiMentorLabel({ name: cc.mentor_nome, email: cc.mentor_email }) : '';
+  const temEstrutura = cc.aspiracao_12m || objetivos.length || pdiLines(cc.kpis).length || mentorTxt;
   el.innerHTML = `
     <div class="card pdi-workspace">
       <header class="pdi-workspace__head">
@@ -310,8 +571,22 @@ function renderColaboradorWorkspace(data) {
         </div>
         <span class="pdi-badge pdi-badge--ativo">${STATUS_CICLO[ciclo.ciclo.status] || ciclo.ciclo.status}</span>
       </header>
+      ${temEstrutura ? `
+      <section class="pdi-block rh-pdi-colab">
+        ${cc.aspiracao_12m ? `<p class="rh-pdi-aspiracao"><span>Aspiração em 12 meses</span>${pdiEsc(cc.aspiracao_12m)}</p>` : ''}
+        <p class="pdi-muted">${mentorTxt ? `Mentor: ${pdiEsc(mentorTxt)}` : 'Mentor ainda não designado'}${cc.horas_mes != null ? ` · ${cc.horas_mes}h/mês para desenvolvimento` : ''}</p>
+        ${pdiRenderRevisao(m.revisaoTrimestral)}
+        <h4>Objetivos SMART</h4>
+        ${objetivos.length ? `<div class="rh-pdi-obj-list">${objetivos.map((o, i) => `
+          <article class="rh-pdi-obj-card">
+            <header><strong>${i + 1}. ${pdiEsc(o.titulo)}</strong>${o.trimestre ? `<span class="rh-pdi-q">${o.trimestre}</span>` : ''}${pdiObjStatusBadge(o.status)}</header>
+            ${pdiSmartList(o)}
+          </article>`).join('')}</div>` : '<p class="pdi-muted">Nenhum objetivo SMART cadastrado.</p>'}
+        <h4>KPIs de progresso</h4>
+        ${pdiRenderKpis(cc.kpis)}
+      </section>` : ''}
       <section class="pdi-block">
-        <h4>Objetivo SMART</h4>
+        <h4>${objetivos.length ? 'Resumo do PDI' : 'Objetivo SMART'}</h4>
         <p class="pdi-smart">${pdiEsc(ciclo.ciclo.objetivo_principal_smart)}</p>
         <p class="pdi-muted">${pdiFmtDate(ciclo.ciclo.data_inicio)} → ${pdiFmtDate(ciclo.ciclo.data_fim)}</p>
         <div class="pdi-progress pdi-progress--lg"><span style="width:${m.progresso}%"></span></div>
@@ -349,6 +624,7 @@ function renderColaboradorWorkspace(data) {
           ${(ciclo.checkpoints || []).map((ch) => `
             <li>
               <strong>${pdiFmtDate(ch.data_reuniao)}</strong>
+              ${ch.tipo === 'trimestral' ? '<span class="pdi-badge pdi-badge--pending">Revisão trimestral</span>' : ''}
               ${ch.anotacoes_liderado ? `<p>${pdiEsc(ch.anotacoes_liderado)}</p>` : ''}
               ${ch.proximos_passos ? `<p class="pdi-muted">Próximos passos: ${pdiEsc(ch.proximos_passos)}</p>` : ''}
             </li>
@@ -356,6 +632,7 @@ function renderColaboradorWorkspace(data) {
         </ul>
       </section>
     </div>`;
+  rhRenderColabSections(el, c);
 
   el.querySelectorAll('[data-save-acao]').forEach((btn) => {
     btn.addEventListener('click', async () => {
@@ -382,6 +659,20 @@ function renderColaboradorWorkspace(data) {
   });
 }
 
+async function deleteColaborador(col, btn) {
+  if (!col) return;
+  const aviso = col.pdi_status_ativo ? '\n\nO PDI ativo dele será cancelado.' : '';
+  if (!confirm(`Excluir ${col.nome} da equipe do RH?${aviso}`)) return;
+  try {
+    if (btn) btn.disabled = true;
+    await pdiApi(`/colaboradores/${col.id}`, { method: 'DELETE' });
+    await loadPdiHr();
+  } catch (err) {
+    alert(err.message);
+    if (btn) btn.disabled = false;
+  }
+}
+
 function openColaboradorForm(existing = null) {
   const modal = document.getElementById('pdi-modal');
   const box = document.getElementById('pdi-modal-body');
@@ -389,10 +680,10 @@ function openColaboradorForm(existing = null) {
   box.innerHTML = `
     <h3>${existing ? 'Editar colaborador' : 'Novo colaborador'}</h3>
     <form id="pdi-colab-form" class="pdi-form">
-      <label><span>Nome</span><input name="nome" required value="${pdiEsc(existing?.nome || '')}" /></label>
-      <label><span>E-mail</span><input type="email" name="email" required value="${pdiEsc(existing?.email || '')}" /></label>
-      <label><span>Cargo atual</span><input name="cargo_atual" value="${pdiEsc(existing?.cargo_atual || '')}" /></label>
-      <label><span>Cargo almejado</span><input name="cargo_almejado" value="${pdiEsc(existing?.cargo_almejado || '')}" /></label>
+      <label><span>Nome</span><input name="nome" required value="${pdiAttr(existing?.nome || '')}" /></label>
+      <label><span>E-mail</span><input type="email" name="email" required value="${pdiAttr(existing?.email || '')}" /></label>
+      <label><span>Cargo atual</span><input name="cargo_atual" list="rh-cargos-list" autocomplete="off" value="${pdiAttr(existing?.cargo_atual || '')}" /></label>
+      <label><span>Cargo almejado</span><input name="cargo_almejado" list="rh-cargos-list" autocomplete="off" value="${pdiAttr(existing?.cargo_almejado || '')}" /></label>
       <label><span>Pontos fortes (um por linha)</span><textarea name="pontos_fortes" rows="3" placeholder="Comunicação, liderança, organização…">${pdiEsc((existing?.pontos_fortes || []).join('\n'))}</textarea></label>
       <label><span>Budget anual (R$)</span><input type="number" name="budget_anual" min="0" step="0.01" value="${existing?.budget_anual ?? 0}" /></label>
       <div class="modal-actions">
@@ -448,11 +739,30 @@ async function openCocriacaoForm(colaboradorId = null) {
         <label><span>Pontos fortes a potencializar (um por linha)</span>
           <textarea name="pontos_fortes" rows="2" placeholder="Quais habilidades você gostaria de priorizar?"></textarea>
         </label>
+        <label><span>Aspiração em 12 meses (papel + impacto) *</span>
+          <textarea name="aspiracao_12m" rows="2" required placeholder="Ex.: Ser tech lead do squad de pagamentos, reduzindo o lead time do time pela metade."></textarea>
+        </label>
+        <div class="rh-pdi-row">
+          <label><span>Horas por mês para desenvolvimento</span>
+            <input type="number" name="horas_mes" min="0" max="744" step="1" inputmode="numeric" placeholder="Ex.: 8" />
+          </label>
+          ${pdiCicloMentorSelect(mentores)}
+        </div>
+        <div id="rh-pdi-cap-preview" class="rh-pdi-cap" aria-live="polite"></div>
       </fieldset>
       <fieldset class="pdi-fieldset pdi-fieldset--estrategia">
         <legend>Bloco 2 · Estratégia</legend>
-        <label><span>Objetivo SMART principal</span>
-          <textarea name="objetivo_principal_smart" rows="3" required placeholder="Meta específica, mensurável, atingível, relevante e temporal…"></textarea>
+        <p class="rh-pdi-hint">Até ${PDI_MAX_OBJETIVOS} objetivos SMART alinhados à aspiração. Mais de ${PDI_MAX_OBJETIVOS} = nenhum entregue.</p>
+        ${[0, 1, 2].map((i) => `
+          <div class="rh-pdi-obj">
+            <p class="rh-pdi-obj__title">Objetivo ${i + 1}${i === 0 ? '' : ' <small>(opcional)</small>'}</p>
+            ${pdiObjFields(`obj${i}_`, {}, { required: i === 0 })}
+          </div>`).join('')}
+        <label><span>KPIs de progresso (um por linha)</span>
+          <textarea name="kpis" rows="3" placeholder="Ex.: Lead time do squad &lt; 3 dias&#10;NPS interno &gt; 8"></textarea>
+        </label>
+        <label><span>Resumo do PDI (opcional — se vazio, usa o título do 1º objetivo)</span>
+          <textarea name="objetivo_principal_smart" rows="2" placeholder="Frase-resumo do plano"></textarea>
         </label>
         <div class="field-row">
           <label><span>Início</span><input type="date" name="data_inicio" required /></label>
@@ -482,6 +792,14 @@ async function openCocriacaoForm(colaboradorId = null) {
 
   bind702010Preview(form, () => collectAcoesFromForm(form, acaoRows));
 
+  const collectObjetivos = () => [0, 1, 2].map((i) => pdiCollectObjetivo(form, `obj${i}_`)).filter(Boolean);
+  const capPreview = box.querySelector('#rh-pdi-cap-preview');
+  const updateCap = () => {
+    if (capPreview) capPreview.innerHTML = pdiRenderCapacidade(pdiCapacidade(form.horas_mes.value, collectObjetivos().length));
+  };
+  form?.addEventListener('input', updateCap);
+  updateCap();
+
   box.querySelector('#pdi-add-acao-row')?.addEventListener('click', () => {
     const wrap = box.querySelector('#pdi-acoes-builder');
     const i = acaoRows++;
@@ -500,20 +818,32 @@ async function openCocriacaoForm(colaboradorId = null) {
     if (eval702010.desbalanceado && !confirm(`${eval702010.alerta}\n\nDeseja criar o PDI mesmo assim?`)) {
       return;
     }
+    const objetivos = collectObjetivos();
+    if (!objetivos.length) {
+      alert('Informe ao menos um objetivo SMART.');
+      return;
+    }
+    const cap = pdiCapacidade(f.horas_mes.value, objetivos.length);
+    if (cap.alerta && !confirm(`${cap.alerta}\n\nDeseja criar o PDI mesmo assim?`)) return;
     const colId = f.colaborador_id.value;
     const pontos = pdiReadLines('pontos_fortes');
-    if (pontos.length) {
-      await pdiApi(`/colaboradores/${colId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ pontos_fortes: pontos }),
-      });
-    }
     try {
+      if (pontos.length) {
+        await pdiApi(`/colaboradores/${colId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ pontos_fortes: pontos }),
+        });
+      }
       await pdiApi('/ciclos', {
         method: 'POST',
         body: JSON.stringify({
           colaborador_id: colId,
           objetivo_principal_smart: f.objetivo_principal_smart.value.trim(),
+          aspiracao_12m: f.aspiracao_12m.value.trim(),
+          horas_mes: f.horas_mes.value,
+          mentor_id: f.ciclo_mentor_id.value,
+          kpis: pdiLines(f.kpis.value),
+          objetivos,
           data_inicio: f.data_inicio.value,
           data_fim: f.data_fim.value,
           gaps_tecnicos: pdiReadLines('gaps_tecnicos'),
@@ -555,7 +885,7 @@ function renderCicloAcaoItem(a, mentores) {
               <option value="formal_10" ${a.dimensao_70_20_10 === 'formal_10' ? 'selected' : ''}>Formal 10%</option>
             </select>
           </label>
-          <label class="pdi-grow"><span>Ação</span><input name="desc" value="${pdiEsc(a.acao_descricao)}" required /></label>
+          <label class="pdi-grow"><span>Ação</span><input name="desc" value="${pdiAttr(a.acao_descricao)}" required /></label>
           <label><span>Prazo</span><input type="date" name="prazo" value="${String(a.prazo_limite || '').slice(0, 10)}" /></label>
           <label><span>Investimento R$</span><input type="number" name="inv" min="0" step="0.01" value="${a.investimento_estimado ?? 0}" /></label>
           ${renderMentorSelect('mentor', mentores, a.mentor_id || '')}
@@ -581,10 +911,101 @@ async function openCicloDetail(cicloId) {
   pdiState.cicloId = cicloId;
   if (!modal || !box) return;
 
+  const cc = full.ciclo;
+  const objetivos = full.objetivos || [];
+  const mentorTxt = cc.mentor_id ? pdiMentorLabel({ name: cc.mentor_nome, email: cc.mentor_email }) : '';
+  const cap = full.metricas.capacidade || {};
+
   box.innerHTML = `
-    <h3>PDI · ${pdiEsc(full.ciclo.colaborador_nome)}</h3>
-    <p class="pdi-smart">${pdiEsc(full.ciclo.objetivo_principal_smart)}</p>
+    <h3>PDI · ${pdiEsc(cc.colaborador_nome)}</h3>
+    <p class="pdi-muted">${pdiEsc(cc.cargo_atual || '—')} → ${pdiEsc(cc.cargo_almejado || '—')} · ${pdiFmtDate(cc.data_inicio)} a ${pdiFmtDate(cc.data_fim)} · ${STATUS_CICLO[cc.status] || cc.status}</p>
+    <p class="pdi-smart">${pdiEsc(cc.objetivo_principal_smart)}</p>
     ${renderAlertas(full.metricas)}
+
+    <section class="pdi-block rh-pdi-estrutura">
+      <div class="rh-pdi-block-head">
+        <h4>Aspiração em 12 meses</h4>
+        <button type="button" class="btn btn-sm btn-ghost" id="rh-pdi-edit-estrutura">Editar estrutura</button>
+      </div>
+      <div id="rh-pdi-estrutura-view">
+        ${cc.aspiracao_12m ? `<p class="rh-pdi-aspiracao">${pdiEsc(cc.aspiracao_12m)}</p>` : '<p class="pdi-muted">Aspiração não definida.</p>'}
+        <dl class="rh-pdi-meta">
+          <div><dt>Mentor</dt><dd>${mentorTxt ? pdiEsc(mentorTxt) : '<span class="pdi-muted">Não designado</span>'}</dd></div>
+          <div><dt>Horas/mês</dt><dd>${cc.horas_mes != null ? `${cc.horas_mes}h` : '<span class="pdi-muted">—</span>'}</dd></div>
+          <div><dt>Objetivos</dt><dd>${objetivos.length}/${PDI_MAX_OBJETIVOS}</dd></div>
+        </dl>
+        ${cap.recomendacao ? `<p class="rh-pdi-hint">${pdiEsc(cap.recomendacao)}</p>` : ''}
+        <h4>KPIs de progresso</h4>
+        ${pdiRenderKpis(cc.kpis)}
+      </div>
+      <form id="rh-pdi-estrutura-form" class="pdi-form" hidden>
+        <label><span>Aspiração em 12 meses (papel + impacto) *</span>
+          <textarea name="aspiracao_12m" rows="2" required>${pdiEsc(cc.aspiracao_12m || '')}</textarea>
+        </label>
+        <div class="rh-pdi-row">
+          <label><span>Horas por mês para desenvolvimento</span>
+            <input type="number" name="horas_mes" min="0" max="744" step="1" inputmode="numeric" value="${cc.horas_mes ?? ''}" />
+          </label>
+          ${pdiCicloMentorSelect(mentores, cc.mentor_id || '')}
+        </div>
+        <div id="rh-pdi-cap-edit" class="rh-pdi-cap" aria-live="polite"></div>
+        <label><span>KPIs de progresso (um por linha)</span>
+          <textarea name="kpis" rows="3">${pdiEsc(pdiLines(cc.kpis).join('\n'))}</textarea>
+        </label>
+        <label><span>Resumo do PDI</span>
+          <textarea name="objetivo_principal_smart" rows="2" required>${pdiEsc(cc.objetivo_principal_smart || '')}</textarea>
+        </label>
+        <div class="pdi-acao-manage__actions">
+          <button type="submit" class="btn btn-sm btn-primary">Salvar estrutura</button>
+          <button type="button" class="btn btn-sm btn-ghost" id="rh-pdi-cancel-estrutura">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="pdi-block">
+      <h4>Objetivos SMART (${objetivos.length}/${PDI_MAX_OBJETIVOS})</h4>
+      <div class="rh-pdi-obj-list">
+        ${objetivos.map((o, i) => `
+          <article class="rh-pdi-obj-card" data-obj-id="${o.id}">
+            <div class="rh-pdi-obj-card__view">
+              <header><strong>${i + 1}. ${pdiEsc(o.titulo)}</strong>${o.trimestre ? `<span class="rh-pdi-q">${o.trimestre}</span>` : ''}</header>
+              ${pdiSmartList(o)}
+              <div class="rh-pdi-obj-card__actions">
+                <label class="rh-pdi-inline"><span>Status</span>
+                  <select data-obj-status="${o.id}">
+                    ${Object.entries(STATUS_ACAO).map(([k, v]) => `<option value="${k}" ${o.status === k ? 'selected' : ''}>${v}</option>`).join('')}
+                  </select>
+                </label>
+                <button type="button" class="btn btn-sm btn-secondary" data-obj-edit="${o.id}">Editar</button>
+                <button type="button" class="btn btn-sm btn-ghost pdi-btn-danger" data-obj-delete="${o.id}">Remover</button>
+              </div>
+            </div>
+            <form class="pdi-form rh-pdi-obj-form" data-obj-form="${o.id}" hidden>
+              ${pdiObjFields('', o, { required: true })}
+              <div class="pdi-acao-manage__actions">
+                <button type="submit" class="btn btn-sm btn-primary">Salvar</button>
+                <button type="button" class="btn btn-sm btn-ghost" data-obj-cancel="${o.id}">Cancelar</button>
+              </div>
+            </form>
+          </article>`).join('') || '<p class="pdi-muted">Nenhum objetivo SMART cadastrado. Ciclos antigos podem receber até 3 objetivos aqui.</p>'}
+      </div>
+      ${objetivos.length < PDI_MAX_OBJETIVOS ? `
+        <form id="rh-pdi-add-obj-form" class="pdi-form pdi-fieldset rh-pdi-obj">
+          <p class="rh-pdi-obj__title">Adicionar objetivo SMART</p>
+          ${pdiObjFields('nobj_', {}, { required: true })}
+          <button type="submit" class="btn btn-secondary btn-sm">+ Adicionar objetivo</button>
+        </form>` : `<p class="rh-pdi-hint">Limite de ${PDI_MAX_OBJETIVOS} objetivos atingido. Foco é desejável: conclua ou remova um para adicionar outro.</p>`}
+    </section>
+
+    <section class="pdi-block">
+      <div class="rh-pdi-block-head">
+        <h4>Checkpoints trimestrais</h4>
+        <button type="button" class="btn btn-sm btn-primary" id="rh-pdi-registrar-trimestral">Registrar revisão trimestral</button>
+      </div>
+      ${pdiRenderRevisao(full.metricas.revisaoTrimestral)}
+      ${pdiRenderTrimestral(full.metricas, mentorTxt)}
+    </section>
+
     ${render702010Bar(full.metricas)}
     <p class="pdi-budget">Budget: ${pdiFmtMoney(full.metricas.budget.gasto)} / ${pdiFmtMoney(full.metricas.budget.limite)}</p>
 
@@ -613,9 +1034,30 @@ async function openCicloDetail(cicloId) {
       <button type="submit" class="btn btn-secondary btn-sm">+ Adicionar ação</button>
     </form>
 
+    <section class="pdi-block">
+      <h4>Histórico de checkpoints</h4>
+      <ul class="pdi-checkpoints">
+        ${(full.checkpoints || []).map((ch) => `
+          <li>
+            <strong>${pdiFmtDate(ch.data_reuniao)}</strong>
+            ${ch.tipo === 'trimestral' ? '<span class="pdi-badge pdi-badge--pending">Revisão trimestral</span>' : '<span class="pdi-badge pdi-badge--muted">1:1</span>'}
+            ${ch.anotacoes_lider ? `<p>${pdiEsc(ch.anotacoes_lider)}</p>` : ''}
+            ${ch.proximos_passos ? `<p class="pdi-muted">Próximos passos: ${pdiEsc(ch.proximos_passos)}</p>` : ''}
+          </li>`).join('') || '<li class="pdi-muted">Nenhum checkpoint registrado.</li>'}
+      </ul>
+    </section>
+
     <form id="pdi-checkpoint-form" class="pdi-form">
-      <h4>Registrar checkpoint (1:1)</h4>
-      <label><span>Data</span><input type="date" name="data_reuniao" required /></label>
+      <h4>Registrar checkpoint</h4>
+      <div class="rh-pdi-row">
+        <label><span>Tipo</span>
+          <select name="tipo">
+            <option value="checkpoint">Checkpoint 1:1</option>
+            <option value="trimestral">Revisão trimestral (com mentor)</option>
+          </select>
+        </label>
+        <label><span>Data</span><input type="date" name="data_reuniao" required /></label>
+      </div>
       <label><span>Anotações do líder</span><textarea name="anotacoes_lider" rows="2"></textarea></label>
       <label><span>Anotações do liderado</span><textarea name="anotacoes_liderado" rows="2"></textarea></label>
       <label><span>Próximos passos</span><textarea name="proximos_passos" rows="2"></textarea></label>
@@ -632,6 +1074,125 @@ async function openCicloDetail(cicloId) {
 
   modal.removeAttribute('hidden');
   box.querySelector('#pdi-modal-close')?.addEventListener('click', () => modal.setAttribute('hidden', ''));
+
+  const refreshDetail = async () => {
+    await openCicloDetail(cicloId);
+    await loadPdiHr();
+  };
+
+  const estruturaView = box.querySelector('#rh-pdi-estrutura-view');
+  const estruturaForm = box.querySelector('#rh-pdi-estrutura-form');
+  const capEdit = box.querySelector('#rh-pdi-cap-edit');
+  const updateCapEdit = () => {
+    if (capEdit && estruturaForm) capEdit.innerHTML = pdiRenderCapacidade(pdiCapacidade(estruturaForm.horas_mes.value, objetivos.length));
+  };
+  estruturaForm?.addEventListener('input', updateCapEdit);
+  box.querySelector('#rh-pdi-edit-estrutura')?.addEventListener('click', () => {
+    estruturaView?.setAttribute('hidden', '');
+    estruturaForm?.removeAttribute('hidden');
+    updateCapEdit();
+  });
+  box.querySelector('#rh-pdi-cancel-estrutura')?.addEventListener('click', () => {
+    estruturaForm?.setAttribute('hidden', '');
+    estruturaView?.removeAttribute('hidden');
+  });
+  estruturaForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    try {
+      await pdiApi(`/ciclos/${cicloId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          aspiracao_12m: f.aspiracao_12m.value.trim(),
+          horas_mes: f.horas_mes.value,
+          mentor_id: f.ciclo_mentor_id.value,
+          kpis: pdiLines(f.kpis.value),
+          objetivo_principal_smart: f.objetivo_principal_smart.value.trim(),
+        }),
+      });
+      await refreshDetail();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  box.querySelectorAll('[data-obj-status]').forEach((sel) => {
+    sel.addEventListener('change', async () => {
+      try {
+        sel.disabled = true;
+        await pdiApi(`/objetivos/${sel.dataset.objStatus}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status: sel.value }),
+        });
+        await refreshDetail();
+      } catch (err) {
+        alert(err.message);
+        sel.disabled = false;
+      }
+    });
+  });
+
+  const toggleObjEdit = (id, editing) => {
+    const item = box.querySelector(`[data-obj-id="${id}"]`);
+    item?.querySelector('.rh-pdi-obj-card__view')?.toggleAttribute('hidden', editing);
+    item?.querySelector(`[data-obj-form="${id}"]`)?.toggleAttribute('hidden', !editing);
+  };
+  box.querySelectorAll('[data-obj-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => toggleObjEdit(btn.dataset.objEdit, true));
+  });
+  box.querySelectorAll('[data-obj-cancel]').forEach((btn) => {
+    btn.addEventListener('click', () => toggleObjEdit(btn.dataset.objCancel, false));
+  });
+  box.querySelectorAll('[data-obj-form]').forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const obj = pdiCollectObjetivo(form, '');
+      if (!obj) return;
+      try {
+        await pdiApi(`/objetivos/${form.dataset.objForm}`, { method: 'PATCH', body: JSON.stringify(obj) });
+        await refreshDetail();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  });
+  box.querySelectorAll('[data-obj-delete]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Remover este objetivo SMART do PDI?')) return;
+      try {
+        await pdiApi(`/objetivos/${btn.dataset.objDelete}`, { method: 'DELETE' });
+        await refreshDetail();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  });
+
+  box.querySelector('#rh-pdi-add-obj-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const obj = pdiCollectObjetivo(e.target, 'nobj_');
+    if (!obj) return;
+    const capAdd = pdiCapacidade(cc.horas_mes, objetivos.length + 1);
+    if (capAdd.alerta && !confirm(`${capAdd.alerta}\n\nAdicionar mesmo assim?`)) return;
+    try {
+      await pdiApi(`/ciclos/${cicloId}/objetivos`, { method: 'POST', body: JSON.stringify(obj) });
+      await refreshDetail();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  box.querySelector('#rh-pdi-registrar-trimestral')?.addEventListener('click', () => {
+    const f = box.querySelector('#pdi-checkpoint-form');
+    if (!f) return;
+    f.tipo.value = 'trimestral';
+    if (!f.data_reuniao.value) {
+      const d = new Date();
+      f.data_reuniao.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+    f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    f.anotacoes_lider?.focus({ preventScroll: true });
+  });
 
   box.querySelector('#pdi-delete-ciclo')?.addEventListener('click', async () => {
     const nome = full.ciclo.colaborador_nome;
@@ -730,14 +1291,14 @@ async function openCicloDetail(cicloId) {
       await pdiApi(`/ciclos/${cicloId}/checkpoints`, {
         method: 'POST',
         body: JSON.stringify({
+          tipo: f.tipo.value,
           data_reuniao: f.data_reuniao.value,
           anotacoes_lider: f.anotacoes_lider.value,
           anotacoes_liderado: f.anotacoes_liderado.value,
           proximos_passos: f.proximos_passos.value,
         }),
       });
-      modal.setAttribute('hidden', '');
-      await loadPdiHr();
+      await refreshDetail();
     } catch (err) {
       alert(err.message);
     }
@@ -746,14 +1307,54 @@ async function openCicloDetail(cicloId) {
 
 async function openColaboradorWorkspace(id) {
   pdiState.colaboradorId = id;
-  pdiState.view = 'colaborador';
-  document.getElementById('pdi-view-gestor')?.setAttribute('hidden', '');
-  document.getElementById('pdi-view-colaborador')?.removeAttribute('hidden');
-  document.querySelectorAll('[data-pdi-subview]').forEach((b) => {
-    b.classList.toggle('active', b.dataset.pdiSubview === 'colaborador');
-  });
+  rhShowView('colaborador');
   const data = await pdiApi(`/colaboradores/${id}`);
   renderColaboradorWorkspace(data);
+}
+
+function rhViewContainer(view) {
+  if (view === 'gestor') return document.getElementById('pdi-view-gestor');
+  if (view === 'colaborador') return document.getElementById('pdi-view-colaborador');
+  return document.getElementById(`rh-view-${view}`);
+}
+
+/** Mostra a seção pedida e esconde as outras (não carrega dados). */
+function rhShowView(view) {
+  pdiState.view = view;
+  const all = [...RH_BUILTIN_VIEWS, ...Object.keys(window.RH_MODULES)];
+  all.forEach((v) => rhViewContainer(v)?.toggleAttribute('hidden', v !== view));
+  document.querySelectorAll('[data-pdi-subview]').forEach((b) => {
+    const on = b.dataset.pdiSubview === view;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+    if (on) b.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  });
+  const select = document.getElementById('rh-nav-select');
+  if (select && select.value !== view) select.value = view;
+}
+
+async function rhOpenModuleView(view) {
+  const mod = window.RH_MODULES[view];
+  const container = rhViewContainer(view);
+  if (!mod || !container) return;
+  try {
+    await mod.onOpen(container);
+  } catch (err) {
+    container.innerHTML = `<p class="section-error">${pdiEsc(err.message || 'Erro ao carregar.')}</p>`;
+  }
+}
+
+/** Troca de seção pela navegação. */
+async function rhGoTo(view) {
+  rhShowView(view);
+  if (view === 'gestor') {
+    renderGestorDashboard(pdiState.dashboard || { colaboradores: [], ciclosAtivos: [], resumo: {} });
+    if (!pdiState.dashboard) loadPdiHr();
+  } else if (view === 'colaborador') {
+    if (pdiState.colaboradorId) await openColaboradorWorkspace(pdiState.colaboradorId);
+  } else {
+    await rhOpenModuleView(view);
+  }
 }
 
 async function loadPdiHr() {
@@ -765,8 +1366,10 @@ async function loadPdiHr() {
     pdiState.dashboard = await pdiApi('');
     if (pdiState.view === 'gestor') {
       renderGestorDashboard(pdiState.dashboard);
-    } else if (pdiState.colaboradorId) {
+    } else if (pdiState.view === 'colaborador' && pdiState.colaboradorId) {
       await openColaboradorWorkspace(pdiState.colaboradorId);
+    } else if (window.RH_MODULES[pdiState.view]) {
+      await rhOpenModuleView(pdiState.view);
     }
   } catch (err) {
     if (errEl) {
@@ -780,17 +1383,9 @@ async function loadPdiHr() {
 
 function initPdiAdmin() {
   document.querySelectorAll('[data-pdi-subview]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const view = btn.dataset.pdiSubview;
-      pdiState.view = view;
-      document.querySelectorAll('[data-pdi-subview]').forEach((b) => b.classList.toggle('active', b === btn));
-      if (view === 'gestor') {
-        document.getElementById('pdi-view-gestor')?.removeAttribute('hidden');
-        document.getElementById('pdi-view-colaborador')?.setAttribute('hidden', '');
-        renderGestorDashboard(pdiState.dashboard || { colaboradores: [], ciclosAtivos: [], resumo: {} });
-      }
-    });
+    btn.addEventListener('click', () => rhGoTo(btn.dataset.pdiSubview));
   });
+  document.getElementById('rh-nav-select')?.addEventListener('change', (e) => rhGoTo(e.target.value));
   document.getElementById('pdi-refresh')?.addEventListener('click', () => loadPdiHr());
   document.getElementById('pdi-modal')?.querySelector('.modal-backdrop')?.addEventListener('click', () => {
     document.getElementById('pdi-modal')?.setAttribute('hidden', '');

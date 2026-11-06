@@ -1,6 +1,7 @@
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
 import { loginUser, signToken, setAuthCookie } from '../../api/_lib/admin-auth.js';
 import { ensureAppSchema, ensureIfNeeded, isMissingColumn } from '../../api/_lib/ensure-schema.js';
+import { ensureAccessShape } from '../../api/_lib/parceiros-auth.js';
 import { checkRateLimit, clientIp } from '../../api/_lib/rate-limit.js';
 
 export default async function handler(req, res) {
@@ -25,6 +26,7 @@ export default async function handler(req, res) {
     }
 
     await ensureIfNeeded();
+    await ensureAccessShape();
     let user;
     try {
       user = await loginUser(body.email, body.password);

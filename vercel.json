@@ -35,6 +35,10 @@
       "destination": "/api/partners/sitemap"
     },
     {
+      "source": "/api/telao/:job/:token",
+      "destination": "/api/telao?job=:job&token=:token"
+    },
+    {
       "source": "/api/telao/:job",
       "destination": "/api/telao?job=:job"
     }
@@ -43,14 +47,6 @@
     {
       "path": "/api/partners/jobs/tick",
       "schedule": "15 6 * * *"
-    },
-    {
-      "path": "/api/telao/tick",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/telao/daily",
-      "schedule": "5 3 * * *"
     }
   ],
   "redirects": [

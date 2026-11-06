@@ -3345,8 +3345,7 @@ function renderPxShell() {
             ['campaigns', 'Campanhas'],
             ['analytics', 'Analytics'],
             ['finance', 'Financeiro'],
-            ['users', 'Usuários'],
-          ].filter(([v]) => v !== 'users' || pxState.role === 'super_admin').map(([v, label]) => `
+          ].map(([v, label]) => `
             <button type="button" class="btn btn-sm btn-secondary${v === pxState.view ? ' active' : ''}" data-px-view="${v}">${label}</button>`).join('')}
         </div>
         <button type="button" id="px-refresh" class="btn btn-secondary btn-sm">Atualizar</button>

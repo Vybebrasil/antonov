@@ -1,5 +1,7 @@
 import { json, adminCors, parseBody } from '../../api/_lib/admin-http.js';
-import { requireAdmin, RESERVED_SLUGS } from '../../api/_lib/admin-auth.js';
+import { RESERVED_SLUGS } from '../../api/_lib/admin-auth.js';
+import { requireAnyModule, requireModule } from '../../api/_lib/parceiros-auth.js';
+import { canAccessReportForm, hasModule } from '../../api/_lib/access.js';
 import { listForms, slugify } from '../../api/_lib/forms.js';
 import { getSql } from '../../api/_lib/db.js';
 
@@ -10,7 +12,9 @@ export default async function handler(req, res) {
     return res.end();
   }
 
-  const session = await requireAdmin(req, res);
+  const session = req.method === 'GET'
+    ? await requireAnyModule(req, res, ['forms', 'dashboard', 'reports'])
+    : await requireModule(req, res, 'forms');
   if (!session) return;
 
   const sql = getSql();
@@ -18,7 +22,10 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       const includeArchived = req.query?.archived === '1';
-      const forms = await listForms(includeArchived);
+      let forms = await listForms(includeArchived);
+      if (!hasModule(session, 'forms') && !hasModule(session, 'dashboard')) {
+        forms = forms.filter((item) => canAccessReportForm(session, item.id));
+      }
       return json(res, 200, { forms });
     } catch (err) {
       console.error('forms list', err);

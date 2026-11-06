@@ -247,72 +247,50 @@ export async function getFormFields(formId) {
   return rows.map(mapFormFieldRow);
 }
 
-export async function countLegacySubmissions(table, from, to, search) {
+export const TURNOS = ['matutino', 'vespertino', 'noturno'];
+
+export function parseTurno(value) {
+  const t = String(value || '').trim().toLowerCase();
+  return TURNOS.includes(t) ? t : '';
+}
+
+export function findTurnoField(fields) {
+  const field = (fields || []).find((f) => /turno/i.test(f.field_key) || /turno/i.test(f.label || ''));
+  return field && /^[a-z0-9_]+$/i.test(field.field_key) ? field.field_key : null;
+}
+
+const LEGACY_TURNO_PATTERNS = {
+  leads_tour: {
+    matutino: ['Manhã%'],
+    vespertino: ['Tarde%'],
+    noturno: ['Início da noite%', 'Noite%'],
+  },
+};
+
+function dynamicTurnoClause(turno, turnoField) {
+  if (!turno) return '';
+  if (!turnoField) return ' AND FALSE';
+  return ` AND (payload->>'${turnoField}') ILIKE '%${turno}%'`;
+}
+
+function legacyTurnoClause(table, turno) {
+  if (!turno) return '';
+  const patterns = LEGACY_TURNO_PATTERNS[table]?.[turno];
+  if (!patterns) return ' AND FALSE';
+  return ` AND (${patterns.map((p) => `melhor_turno ILIKE '${p}'`).join(' OR ')})`;
+}
+
+export async function countLegacySubmissions(table, from, to, search, turno = '') {
   if (!LEGACY_TABLES[table]) return 0;
   const sql = getSql();
-
+  const params = [from, to];
+  let where = `created_at >= $1 AND created_at <= $2${legacyTurnoClause(table, turno)}`;
   if (search) {
-    if (table === 'leads_tour') {
-      const r = await sql`
-        SELECT COUNT(*)::int AS n FROM leads_tour
-        WHERE created_at >= ${from} AND created_at <= ${to}
-        AND (
-          LOWER(nome) LIKE ${`%${search.toLowerCase()}%`}
-          OR LOWER(email) LIKE ${`%${search.toLowerCase()}%`}
-          OR LOWER(telefone) LIKE ${`%${search.toLowerCase()}%`}
-        )
-      `;
-      return r[0]?.n || 0;
-    }
-    if (table === 'leads_curriculos') {
-      const r = await sql`
-        SELECT COUNT(*)::int AS n FROM leads_curriculos
-        WHERE created_at >= ${from} AND created_at <= ${to}
-        AND (
-          LOWER(nome) LIKE ${`%${search.toLowerCase()}%`}
-          OR LOWER(email) LIKE ${`%${search.toLowerCase()}%`}
-          OR LOWER(telefone) LIKE ${`%${search.toLowerCase()}%`}
-        )
-      `;
-      return r[0]?.n || 0;
-    }
-    if (table === 'leads_pre_matricula') {
-      const r = await sql`
-        SELECT COUNT(*)::int AS n FROM leads_pre_matricula
-        WHERE created_at >= ${from} AND created_at <= ${to}
-        AND (
-          LOWER(nome) LIKE ${`%${search.toLowerCase()}%`}
-          OR LOWER(email) LIKE ${`%${search.toLowerCase()}%`}
-          OR LOWER(telefone) LIKE ${`%${search.toLowerCase()}%`}
-        )
-      `;
-      return r[0]?.n || 0;
-    }
-    return 0;
+    params.push(`%${search.toLowerCase()}%`);
+    where += ' AND (LOWER(nome) LIKE $3 OR LOWER(email) LIKE $3 OR LOWER(telefone) LIKE $3)';
   }
-
-  if (table === 'leads_tour') {
-    const r = await sql`
-      SELECT COUNT(*)::int AS n FROM leads_tour
-      WHERE created_at >= ${from} AND created_at <= ${to}
-    `;
-    return r[0]?.n || 0;
-  }
-  if (table === 'leads_curriculos') {
-    const r = await sql`
-      SELECT COUNT(*)::int AS n FROM leads_curriculos
-      WHERE created_at >= ${from} AND created_at <= ${to}
-    `;
-    return r[0]?.n || 0;
-  }
-  if (table === 'leads_pre_matricula') {
-    const r = await sql`
-      SELECT COUNT(*)::int AS n FROM leads_pre_matricula
-      WHERE created_at >= ${from} AND created_at <= ${to}
-    `;
-    return r[0]?.n || 0;
-  }
-  return 0;
+  const r = await sql(`SELECT COUNT(*)::int AS n FROM ${table} WHERE ${where}`, params);
+  return r[0]?.n || 0;
 }
 
 const LEGACY_TABLE_SELECT = {
@@ -344,18 +322,19 @@ function buildDynamicOrderBy(sort, order, columns) {
 
 export async function fetchLegacySubmissions(
   table,
-  { from, to, search, limit, offset, sort = 'created_at', order = 'desc' },
+  { from, to, search, turno = '', limit, offset, sort = 'created_at', order = 'desc' },
 ) {
   if (!LEGACY_TABLES[table] || !LEGACY_TABLE_SELECT[table]) return [];
   const sql = getSql();
   const cols = LEGACY_TABLE_SELECT[table];
   const orderBy = buildLegacyOrderBy(table, sort, order);
+  const turnoSql = legacyTurnoClause(table, turno);
 
   if (search) {
     const s = `%${search.toLowerCase()}%`;
     return sql(
       `SELECT ${cols} FROM ${table}
-       WHERE created_at >= $1 AND created_at <= $2
+       WHERE created_at >= $1 AND created_at <= $2${turnoSql}
        AND (LOWER(nome) LIKE $3 OR LOWER(email) LIKE $3 OR LOWER(telefone) LIKE $3)
        ORDER BY ${orderBy} LIMIT $4 OFFSET $5`,
       [from, to, s, limit, offset],
@@ -364,7 +343,7 @@ export async function fetchLegacySubmissions(
 
   return sql(
     `SELECT ${cols} FROM ${table}
-     WHERE created_at >= $1 AND created_at <= $2
+     WHERE created_at >= $1 AND created_at <= $2${turnoSql}
      ORDER BY ${orderBy} LIMIT $3 OFFSET $4`,
     [from, to, limit, offset],
   );
@@ -383,39 +362,32 @@ export function normalizeLegacyRow(row, table) {
   };
 }
 
-export async function countDynamicSubmissions(formId, from, to, search) {
+export async function countDynamicSubmissions(formId, from, to, search, turno = '', turnoField = null) {
   const sql = getSql();
+  const params = [formId, from, to];
+  let where = `form_id = $1 AND created_at >= $2 AND created_at <= $3${dynamicTurnoClause(turno, turnoField)}`;
   if (search) {
-    const s = `%${search.toLowerCase()}%`;
-    const rows = await sql`
-      SELECT COUNT(*)::int AS n FROM form_submissions
-      WHERE form_id = ${formId}
-      AND created_at >= ${from} AND created_at <= ${to}
-      AND payload::text ILIKE ${s}
-    `;
-    return rows[0]?.n || 0;
+    params.push(`%${search.toLowerCase()}%`);
+    where += ' AND payload::text ILIKE $4';
   }
-  const rows = await sql`
-    SELECT COUNT(*)::int AS n FROM form_submissions
-    WHERE form_id = ${formId}
-    AND created_at >= ${from} AND created_at <= ${to}
-  `;
+  const rows = await sql(`SELECT COUNT(*)::int AS n FROM form_submissions WHERE ${where}`, params);
   return rows[0]?.n || 0;
 }
 
 export async function fetchDynamicSubmissions(
   formId,
-  { from, to, search, limit, offset, sort = 'created_at', order = 'desc', columns = [] },
+  { from, to, search, turno = '', turnoField = null, limit, offset, sort = 'created_at', order = 'desc', columns = [] },
 ) {
   const sql = getSql();
   const orderBy = buildDynamicOrderBy(sort, order, columns);
+  const turnoSql = dynamicTurnoClause(turno, turnoField);
 
   if (search) {
     const s = `%${search.toLowerCase()}%`;
     return sql(
       `SELECT id, payload, page, created_at
        FROM form_submissions
-       WHERE form_id = $1 AND created_at >= $2 AND created_at <= $3
+       WHERE form_id = $1 AND created_at >= $2 AND created_at <= $3${turnoSql}
        AND payload::text ILIKE $4
        ORDER BY ${orderBy} LIMIT $5 OFFSET $6`,
       [formId, from, to, s, limit, offset],
@@ -425,7 +397,7 @@ export async function fetchDynamicSubmissions(
   return sql(
     `SELECT id, payload, page, created_at
      FROM form_submissions
-     WHERE form_id = $1 AND created_at >= $2 AND created_at <= $3
+     WHERE form_id = $1 AND created_at >= $2 AND created_at <= $3${turnoSql}
      ORDER BY ${orderBy} LIMIT $4 OFFSET $5`,
     [formId, from, to, limit, offset],
   );

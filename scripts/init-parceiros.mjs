@@ -26,6 +26,8 @@ export async function ensureParceirosSchema(sql) {
   await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS role TEXT`;
   await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS partner_id BIGINT`;
   await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ`;
+  await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS modules TEXT`;
+  await sql`ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS report_forms TEXT`;
   await sql`UPDATE admin_users SET role = 'super_admin' WHERE role IS NULL OR role = ''`;
   await sql`ALTER TABLE admin_users ALTER COLUMN role SET DEFAULT 'admin_antonov'`;
   await sql`

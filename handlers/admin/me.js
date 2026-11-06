@@ -15,9 +15,13 @@ export default async function handler(req, res) {
   if (!session) return json(res, 401, { error: 'Não autenticado.' });
   return json(res, 200, {
     ok: true,
+    userId: session.userId,
     email: session.email,
     name: session.name,
     role: session.role,
     partnerId: session.partnerId,
+    modules: session.modules || [],
+    reportForms: session.reportForms ?? null,
+    mustChangePassword: Boolean(session.mustChangePassword),
   });
 }

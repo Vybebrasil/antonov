@@ -1,5 +1,5 @@
 import { json, adminCors } from '../../api/_lib/admin-http.js';
-import { requireAdmin } from '../../api/_lib/admin-auth.js';
+import { denyUnlessReportForm, requireAnyModule } from '../../api/_lib/parceiros-auth.js';
 import {
   getFormById,
   deleteDynamicSubmission,
@@ -17,8 +17,11 @@ export default async function handler(req, res) {
     return json(res, 405, { error: 'Método não permitido.' });
   }
 
-  const session = await requireAdmin(req, res);
+  const session = await requireAnyModule(req, res, ['forms', 'reports']);
   if (!session) return;
+  if (session.role !== 'super_admin') {
+    return json(res, 403, { error: 'Somente administradores podem excluir respostas.' });
+  }
 
   const formId = Number(req.query?.id);
   const submissionId = Number(req.query?.submissionId);
@@ -26,6 +29,7 @@ export default async function handler(req, res) {
 
   const form = await getFormById(formId);
   if (!form) return json(res, 404, { error: 'Formulário não encontrado.' });
+  if (denyUnlessReportForm(res, session, formId)) return;
 
   try {
     let deleted = false;
