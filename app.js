@@ -63,7 +63,7 @@
     if (e.key === 'Escape' && nav?.classList.contains('is-open')) closeNav();
   });
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 880 && nav?.classList.contains('is-open')) closeNav();
+    if (window.innerWidth > 1100 && nav?.classList.contains('is-open')) closeNav();
   });
 
   // ---------- page transition (covering -> hovering -> takeoff) ----------

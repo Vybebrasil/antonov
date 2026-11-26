@@ -439,7 +439,8 @@ section { position: relative; }
 
 body.nav-open { overflow: hidden; }
 
-@media (max-width: 880px) {
+/* menu completo só cabe a partir de ~1100px (6 links + CTA) */
+@media (max-width: 1100px) {
   .nav__inner {
     gap: 10px;
   }
@@ -449,6 +450,7 @@ body.nav-open { overflow: hidden; }
     height: 32px;
   }
   .nav__links { display: none; }
+  .nav__cta { margin-left: auto; }
   .nav__actions { display: none; }
   .nav__drawer-stores { display: flex; }
   .nav__burger {
@@ -458,7 +460,7 @@ body.nav-open { overflow: hidden; }
   }
 }
 
-@media (min-width: 881px) {
+@media (min-width: 1101px) {
   .nav__backdrop,
   .nav__drawer { display: none; }
 }
